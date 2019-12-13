@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+{% for keypair in keypairs[:chain_node_num] %}
+  bft_node{{ keypair.index }}:
+    container_name: bft_node{{ keypair.index }}
+    image: nervos/muta:dev
+    hostname: bft_node{{ keypair.index }}
+    environment:
+      - RUST_LOG
+      - RUST_BACKTRACE
+    volumes:
+      - {{ muta_path }}:/app
+      - ./configs/{{ keypair.index }}.toml:/app/devtools/chain/config.toml
+      - {{ chain_dir }}/data/{{ keypair.index }}:/data
+      - {{ chain_dir }}/logs/{{ keypair.index }}:/logs
+      - {{ muta_path }}/target/release/muta-chain-{{ muta_version }}:/app/muta-chain
+    networks:
+      chaos:
+        aliases:
+          - bft_node{{ keypair.index }}
+        ipv4_address: {{ keypair.ip_address }}
+    command: |
+      sh -c '
+      cd /app;
+      ./muta-chain;'
+{% endfor %}
+
+networks:
+  chaos:
+    ipam:
+     config:
+       - subnet: {{ subnet }}

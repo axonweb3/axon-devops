@@ -1,0 +1,58 @@
+# chain id
+chain_id = "b6a4d7da21443f5e816e8700eea87610e6d769657d6b8ec73028457bf2ca4036"  # by sha256(Muta)
+
+# crypto
+privkey = "{{ item.private_key }}"
+
+# db config
+data_path = "/data"
+
+[graphql]
+listening_address = "0.0.0.0:8000"
+graphql_uri = "/graphql"
+graphiql_uri = "/graphiql"
+
+[network]
+listening_address = "0.0.0.0:1337"
+
+{% for bootstraps in keypairs[:bootstraps_num] %}
+{% if bootstraps.index != item.index %}
+[[network.bootstraps]]
+pubkey = "{{ bootstraps.public_key }}"
+address = "{{ bootstraps.ip_address }}:1337"
+
+{% endif %}
+{% endfor %}
+
+[mempool]
+timeout_gap = 200
+pool_size = 20000
+
+[consensus]
+cycles_limit = 99999999
+cycles_price = 1
+interval = 3000
+verifier_list = [
+{% for k in keypairs[:chain_node_num] %}
+    "{{ k.address }}",
+{% endfor %}
+]
+
+[consensus.duration]
+propose_numerator = 24
+propose_denominator = 30
+prevote_numerator = 6
+prevote_denominator = 30
+precommit_numerator = 6
+precommit_denominator = 30
+
+[executor]
+light = false
+
+[logger]
+filter = "info"
+log_to_console = false
+console_show_file_and_line = false
+log_path = "/logs"
+log_to_file = true
+metrics = true
