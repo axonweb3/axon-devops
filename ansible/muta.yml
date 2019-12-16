@@ -1,8 +1,8 @@
 ---
 - name: muta multi nodes chain
-  hosts: vagrant
+  hosts: nas_local
   vars:
-    devops_path: ~/muta-devops
+    devops_path: ~/tmp/muta-devops
     muta_path: "{{ devops_path }}/muta"
     configs_path: "{{ devops_path }}/configs"
     data_dir: "{{ devops_path }}/chain-data"
@@ -10,15 +10,14 @@
     # muta_version: d6333091959da6ab0a12630282f6ea783d509319
     muta_version: 7c04ff3  # 有 metrics log 的版本
     muta_repo: https://github.com/huwenchao/muta.git
-    chain_node_num: 5
+    chain_node_num: 4
     bootstraps_num: "{{ chain_node_num }}"
-    force_recreate: false
+    force_recreate: true
   vars_files:
     - chain_meta.json
-  environment:
-    http_proxy: http://10.0.2.2:7890
-    https_proxy: http://10.0.2.2:7890
-    all_proxy: socks5://10.0.2.2:7891
+  # environment:
+  #   http_proxy: http://127.0.0.1:7890
+  #   https_proxy: http://127.0.0.1:7890
   tasks:
     - name: install necessary packages
       block:
@@ -28,6 +27,7 @@
               - docker.io
               - git
               - python-pip
+              - python-apt
             update_cache: yes
         - name: install docker-compose
           get_url:
@@ -117,16 +117,6 @@
             - kibana.yml
             - fluent-bit-muta-parser.conf
             - fluent-bit-muta-docker.conf
-        - name: start elasticsearch
-          docker_container:
-            name: elasticsearch
-            image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
-            network_mode: host
-            volumes:
-              - "{{ configs_path }}/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
-              - "{{ devops_path }}/es-data:/usr/share/elasticsearch/data"
-            env:
-              discovery.type: single-node
         - name: start elasticsearch
           docker_container:
             name: elasticsearch
