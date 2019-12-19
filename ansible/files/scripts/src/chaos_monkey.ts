@@ -1,5 +1,5 @@
 import { DOCKER_COMPOSE_CONFIG, logger, logAndNotify } from "./utils";
-const shell = require("shelljs");
+import { exec } from "child_process";
 const uuidv1 = require("uuid/v1");
 
 const TARGETS = Object.entries(DOCKER_COMPOSE_CONFIG.services).map(
@@ -82,16 +82,18 @@ async function runAction(action: Action) {
   }
   const action_id = uuidv1();
   logger.info({ name: "chaos_action_start", cmd, action, action_id });
-  let action_res = shell.exec(cmd);
-  if (action_res.code !== 0) {
-    logAndNotify(
-      "chaos_action_fail",
-      { action_id, action, cmd, action_res },
-      "error"
-    );
-  } else {
-    logAndNotify("chaos_action_success", { action_id, action, cmd });
-  }
+
+  exec(cmd, (error, stdout, stderr) => {
+    if (error) {
+      logAndNotify(
+        "chaos_action_fail",
+        { action_id, action, cmd, stdout, stderr },
+        "error"
+      );
+    } else {
+      logAndNotify("chaos_action_success", { action_id, action, cmd });
+    }
+  });
 }
 
 export async function randomChaos() {
