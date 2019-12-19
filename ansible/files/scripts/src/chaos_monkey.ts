@@ -54,7 +54,7 @@ function genRandomAction() {
   } else if (action === "net_delay") {
     params["time"] = randomInt(1000, 3000);
   }
-  let duration = "10s";
+  let duration = "1m";
   let target = choose(TARGETS);
   let result = {
     action,

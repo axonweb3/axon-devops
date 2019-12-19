@@ -7,18 +7,13 @@
     muta_path: "{{ devops_path }}/muta"
     configs_path: "{{ devops_path }}/configs"
     data_dir: "{{ devops_path }}/chain-data"
-    # muta_version: master
-    # muta_version: d6333091959da6ab0a12630282f6ea783d509319
     muta_version: eb73210
     muta_repo: https://github.com/KaoImin/muta.git
     chain_node_num: 4
     bootstraps_num: "{{ chain_node_num }}"
-    force_recreate: true
+    force_recreate: false
   vars_files:
     - chain_meta.json
-  # environment:
-  #   http_proxy: http://127.0.0.1:7890
-  #   https_proxy: http://127.0.0.1:7890
   tasks:
     - name: install necessary packages
       block:
@@ -38,7 +33,6 @@
         - pip:
             name:
               - docker
-              # - docker-compose
       become: yes
       when: ansible_facts['distribution'] == "Ubuntu"
     - debug:
