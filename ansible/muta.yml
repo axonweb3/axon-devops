@@ -1,15 +1,16 @@
 ---
 - name: muta multi nodes chain
-  hosts: nas_local
+  hosts: muta-dev
+  user: muta
   vars:
-    devops_path: ~/tmp/muta-devops
+    devops_path: "/home/muta/muta-devops"
     muta_path: "{{ devops_path }}/muta"
     configs_path: "{{ devops_path }}/configs"
     data_dir: "{{ devops_path }}/chain-data"
     # muta_version: master
     # muta_version: d6333091959da6ab0a12630282f6ea783d509319
-    muta_version: 7c04ff3  # 有 metrics log 的版本
-    muta_repo: https://github.com/huwenchao/muta.git
+    muta_version: eb73210
+    muta_repo: https://github.com/KaoImin/muta.git
     chain_node_num: 4
     bootstraps_num: "{{ chain_node_num }}"
     force_recreate: true
@@ -35,8 +36,10 @@
             dest: /usr/local/bin/docker-compose
             mode: 0755
         - pip:
-            name: docker
-      become: true
+            name:
+              - docker
+              # - docker-compose
+      become: yes
       when: ansible_facts['distribution'] == "Ubuntu"
     - debug:
         msg: Please install docker, git, and docker-compose yourself.
@@ -51,10 +54,17 @@
         - "{{ devops_path }}/es-data"
         - "{{ devops_path }}/kibana-data"
         - "{{ devops_path }}/fluent-bit-data"
+    - name: copy scripts
+      synchronize:
+        src: "scripts/"
+        dest: "{{ devops_path}}/scripts/"
+        rsync_opts:
+          - "--exclude=node_modules/"
     - name: Start service docker, if not started
       service:
         name: docker
         state: started
+      become: yes
     - name: "ensure muta repo exists, and version is '{{ muta_version }}'"
       git:
         repo: "{{ muta_repo }}"
@@ -65,7 +75,6 @@
         name: nervos/muta
         tag: dev
         source: pull
-      become: true
     - name: build muta binary
       command: "docker run -it --rm --name build-muta-{{ muta_version }} -v {{ muta_path }}:/code -v {{ muta_path }}/target/cargo_cache:/usr/local/cargo/registry nervos/muta:dev bash -c 'cd /code && cargo build --release && cp target/release/muta-chain target/release/muta-chain-{{ muta_version }}'"
       args:
@@ -95,10 +104,16 @@
         src: templates/config.toml.j2
         dest: "{{ chain_dir }}/configs/{{ item.index }}.toml"
       loop: "{{ keypairs[:chain_node_num] | list }}"
+    - name: check if current exists
+      stat:
+        path: "{{ data_dir }}/current"
+      register: current_result
+    - debug: var=current_result
     - name: teardown running chain
       docker_compose:
         project_src: "{{ data_dir }}/current"
         state: absent
+      when: current_result['stat']['exists']
     - name: create 'current' link to latest chain_dir
       file:
         src: "{{ chain_dir }}"

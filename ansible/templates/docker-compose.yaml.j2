@@ -1,6 +1,28 @@
 version: '2'
 
 services:
+  scripts:
+    container_name: scripts
+    image: node
+    hostname: scripts
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - {{ devops_path }}:/devops
+      - {{ chain_dir }}:/chain
+      - {{ devops_path }}/scripts:/app
+    networks:
+      chaos:
+        aliases:
+          - scripts
+        ipv4_address: 174.20.0.100
+    command: |
+      sh -c '
+      cd /app;
+      cp bin/pumba_linux_amd64 /usr/local/bin/pumba;
+      chmod +x /usr/local/bin/pumba;
+      npm install && npm start;
+      '
+
 {% for keypair in keypairs[:chain_node_num] %}
   bft_node{{ keypair.index }}:
     container_name: bft_node{{ keypair.index }}
