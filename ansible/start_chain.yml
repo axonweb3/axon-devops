@@ -1,0 +1,64 @@
+---
+- name: start chain and scripts
+  hosts: muta-dev
+  user: muta
+  vars:
+    devops_path: "/home/muta/muta-devops"
+    muta_path: "{{ devops_path }}/muta"
+    configs_path: "{{ devops_path }}/configs"
+    data_dir: "{{ devops_path }}/chain-data"
+    muta_version: eb73210
+    muta_repo: https://github.com/KaoImin/muta.git
+    chain_node_num: 4
+    bootstraps_num: "{{ chain_node_num }}"
+    force_recreate: true
+  vars_files:
+    - chain_meta.json
+  tasks:
+    - name: "ensure muta repo exists, and version is '{{ muta_version }}'"
+      git:
+        repo: "{{ muta_repo }}"
+        dest: "{{ muta_path }}"
+        version: "{{ muta_version }}"
+    - name: build muta binary
+      command: "docker run -it --rm --name build-muta-{{ muta_version }} -v {{ muta_path }}:/code -v {{ muta_path }}/target/cargo_cache:/usr/local/cargo/registry nervos/muta:dev bash -c 'cd /code && cargo build --release && cp target/release/muta-chain target/release/muta-chain-{{ muta_version }}'"
+      args:
+        chdir: "{{ muta_path }}"
+        creates: "target/release/muta-chain-{{ muta_version }}"
+    - command:
+        cmd: ./get_chain_name.py -c {{ muta_version }} -n {{ chain_node_num }} {{ force_recreate and '-f' or '' }}
+        chdir: "{{ data_dir }}"
+      register: chain_name
+    - set_fact: chain_dir="{{ data_dir }}/{{ chain_name.stdout }}"
+    - debug: var=chain_dir
+    - file: path="{{ chain_dir }}{{ item }}" state=directory
+      with_items:
+        - /
+        - /data
+        - /logs
+        - /configs
+    - template:
+        src: templates/docker-compose.yaml.j2
+        dest: "{{ chain_dir }}/docker-compose.yaml"
+    - template:
+        src: templates/config.toml.j2
+        dest: "{{ chain_dir }}/configs/{{ item.index }}.toml"
+      loop: "{{ keypairs[:chain_node_num] | list }}"
+    - name: check if current exists
+      stat:
+        path: "{{ data_dir }}/current"
+      register: current_result
+    - debug: var=current_result
+    - name: teardown running chain
+      docker_compose:
+        project_src: "{{ data_dir }}/current"
+        state: absent
+      when: current_result['stat']['exists']
+    - name: create 'current' link to latest chain_dir
+      file:
+        src: "{{ chain_dir }}"
+        dest: "{{ data_dir }}/current"
+        state: link
+    - name: ensure chain is up
+      docker_compose:
+        project_src: "{{ data_dir }}/current"

@@ -1,0 +1,21 @@
+---
+- name: init chain server
+  hosts: muta-dev
+  become: yes
+  tasks:
+    - name: install docker, git and pip
+      apt:
+        name:
+          - docker.io
+          - git
+          - python-pip
+          - python-apt
+        update_cache: yes
+    - name: install docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.25.0/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: 0755
+    - pip:
+        name:
+          - docker
