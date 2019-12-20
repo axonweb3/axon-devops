@@ -9,7 +9,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - {{ devops_path }}:/devops
       - {{ chain_dir }}:/chain
-      - {{ devops_path }}/scripts:/app
+      - {{ devops_path }}/devops/ansible/scripts:/app
     networks:
       chaos:
         aliases:

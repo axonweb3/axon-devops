@@ -1,19 +1,17 @@
 ---
 - name: start chain and scripts
-  hosts: muta-dev
+  hosts: "{{ vhost | default('muta-dev') }}"
   user: muta
   vars:
-    devops_path: "/home/muta/muta-devops"
-    muta_path: "{{ devops_path }}/muta"
-    configs_path: "{{ devops_path }}/configs"
-    data_dir: "{{ devops_path }}/chain-data"
+    ansible_python_interpreter: /usr/bin/python3
     muta_version: eb73210
     muta_repo: https://github.com/KaoImin/muta.git
     chain_node_num: 4
     bootstraps_num: "{{ chain_node_num }}"
-    force_recreate: true
+    force_recreate: false
   vars_files:
-    - chain_meta.json
+    - vars/path.yml
+    - vars/chain_meta.json
   tasks:
     - name: "ensure muta repo exists, and version is '{{ muta_version }}'"
       git:

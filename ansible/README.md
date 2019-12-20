@@ -15,10 +15,18 @@ Features:
 1. Prepare a machine with ubuntu 18. It can be a virtual machine, a physical machine or an ecs as long as you can ssh into it with user `muta`. We refer it as monitor machine below.
 2. Install ansible in your machine.
 3. Modify your ssh config or the hosts file `muta-dev` line with necessary information, make sure you can get success with `make test` command.
-4. Modify the `.env.example` to `.env`, and edit the content with your telegram bot token and group chat id, you can get notification when the chain stops or the chaos monkey
-5. Run `make` and you will get the chain and monitor platform.
+4. Modify the `.env.example` to `.env`, and edit the content with your telegram bot token and group chat id, you can get notification when the chain stops or the chaos monkey.
+5. Run `make` and you will get the chain and monitor platform running on the server.
 
 
 - The chain runs in docker with ip `174.20.0.101` ~ `174.20.0.254`. The default node number is 4. You can change it in `muta.yml` vars.
 - The `elasticsearch` runs on `4001` port. Use command `curl "127.0.0.1:4001/_cat/indices?v"` to test on your monitor machine.
 - The `kibana` runs on `4002` port. Visit `127.0.0.1:4002` to interact with it.
+
+## Recreate chain with CI on server
+
+```
+# login to your chain machine
+$ cd {devops-path}/devops/ansible
+$ ansible-playbook start_chain.yml -e '{"vhost": "localhost", "muta_version": "xxx"}'
+```

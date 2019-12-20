@@ -1,7 +1,7 @@
 ---
 - name: create muta user
   hosts: muta-dev
-  become: yes
+  become: true
   tasks:
     - name: create muta user
       user:

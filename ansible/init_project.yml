@@ -3,10 +3,9 @@
   hosts: muta-dev
   user: muta
   vars:
-    devops_path: "/home/muta/muta-devops"
-    muta_path: "{{ devops_path }}/muta"
-    configs_path: "{{ devops_path }}/configs"
-    data_dir: "{{ devops_path }}/chain-data"
+    ansible_python_interpreter: /usr/bin/python3
+  vars_files:
+    - vars/path.yml
   tasks:
     - name: ensure dirs created
       file: path="{{ item }}" state=directory
@@ -18,17 +17,20 @@
         - "{{ devops_path }}/es-data"
         - "{{ devops_path }}/kibana-data"
         - "{{ devops_path }}/fluent-bit-data"
-    - name: copy scripts
+    - name: copy devops repo for ci
       synchronize:
-        src: "scripts/"
-        dest: "{{ devops_path}}/scripts/"
+        src: "{{ playbook_dir }}"
+        dest: "{{ devops_path }}/devops/"
         rsync_opts:
-          - "--exclude=node_modules/"
+          - "--exclude=*/node_modules"
+          - "--exclude=*/.git"
+          - "--exclude=*/.vagrant"
+          - "--exclude=*/.ansible_fact_cache"
     - name: Start service docker, if not started
       service:
         name: docker
         state: started
-      become: yes
+      become: true
     - name: ensure 'nervos/muta:dev' docker image exists
       docker_image:
         name: nervos/muta
