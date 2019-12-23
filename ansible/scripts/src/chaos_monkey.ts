@@ -1,10 +1,13 @@
-import { DOCKER_COMPOSE_CONFIG, logger, logAndNotify } from "./utils";
+import { DOCKER_COMPOSE_CONFIG, logger, log } from "./utils";
 import { exec } from "child_process";
 const uuidv1 = require("uuid/v1");
 
 const TARGETS = Object.entries(DOCKER_COMPOSE_CONFIG.services)
   .filter(entry => entry[0] !== "scripts")
-  .map(entry => entry[1]["container_name"]);
+  .map(entry => {
+    const value = entry[1] as Object;
+    return value["container_name"];
+  });
 
 /**
  * - duration: e.g. '30s', unit can be 'ms/s/m/h'
@@ -85,13 +88,14 @@ async function runAction(action: Action) {
 
   exec(cmd, (error, stdout, stderr) => {
     if (error) {
-      logAndNotify(
+      log(
         "chaos_action_fail",
         { action_id, action, cmd, stdout, stderr },
-        "error"
+        "error",
+        true
       );
     } else {
-      logAndNotify("chaos_action_success", { action_id, action, cmd });
+      log("chaos_action_success", { action_id, action, cmd });
     }
   });
 }

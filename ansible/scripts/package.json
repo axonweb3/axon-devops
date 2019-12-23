@@ -5,10 +5,11 @@
   "author": "huwenchao",
   "license": "MIT",
   "scripts": {
+    "build": "tsc -p tsconfig.json",
     "start": "yarn run ts-node src/main.ts",
     "test": "jest --color",
     "lint": "eslint --fix '{src,test}/**/*.{js,ts}'",
-    "prettier": "prettier --write **/*.{js,ts,graphql}"
+    "prettier": "prettier --write src/**/*.{js,ts,graphql}"
   },
   "dependencies": {
     "@types/dotenv": "^8.2.0",

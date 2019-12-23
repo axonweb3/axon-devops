@@ -1,4 +1,4 @@
-import { CHAIN_ID, logger, URLS, logAndNotify } from "./utils";
+import { CHAIN_ID, logger, URLS, log } from "./utils";
 import { Muta } from "muta-sdk";
 
 let latest_epoch_id = 0;
@@ -22,7 +22,7 @@ export async function monitor() {
   const current_epoch_id = Math.max(...current_epoch_ids);
   if (current_epoch_id <= latest_epoch_id) {
     const context = { latest_epoch_id, current_epoch_ids };
-    logAndNotify("chain_stops", context, "error");
+    log("chain_stops", context, "error", true);
   } else {
     latest_epoch_id = current_epoch_id;
   }

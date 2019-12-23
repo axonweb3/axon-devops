@@ -52,7 +52,10 @@ export const DOCKER_COMPOSE_CONFIG = yaml.safeLoad(
 
 export const URLS = Object.entries(DOCKER_COMPOSE_CONFIG.services)
   .filter(entry => entry[0] !== "scripts")
-  .map(entry => entry[1]["networks"]["chaos"]["ipv4_address"])
+  .map(entry => {
+    const value = entry[1] as Object;
+    return value["networks"]["chaos"]["ipv4_address"];
+  })
   .map(ip => `http://${ip}:8000/graphql`);
 
 const winston = require("winston");
@@ -72,7 +75,7 @@ export const logger = winston.createLogger({
 
 import * as request from "request-promise-native";
 export const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
-export const CHAT_ID = parseInt(process.env.CHAT_ID);
+export const CHAT_ID = parseInt(process.env.CHAT_ID || "0");
 export const sendMessageToTelegram = async (text: string) => {
   await request.post({
     url: `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
@@ -82,10 +85,11 @@ export const sendMessageToTelegram = async (text: string) => {
     }
   });
 };
-export const logAndNotify = async (
+export const log = async (
   name: string,
   msg: object | string,
-  level: string = "info"
+  level: string = "info",
+  notify: boolean = false
 ) => {
   let log, out;
   if (typeof msg === "string") {
@@ -96,5 +100,7 @@ export const logAndNotify = async (
     log = { name, ...msg };
   }
   logger.log({ level, message: log });
-  sendMessageToTelegram(out);
+  if (notify) {
+    sendMessageToTelegram(out);
+  }
 };
