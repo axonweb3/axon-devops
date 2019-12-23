@@ -34,7 +34,7 @@ interface Action {
   params: object;
 }
 
-const ACTIONS = ["net_delay", "net_loss", "net_dup", "net_corrupt", "pause"];
+const ACTIONS = ["net_delay", "net_loss", "net_dup", "net_corrupt"];
 
 function choose(choices) {
   let index = Math.floor(Math.random() * choices.length);
