@@ -2,9 +2,9 @@ import { DOCKER_COMPOSE_CONFIG, logger, logAndNotify } from "./utils";
 import { exec } from "child_process";
 const uuidv1 = require("uuid/v1");
 
-const TARGETS = Object.entries(DOCKER_COMPOSE_CONFIG.services).map(
-  entry => entry[1]["container_name"]
-);
+const TARGETS = Object.entries(DOCKER_COMPOSE_CONFIG.services)
+  .filter(entry => entry[0] !== "scripts")
+  .map(entry => entry[1]["container_name"]);
 
 /**
  * - duration: e.g. '30s', unit can be 'ms/s/m/h'
@@ -34,7 +34,7 @@ interface Action {
   params: object;
 }
 
-const ACTIONS = ["net_delay", "net_loss", "net_dup", "net_corrupt"];
+const ACTIONS = ["net_delay", "net_loss", "net_dup", "net_corrupt", "pause"];
 
 function choose(choices) {
   let index = Math.floor(Math.random() * choices.length);
