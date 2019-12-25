@@ -5,6 +5,7 @@ import os
 import argparse
 import datetime
 from glob import glob
+import json
 
 parser = argparse.ArgumentParser(description='get chain name')
 parser.add_argument('--commit_id', '-c', type=str)
@@ -19,8 +20,25 @@ chains = sorted(glob('{commid_id}-{node_num:03d}-*/'.format(commid_id=args.commi
 # print(chains)
 if args.force_recreate or not chains:
     now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    new_chain = '{args.commit_id}-{args.node_num:03d}-{now}'.format(datetime=datetime, args=args, now=now)
+    current_chain_meta = {
+        'start_time': now,
+        'commit_id': args.commit_id,
+        'node_num': args.node_num,
+    }
+    new_chain = '{commit_id}-{node_num:03d}-{now}'.format(**current_chain_meta)
+    current_chain_meta['chain_id'] = new_chain
 else:
-    new_chain = chains[0]
+    new_chain = chains[0].strip('/')
+    start_time = new_chain.split('-')[-1]
+    current_chain_meta = {
+        'start_time': start_time,
+        'commit_id': args.commit_id,
+        'node_num': args.node_num,
+        'chain_id': new_chain,
+    }
+
+
+json.dump(current_chain_meta, open('current_chain_meta.json', 'w'), indent=4)
+
 
 print(new_chain)

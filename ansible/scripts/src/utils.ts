@@ -50,6 +50,8 @@ export const DOCKER_COMPOSE_CONFIG = yaml.safeLoad(
   readFileSync("/chain/docker-compose.yaml", "utf-8")
 );
 
+export const CHAIN_META = require("/chain/current_chain_meta.json");
+
 export const URLS = Object.entries(DOCKER_COMPOSE_CONFIG.services)
   .filter(entry => entry[0] !== "scripts")
   .map(entry => {

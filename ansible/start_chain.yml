@@ -4,7 +4,7 @@
   user: muta
   vars:
     ansible_python_interpreter: /usr/bin/python3
-    muta_version: 9376d0e
+    muta_version: 6cfe1df
     muta_repo: https://github.com/nervosnetwork/muta.git
     chain_node_num: 4
     bootstraps_num: "{{ chain_node_num }}"
@@ -19,7 +19,7 @@
         dest: "{{ muta_path }}"
         version: "{{ muta_version }}"
     - name: build muta binary
-      command: "docker run -it --rm --name build-muta-{{ muta_version }} -v {{ muta_path }}:/code -v {{ muta_path }}/target/cargo_cache:/usr/local/cargo/registry nervos/muta:dev bash -c 'cd /code && cargo build --release && cp target/release/muta-chain target/release/muta-chain-{{ muta_version }}'"
+      command: "docker run --rm --name build-muta-{{ muta_version }} -v {{ muta_path }}:/code -v {{ muta_path }}/target/cargo_cache:/usr/local/cargo/registry nervos/muta:dev bash -c 'cd /code && cargo build --release && cp target/release/muta-chain target/release/muta-chain-{{ muta_version }}'"
       args:
         chdir: "{{ muta_path }}"
         creates: "target/release/muta-chain-{{ muta_version }}"
@@ -35,6 +35,10 @@
         - /data
         - /logs
         - /configs
+    - copy:
+        src: "{{ data_dir }}/current_chain_meta.json"
+        dest: "{{ chain_dir }}/current_chain_meta.json"
+        remote_src: yes
     - template:
         src: templates/docker-compose.yaml.j2
         dest: "{{ chain_dir }}/docker-compose.yaml"
