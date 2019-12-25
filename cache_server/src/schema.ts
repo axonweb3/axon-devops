@@ -10,7 +10,7 @@ import { readFileSync } from "fs";
 // Fill this in with the schema string
 const schemaString = readFileSync("schemas/muta_cache_server.graphql", "utf-8");
 // Make a GraphQL schema with no resolvers
-const schema = makeExecutableSchema({ typeDefs: schemaString });
+export const schema = makeExecutableSchema({ typeDefs: schemaString });
 
 function randomHex(length: number) {
   var result = "";
@@ -47,24 +47,14 @@ addMockFunctionsToSchema({
   schema,
   mocks: {
     Uint64: genRandomFunc(3),
-    Hash: genRandomFunc(16),
-    Address: genRandomFunc(16),
-    Bloom: genRandomFunc(16),
-    Bytes: genRandomFunc(16),
-    UserAddress: genRandomFunc(16),
-    ContractAddress: genRandomFunc(16),
-    AssetID: genRandomFunc(16),
-    Balance: genRandomFunc(16)
+    Hash: genRandomFunc(64),
+    Address: genRandomFunc(42),
+    Bloom: genRandomFunc(40),
+    Bytes: genRandomFunc(30),
+    UserAddress: genRandomFunc(42),
+    ContractAddress: genRandomFunc(42),
+    AssetID: genRandomFunc(64),
+    Balance: genRandomFunc(10)
   }
   // preserveResolvers: true,
-});
-
-// const query = readFileSync("schemas/query.graphql", "utf-8");
-// graphql(schema, query).then((result) => console.log(JSON.stringify(result, null, 2)));
-
-const server = new ApolloServer({
-  schema
-});
-server.listen().then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`);
 });

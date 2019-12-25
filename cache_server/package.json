@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "yarn run ts-node src/mock.ts",
-    "mock": "yarn run ts-node src/mock.ts",
+    "start": "yarn run ts-node src/index.ts",
+    "demo": "yarn run ts-node src/demo.ts",
     "test": "jest --color",
     "lint": "eslint --fix '{src,test}/**/*.{js,ts}'",
     "prettier": "prettier --write {src,schemas}/**/*.{js,ts,graphql}"
