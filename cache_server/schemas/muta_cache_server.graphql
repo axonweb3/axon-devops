@@ -1,0 +1,235 @@
+scalar Uint64
+scalar Hash
+scalar Address
+scalar Bloom
+scalar Bytes
+scalar UserAddress
+scalar ContractAddress
+scalar AssetID
+scalar Balance
+
+type Query {
+  getEpoch(epochId: Uint64): Epoch
+  getTransaction(txHash: Hash!): Transaction
+  getAccount(address: Address!): Account
+  getAsset(assetId: AssetID!): Asset
+  getEpochs(limit: Int, cursor: String): Epochs!
+  getTransactions(limit: Int, cursor: String): Transactions!
+  getAccounts(limit: Int, cursor: String): Accounts!
+  getAssets(limit: Int, cursor: String): Assets!
+  search(q: String!): SearchResult
+}
+
+schema {
+  query: Query
+}
+
+union SearchResult = Epoch | Transaction | UserAccount | ContractAccount | Asset
+
+type Epochs {
+  totalCount: Int!
+  epochs: [Epoch!]!
+  pageInfo: PageInfo!
+}
+
+type Transactions {
+  totalCount: Int!
+  transactions: [Transaction!]!
+  pageInfo: PageInfo!
+}
+
+type Assets {
+  totalCount: Int!
+  assets: [Asset!]!
+  pageInfo: PageInfo!
+}
+
+type Accounts {
+  totalCount: Int!
+  accounts: [Account!]!
+  pageInfo: PageInfo!
+}
+
+type PageInfo {
+  endCursor: String!
+  hasNextPage: Boolean!
+}
+
+type Asset {
+  id: AssetID!
+  name: String!
+  symbol: String!
+  supply: String!
+  manageContract: ContractAddress!
+  storageRoot: Hash!
+}
+
+union Account = UserAccount | ContractAccount
+
+type UserAccount {
+  transactions: Transactions!
+  nonce: Uint64!
+  assets: [AccountAsset!]!
+}
+
+type AccountAsset {
+  assetId: AssetID!
+  assetInfo: AssetInfo!
+}
+
+type AssetInfo {
+  balance: Balance!
+  approved: ApprovedInfo!
+}
+
+type ApprovedInfo {
+  contractAddress: ContractAddress!
+  max: Balance!
+  used: Balance!
+}
+
+type ContractAccount {
+  transactions: Transactions!
+  nonce: Uint64!
+  assets: [AccountAsset!]!
+  storageRoot: Hash!
+}
+
+type EpochHeader {
+  chainId: Hash!
+  epochId: Uint64!
+  preHash: Hash!
+  timestamp: Uint64!
+  logsBloom: [Bloom!]!
+  orderRoot: Hash!
+  confirmRoot: [Hash!]!
+  stateRoot: Hash!
+  receiptRoot: [Hash!]!
+  cyclesUsed: [Uint64!]!
+  proposer: Address!
+  proof: Proof!
+  validatorVersion: Uint64!
+  validators: [Validator!]!
+}
+
+type Proof {
+  epochId: Uint64!
+  round: Uint64!
+  epochHash: Hash!
+  signature: Bytes!
+  bitmap: Bytes!
+}
+
+type Validator {
+  address: UserAddress!
+  proposeWeight: Uint64!
+  voteWeight: Uint64!
+}
+
+type Epoch {
+  header: EpochHeader!
+  orderedTxHashes: [Hash!]!
+  orderedTx: [Transaction!]!
+}
+
+type Transaction {
+  txHash: Hash!
+  chainId: Hash!
+  nonce: Hash!
+  timeout: Uint64!
+  fee: Fee!
+  action: TransactionAction!
+  pubkey: Bytes!
+  signature: Bytes!
+  from: UserAddress!
+  epochId: Uint64!
+  epoch: Epoch!
+  txIndex: Int!
+  receipt: Receipt!
+}
+
+type Receipt {
+  stateRoot: Hash!
+  epochId: Uint64!
+  epoch: Epoch!
+  txHash: Hash!
+  cyclesUsed: Fee!
+  result: ReceiptResult!
+}
+
+union ReceiptResult =
+    TransferReceipt
+  | ApproveReceipt
+  | DeployReceipt
+  | CallReceipt
+  | FailReceipt
+
+type TransferReceipt {
+  receiver: UserAddress!
+  assetId: AssetID!
+  beforeAmount: Balance!
+  afterAmount: Balance!
+}
+
+type ApproveReceipt {
+  spender: ContractAddress!
+  assetId: AssetID!
+  max: Balance!
+}
+
+type DeployReceipt {
+  contract: ContractAddress!
+  contractType: ContractType!
+}
+
+type CallReceipt {
+  contract: ContractAddress!
+  returnValue: Bytes!
+  logsBloom: Bloom!
+}
+
+type FailReceipt {
+  system: String!
+  user: String!
+}
+
+union TransactionAction = Transfer | Approve | Deploy | Call
+
+type Fee {
+  assetId: AssetID!
+  cycle: Uint64!
+}
+
+type Transfer {
+  receiver: UserAddress!
+  carryingAsset: CarryingAsset!
+}
+
+type Approve {
+  spender: ContractAddress!
+  assetId: AssetID!
+  max: Balance!
+}
+
+type Deploy {
+  code: Bytes!
+  contractType: ContractType!
+}
+
+type Call {
+  contract: ContractAddress!
+  method: String!
+  args: [Bytes!]!
+  carryingAsset: CarryingAsset
+}
+
+type CarryingAsset {
+  assetId: AssetID!
+  amount: Balance!
+}
+
+enum ContractType {
+  Asset
+  App
+  Library
+}
