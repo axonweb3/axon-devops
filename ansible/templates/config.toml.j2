@@ -37,6 +37,12 @@ verifier_list = [
     "{{ k.address }}",
 {% endfor %}
 ]
+public_keys = [
+{% for k in keypairs[:chain_node_num] %}
+    "{{ k.bls_public_key }}",
+{% endfor %}
+]
+common_ref = "{{ common_ref }}"
 
 [consensus.duration]
 propose_ratio = 10
