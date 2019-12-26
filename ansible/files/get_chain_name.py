@@ -19,13 +19,13 @@ args = parser.parse_args()
 chains = sorted(glob('{commid_id}-{node_num:03d}-*/'.format(commid_id=args.commit_id, node_num=args.node_num)), reverse=True)
 # print(chains)
 if args.force_recreate or not chains:
-    now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    start_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     current_chain_meta = {
-        'start_time': now,
+        'start_time': start_time,
         'commit_id': args.commit_id,
         'node_num': args.node_num,
     }
-    new_chain = '{commit_id}-{node_num:03d}-{now}'.format(**current_chain_meta)
+    new_chain = '{commit_id}-{node_num:03d}-{start_time}'.format(**current_chain_meta)
     current_chain_meta['chain_id'] = new_chain
 else:
     new_chain = chains[0].strip('/')
