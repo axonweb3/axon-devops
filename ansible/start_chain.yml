@@ -4,7 +4,7 @@
   user: muta
   vars:
     ansible_python_interpreter: /usr/bin/python3
-    muta_version: 6cfe1df
+    muta_version: 016d49f
     muta_repo: https://github.com/nervosnetwork/muta.git
     chain_node_num: 4
     bootstraps_num: "{{ chain_node_num }}"
@@ -64,3 +64,5 @@
     - name: ensure chain is up
       docker_compose:
         project_src: "{{ data_dir }}/current"
+    - name: deploy finish log
+      command: "docker exec scripts bash -c 'cd /app && yarn run ts-node src/deploy_log'"

@@ -61,14 +61,14 @@ export const URLS = Object.entries(DOCKER_COMPOSE_CONFIG.services)
   .map(ip => `http://${ip}:8000/graphql`);
 
 const winston = require("winston");
+export const logger_format = winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+);
 
 export const logger = winston.createLogger({
   // level: 'info',
-  // format: winston.format.json(),
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
+  format: logger_format,
   transports: [
     new winston.transports.File({ filename: "/chain/logs/monitor.log" }),
     new winston.transports.Console()
