@@ -29,8 +29,7 @@ services:
     image: nervos/muta:dev
     hostname: bft_node{{ keypair.index }}
     environment:
-      - RUST_LOG
-      - RUST_BACKTRACE
+      - RUST_BACKTRACE=full
     volumes:
       - {{ muta_path }}:/app
       - ./configs/{{ keypair.index }}.toml:/app/devtools/chain/config.toml
@@ -42,6 +41,8 @@ services:
         aliases:
           - bft_node{{ keypair.index }}
         ipv4_address: {{ keypair.ip_address }}
+#    command: |
+#      sh -c 'trap : TERM INT; sleep infinity & wait'
     command: |
       sh -c '
       cd /app;
