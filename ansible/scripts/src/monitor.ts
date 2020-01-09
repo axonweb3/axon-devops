@@ -1,5 +1,5 @@
-import { CHAIN_ID, logger, URLS, log, CHAIN_META } from "./utils";
-import { Muta } from "muta-sdk";
+import { CHAIN_ID, CHAIN_META, logger, URLS, log } from "./utils";
+const { Muta, utils, AssetService } = require("muta-sdk");
 
 let latest_epoch_id = 0;
 
@@ -24,7 +24,6 @@ export async function monitor() {
     const context = {
       latest_epoch_id,
       current_epoch_ids,
-      chain: CHAIN_META.chain_id
     };
     log("chain_stops", context, "error", true);
   } else {

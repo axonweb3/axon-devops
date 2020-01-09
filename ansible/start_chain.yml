@@ -4,9 +4,9 @@
   user: muta
   vars:
     ansible_python_interpreter: /usr/bin/python3
-    muta_version: d2b36d9
+    muta_version: 3a5783e
     muta_repo: https://github.com/nervosnetwork/muta.git
-    chain_node_num: 4
+    chain_node_num: 8
     bootstraps_num: "{{ chain_node_num }}"
     force_recreate: false
   vars_files:
