@@ -1,0 +1,21 @@
+apiVersion: pingcap.com/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: stable-network-corrupt
+  namespace: chaos-testing
+spec:
+  action: corrupt
+  mode: fixed-percent
+  value: 30
+  selector:
+    namespaces:
+      - mutadev
+    labelSelectors:
+      chain: "muta"
+      chaos: "true"
+  corrupt:
+    corrupt: "40"
+    correlation: "25"
+  duration: "10s"
+  scheduler:
+    cron: "@every 1m30s"

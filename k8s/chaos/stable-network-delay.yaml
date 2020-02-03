@@ -1,0 +1,22 @@
+apiVersion: pingcap.com/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: stable-network-delay
+  namespace: chaos-testing
+spec:
+  action: delay
+  mode: fixed-percent
+  value: 30
+  selector:
+    namespaces:
+      - mutadev
+    labelSelectors:
+      chain: "muta"
+      chaos: "true"
+  delay:
+    latency: "400ms"
+    correlation: "25"
+    jitter: "400ms"
+  duration: "10s"
+  scheduler:
+    cron: "@every 1m10s"
