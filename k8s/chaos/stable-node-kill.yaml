@@ -1,0 +1,17 @@
+apiVersion: pingcap.com/v1alpha1
+kind: PodChaos
+metadata:
+  name: stable-node-kill
+  namespace: chaos-testing
+spec:
+  action: pod-kill
+  mode: fixed-percent
+  value: 30
+  selector:
+    namespaces:
+      - mutadev
+    labelSelectors:
+      chain: "muta"
+      chaos: "true"
+  scheduler:
+    cron: "@every 30m"
