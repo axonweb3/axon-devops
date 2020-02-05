@@ -6,13 +6,12 @@ metadata:
 spec:
   action: partition
   mode: fixed-percent
-  value: 50
+  value: "50"
   selector:
     namespaces:
       - mutadev
     labelSelectors:
-      chain: "muta"
-      chaos: "true"
+      stable-network-partition: "true"
   direction: both
   duration: "30s"
   scheduler:

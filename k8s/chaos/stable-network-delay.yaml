@@ -6,13 +6,12 @@ metadata:
 spec:
   action: delay
   mode: fixed-percent
-  value: 30
+  value: "30"
   selector:
     namespaces:
       - mutadev
     labelSelectors:
-      chain: "muta"
-      chaos: "true"
+      stable-network-delay: "true"
   delay:
     latency: "400ms"
     correlation: "25"

@@ -6,12 +6,11 @@ metadata:
 spec:
   action: pod-kill
   mode: fixed-percent
-  value: 30
+  value: "30"
   selector:
     namespaces:
       - mutadev
     labelSelectors:
-      chain: "muta"
-      chaos: "true"
+      stable-node-kill: "true"
   scheduler:
     cron: "@every 30m"
