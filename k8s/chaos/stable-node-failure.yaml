@@ -5,14 +5,13 @@ metadata:
   namespace: chaos-testing
 spec:
   action: pod-failure
-    mode: fixed-percent
-    value: 30
+  mode: fixed-percent
+  value: "30"
   duration: "30s"
   selector:
     namespaces:
       - mutadev
     labelSelectors:
-      chain: "muta"
-      chaos: "true"
+      stable-node-failure: "true"
   scheduler:
     cron: "@every 10m"
