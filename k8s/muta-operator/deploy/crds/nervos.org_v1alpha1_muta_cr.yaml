@@ -34,6 +34,9 @@ spec:
       log_path: "logs/"
       log_to_file: true
       metrics: true
+      modules_level:
+        "overlord::state::process": "debug"
+        "core_consensus": "error"
   genesis: # https://github.com/nervosnetwork/muta/blob/master/devtools/chain/genesis.toml
     prevhash: "44915be5b6c20b0678cf05fcddbbaa832e25d7e6ac538784cd5c24de00d47472"
     metadata:
