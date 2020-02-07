@@ -429,8 +429,8 @@ func (r *ReconcileMuta) createBenchmark(instance *nervosv1alpha1.Muta, name stri
 							Containers: []corev1.Container{
 								{
 									Name:  fmt.Sprintf("%s-benchmark", name),
-									Image: "mutadev/muta-benchmark:0.1.1",
-									Args:  []string{"-d", instance.Spec.Benchmark.Duration, url},
+									Image: "mutadev/muta-benchmark:latest",
+									Args:  []string{"-d", instance.Spec.Benchmark.Duration, "-c", "10", url},
 								},
 							},
 							RestartPolicy: corev1.RestartPolicyNever,
