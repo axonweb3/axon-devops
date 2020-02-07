@@ -76,7 +76,7 @@ async function once() {
         }
     })
     Array.from(running.keys()).forEach((e) => {
-        if (records.has(e) && running.get(e).length === records.get(e).length) {
+        if (records.has(e) && running.get(e).height === records.get(e).height) {
             stopped.set(e, running.get(e))
         }
     })
