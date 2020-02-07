@@ -30,13 +30,8 @@ async function warn(text) {
     }
 }
 
-async function once() {
-    console.log(new Date(), "Check once")
+async function data() {
     var running = new Map();
-    var created = new Map();
-    var deleted = new Map();
-    var stopped = new Map();
-
     var res = await k8sCoreApi.listNamespacedService('mutadev');
 
     for await (const e of res.body.items.filter((e) => {
@@ -64,17 +59,14 @@ async function once() {
         running.get(e.metadata.name).height = res;
         running.get(e.metadata.name).labels = e.metadata.labels['muta.nervos.org'];
     }
+    return running
+}
 
-    Array.from(running.keys()).forEach((e) => {
-        if (!records.has(e)) {
-            created.set(e, running.get(e))
-        }
-    })
-    Array.from(records.keys()).forEach((e) => {
-        if (!running.has(e)) {
-            deleted.set(e, running.get(e))
-        }
-    })
+async function watch_stopped() {
+    console.log(new Date(), "Check once")
+    var running = await data()
+    var stopped = new Map();
+
     Array.from(running.keys()).forEach((e) => {
         if (records.has(e) && running.get(e).height === records.get(e).height) {
             stopped.set(e, running.get(e))
@@ -95,13 +87,31 @@ async function once() {
             'stopped': msg,
         }, undefined, 4))
     }
-
     records = running;
 }
 
+async function watch_alldata() {
+    var running = await data();
+    var msg = {};
+    for (const [k, v] of running.entries()) {
+        const l = v.labels;
+        if (!(l in msg)) {
+            msg[l] = {};
+        }
+        msg[l][k] = v.height;
+    }
+
+    if (Array.from(running.keys()).length !== 0) {
+        await warn(JSON.stringify({
+            'running': msg,
+        }, undefined, 4))
+    }
+}
+
 async function main() {
-    await once()
-    setInterval(once, cDuration * 1000)
+    await watch_stopped()
+    setInterval(watch_stopped, cDuration * 1000)
+    setInterval(watch_alldata, cDuration * 6 * 1000)
 }
 
 main()
