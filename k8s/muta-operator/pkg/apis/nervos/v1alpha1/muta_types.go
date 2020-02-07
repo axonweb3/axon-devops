@@ -156,12 +156,13 @@ type ConfigExecutor struct {
 }
 
 type ConfigLogger struct {
-	Filter                 string `json:"filter" toml:"filter"`
-	LogToConsole           bool   `json:"log_to_console" toml:"log_to_console"`
-	ConsoleShowFileAndLine bool   `json:"console_show_file_and_line" toml:"console_show_file_and_line"`
-	LogPath                string `json:"log_path" toml:"log_path"`
-	LogToFile              bool   `json:"log_to_file" toml:"log_to_file"`
-	Metrics                bool   `json:"metrics" toml:"metrics"`
+	Filter                 string            `json:"filter" toml:"filter"`
+	LogToConsole           bool              `json:"log_to_console" toml:"log_to_console"`
+	ConsoleShowFileAndLine bool              `json:"console_show_file_and_line" toml:"console_show_file_and_line"`
+	LogPath                string            `json:"log_path" toml:"log_path"`
+	LogToFile              bool              `json:"log_to_file" toml:"log_to_file"`
+	Metrics                bool              `json:"metrics" toml:"metrics"`
+	ModulesLevel           map[string]string `json:"modules_level,omitempty" toml:"modules_level,omitempty"`
 }
 
 // MutaStatus defines the observed state of Muta
