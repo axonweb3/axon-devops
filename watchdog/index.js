@@ -17,17 +17,17 @@ var records = new Map();
 
 async function warn(text) {
     console.log(text)
-    var ic = 0;
-    while (text.length > ic) {
-        await request.post({
-            url: `https://api.telegram.org/bot${cTgToken}/sendMessage`,
-            form: {
-                chat_id: cChatID,
-                text: text.substring(ic, ic + 4096),
-            }
-        });
-        ic = ic + 4096;
-    }
+    // var ic = 0;
+    // while (text.length > ic) {
+    //     await request.post({
+    //         url: `https://api.telegram.org/bot${cTgToken}/sendMessage`,
+    //         form: {
+    //             chat_id: cChatID,
+    //             text: text.substring(ic, ic + 4096),
+    //         }
+    //     });
+    //     ic = ic + 4096;
+    // }
 }
 
 async function once() {
@@ -87,7 +87,7 @@ async function once() {
         if (!(l in msg)) {
             msg[l] = {};
         }
-        msg[l][k] = v;
+        msg[l][k] = v.height;
     }
 
     if (Array.from(stopped.keys()).length !== 0) {
