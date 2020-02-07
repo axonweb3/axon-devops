@@ -17,17 +17,17 @@ var records = new Map();
 
 async function warn(text) {
     console.log(text)
-    var ic = 0;
-    while (text.length > ic) {
-        await request.post({
-            url: `https://api.telegram.org/bot${cTgToken}/sendMessage`,
-            form: {
-                chat_id: cChatID,
-                text: text.substring(ic, ic + 4096),
-            }
-        });
-        ic = ic + 4096;
-    }
+    // var ic = 0;
+    // while (text.length > ic) {
+    //     await request.post({
+    //         url: `https://api.telegram.org/bot${cTgToken}/sendMessage`,
+    //         form: {
+    //             chat_id: cChatID,
+    //             text: text.substring(ic, ic + 4096),
+    //         }
+    //     });
+    //     ic = ic + 4096;
+    // }
 }
 
 async function data() {
@@ -54,10 +54,13 @@ async function data() {
         }).client;
 
         running.set(e.metadata.name, {});
-
-        var res = await sdk.getLatestBlockHeight();
-        running.get(e.metadata.name).height = res;
-        running.get(e.metadata.name).labels = e.metadata.labels['muta.nervos.org'];
+        try {
+            var res = await sdk.getLatestBlockHeight();
+            running.get(e.metadata.name).height = res;
+            running.get(e.metadata.name).labels = e.metadata.labels['muta.nervos.org'];
+        } catch (err) {
+            console.log(err)
+        }
     }
     return running
 }
