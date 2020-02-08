@@ -7,16 +7,19 @@ const cProxyHostPort = process.env.PROXY_HOSTPORT;
 const cTgToken = process.env.TG_TOKEN;
 const cChatID = process.env.CHAT_ID;
 const cDuration = process.env.DURATION ? parseInt(process.env.DURATION) : 300;
+const cNameSpace = 'mutadev';
+const cMute = process.env.MUTE ? true : false;
 
 const kc = new k8s.KubeConfig();
 kc.loadFromFile('./config/kube.config');
 
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 
-var records = new Map();
-
 async function warn(text) {
-    console.log(text)
+    console.log(text);
+    if (cMute) {
+        return
+    }
     var ic = 0;
     while (text.length > ic) {
         await request.post({
@@ -30,44 +33,54 @@ async function warn(text) {
     }
 }
 
-async function data() {
+async function getNodeData(name) {
+    var res = await k8sCoreApi.readNamespacedService(name, cNameSpace);
+
+    var apiPort = 0;
+    res.body.spec.ports.forEach((e) => {
+        if (e.name == 'api') {
+            apiPort = e.port;
+        }
+    })
+    var tagName = res.body.metadata.labels['muta.nervos.org']
+
+    var dst = '';
+    if (cUseProxy) {
+        dst = `http://${cProxyHostPort}/api/v1/namespaces/mutadev/services/${res.body.metadata.name}:api/proxy/`
+    } else {
+        dst = 'http://' + res.body.spec.clusterIP + ':' + apiPort + '/'
+    }
+    var sdk = new mutasdk.Muta({
+        endpoint: dst + 'graphql',
+    }).client;
+
+    var ret = {};
+    ret.tagName = tagName;
+    try {
+        var res = await sdk.getLatestBlockHeight();
+        ret.height = res;
+    } catch (err) {
+    }
+    return ret;
+}
+
+async function getNodeDataList() {
     var running = new Map();
-    var res = await k8sCoreApi.listNamespacedService('mutadev');
+    var res = await k8sCoreApi.listNamespacedService(cNameSpace);
 
     for await (const e of res.body.items.filter((e) => {
         return e.metadata.ownerReferences[0].kind === 'Muta'
     })) {
-        var apiPort = 0;
-        e.spec.ports.forEach((e) => {
-            if (e.name == 'api') {
-                apiPort = e.port;
-            }
-        })
-        var dst = '';
-        if (cUseProxy) {
-            dst = `http://${cProxyHostPort}/api/v1/namespaces/mutadev/services/${e.metadata.name}:api/proxy/`
-        } else {
-            dst = 'http://' + e.spec.clusterIP + ':' + apiPort + '/'
-        }
-        var sdk = new mutasdk.Muta({
-            endpoint: dst + 'graphql',
-        }).client;
-
-        running.set(e.metadata.name, {});
-        try {
-            var res = await sdk.getLatestBlockHeight();
-            running.get(e.metadata.name).height = res;
-            running.get(e.metadata.name).labels = e.metadata.labels['muta.nervos.org'];
-        } catch (err) {
-            console.log(err)
-        }
+        const data = await getNodeData(e.metadata.name);
+        running.set(e.metadata.name, data);
     }
     return running
 }
 
+var records = new Map();
 async function watch_stopped() {
     console.log(new Date(), "Check once")
-    var running = await data()
+    var running = await getNodeDataList()
     var stopped = new Map();
 
     Array.from(running.keys()).forEach((e) => {
@@ -78,7 +91,7 @@ async function watch_stopped() {
 
     var msg = {};
     for (const [k, v] of stopped.entries()) {
-        const l = v.labels;
+        const l = v.tagName;
         if (!(l in msg)) {
             msg[l] = {};
         }
@@ -94,10 +107,10 @@ async function watch_stopped() {
 }
 
 async function watch_alldata() {
-    var running = await data();
+    var running = await getNodeDataList();
     var msg = {};
     for (const [k, v] of running.entries()) {
-        const l = v.labels;
+        const l = v.tagName;
         if (!(l in msg)) {
             msg[l] = {};
         }
@@ -111,10 +124,53 @@ async function watch_alldata() {
     }
 }
 
+async function watch_request() {
+    var update_id = 0;
+    while (true) {
+        const offset = update_id + 1;
+        const res = await request.get(`https://api.telegram.org/bot${cTgToken}/getUpdates?offset=${offset}&timeout=6`);
+        const data = JSON.parse(res);
+
+        for (const e of data.result) {
+            update_id = e.update_id;
+            message = e.message;
+            if (!message) {
+                continue
+            }
+            if (!message.text) {
+                continue
+            }
+            const args = message.text.split(' ');
+
+            if (args[0] === '/get-node') {
+                const nodename = args[1]
+                if (!nodename) {
+                    continue
+                }
+                await warn(JSON.stringify(await getNodeData(nodename), undefined, 4))
+            }
+            if (args[0] === '/get-node-list') {
+                const tagsname = args[1]
+                if (!tagsname) {
+                    continue
+                }
+                const l = await getNodeDataList();
+                const b = new Map(Array.from(l.entries()).filter(e => e[1].tagName === tagsname));
+                const m = {};
+                for (const [k, v] of b.entries()) {
+                    m[k] = v;
+                }
+                await warn(JSON.stringify(m, undefined, 4));
+            }
+        }
+    }
+}
+
 async function main() {
     await watch_stopped()
     setInterval(watch_stopped, cDuration * 1000)
     setInterval(watch_alldata, cDuration * 6 * 1000)
+    watch_request()
 }
 
 main()
