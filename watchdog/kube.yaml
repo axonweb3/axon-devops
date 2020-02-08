@@ -1,0 +1,27 @@
+// create configmap
+// kubectl create -n mutadev configmap kubeconfig --from-file=kube.config=~/.kube/config
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: watchdog
+spec:
+  containers:
+  - name: watchdog
+    image: mutadev/watchdog:0.1.0
+    volumeMounts:
+        - name: config
+          mountPath: /src/config
+    env:
+      - name: USE_PROXY
+        value: ""
+      - name: PROXY_HOSTPORT
+        value: ""
+      - name: TG_TOKEN
+        value: ""
+      - name: CHAT_ID
+        value: ""
+  volumes:
+    - name: config
+      configMap:
+        name: kubeconfig
