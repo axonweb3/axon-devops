@@ -162,6 +162,9 @@ async function watch_request() {
                 }
                 await warn(JSON.stringify(m, undefined, 4));
             }
+            if (args[0] === '/help') {
+                await warn('/get-node [node-name]\r\n/get-node-list [node-tags]');
+            }
         }
     }
 }
