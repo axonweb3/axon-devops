@@ -5,6 +5,15 @@ metadata:
   namespace: mutadev # Only supports deployment to the mutadev namespace
 spec:
   image: mutadev/muta:latest # docker image
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+      ephemeral-storage: 20Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+      ephemeral-storage: 1Gi
   chaos: # all / stable-network-corrupt / stable-network-delay / stable-network-duplicate / stable-network-loss / stable-network-partition / stable-node-failure / stable-node-kill
     - stable-network-delay
   benchmark: # Create cronjob to execute https://github.com/nervosnetwork/muta-benchmark

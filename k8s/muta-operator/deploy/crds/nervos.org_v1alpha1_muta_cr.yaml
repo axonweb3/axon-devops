@@ -5,6 +5,15 @@ metadata:
   namespace: mutadev # Only supports deployment to the mutadev namespace
 spec:
   image: mutadev/muta:latest # docker image
+  resources:
+    limits:
+      cpu: 1
+      memory: 500m
+      ephemeral-storage: 5Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+      ephemeral-storage: 5Gi
   chaos: # all / stable-network-corrupt / stable-network-delay / stable-network-duplicate / stable-network-loss / stable-network-partition / stable-node-failure / stable-node-kill
     - stable-network-corrupt
     - stable-network-delay
@@ -48,6 +57,7 @@ spec:
       propose_ratio: 15
       prevote_ratio: 15
       precommit_ratio: 10
+      brake_ratio: 3
     services:
       - name: asset
         payload: '{ "id": "f56924db538e77bb5951eb5ff0d02b88983c49c45eea30e8ae3e7234b311436c", "name": "MutaToken", "symbol": "MT", "supply": 320000011, "issuer": "f8389d774afdad8755ef8e629e5a154fddc6325a" }'
