@@ -7,7 +7,7 @@ spec:
   image: mutadev/muta:latest # docker image
   resources:
     limits:
-      cpu: 1
+      cpu: 500m
       memory: 1Gi
       ephemeral-storage: 20Gi
     requests:
