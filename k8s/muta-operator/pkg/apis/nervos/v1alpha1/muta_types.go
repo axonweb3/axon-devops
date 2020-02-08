@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -56,12 +57,13 @@ type MutaSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
-	Image     string        `json:"image"`
-	Chaos     []ChaosType   `json:"chaos"`
-	Benchmark *Benchmark    `json:"benchmark"`
-	Size      uint64        `json:"size"`
-	Config    Config        `json:"config"`
-	Genesis   ConfigGenesis `json:"genesis" toml:"genesis"`
+	Resources corev1.ResourceRequirements `json:"resources"`
+	Image     string                      `json:"image"`
+	Chaos     []ChaosType                 `json:"chaos"`
+	Benchmark *Benchmark                  `json:"benchmark"`
+	Size      uint64                      `json:"size"`
+	Config    Config                      `json:"config"`
+	Genesis   ConfigGenesis               `json:"genesis" toml:"genesis"`
 }
 
 // Benchmark defines the parameters of benchmark
@@ -116,6 +118,7 @@ type ConfigMetadata struct {
 	ProposeRatio   uint64           `json:"propose_ratio"`
 	PrevoteRatio   uint64           `json:"prevote_ratio"`
 	PrecommitRatio uint64           `json:"precommit_ratio"`
+	BrakeRatio     uint64           `json:"brake_ratio"`
 }
 
 type ConfigVerifier struct {
