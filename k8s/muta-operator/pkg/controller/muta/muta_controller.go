@@ -112,7 +112,8 @@ func (r *ReconcileMuta) Reconcile(request reconcile.Request) (reconcile.Result, 
 	}
 
 	if err = r.createMutaChain(instance); err != nil {
-		return reconcile.Result{}, err
+		log.Error(err, "create muta chain")
+		return reconcile.Result{}, nil
 	}
 	return reconcile.Result{}, nil
 	// log.Info("Reconcile %s status %s message %s", instance.GetName(), instance.Status.Status, instance.Status.Message)
@@ -282,6 +283,7 @@ func (r *ReconcileMuta) createNode(instance *nervosv1alpha1.Muta, name string) e
 
 	labels := make(map[string]string)
 	labels["app"] = name
+	labels["muta.nervos.org"] = instance.Name
 
 	var chaosList []nervosv1alpha1.ChaosType
 	if len(instance.Spec.Chaos) == 1 && instance.Spec.Chaos[0] == nervosv1alpha1.ChaosAll {
@@ -333,6 +335,7 @@ func (r *ReconcileMuta) createNodeService(instance *nervosv1alpha1.Muta, name st
 
 	labels := make(map[string]string)
 	labels["app"] = name
+	labels["muta.nervos.org"] = instance.Name
 
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -376,14 +379,21 @@ func (r *ReconcileMuta) createConfigMap(instance *nervosv1alpha1.Muta, name stri
 		return err
 	}
 
+	labels := make(map[string]string)
+	labels["muta.nervos.org"] = instance.Name
+
 	data := map[string]string{
 		"config.toml":  string(configB),
 		"genesis.toml": string(genesisB),
 	}
-	configMap := &corev1.ConfigMap{}
-	configMap.Name = name
-	configMap.Namespace = instance.Namespace
-	configMap.Data = data
+	configMap := &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: instance.Namespace,
+			Labels:    labels,
+		},
+		Data: data,
+	}
 
 	if err := controllerutil.SetControllerReference(instance, configMap, r.scheme); err != nil {
 		return err
@@ -395,6 +405,7 @@ func (r *ReconcileMuta) createConfigMap(instance *nervosv1alpha1.Muta, name stri
 func (r *ReconcileMuta) createBenchmark(instance *nervosv1alpha1.Muta, name string) error {
 	labels := make(map[string]string)
 	labels["app"] = name
+	labels["muta.nervos.org"] = instance.Name
 
 	apiTCPAddr, err := net.ResolveTCPAddr("tcp", instance.Spec.Config.GraphQL.ListeningAddress)
 	if err != nil {
@@ -418,8 +429,8 @@ func (r *ReconcileMuta) createBenchmark(instance *nervosv1alpha1.Muta, name stri
 							Containers: []corev1.Container{
 								{
 									Name:  fmt.Sprintf("%s-benchmark", name),
-									Image: "mutadev/muta-benchmark:0.1.1",
-									Args:  []string{"-d", instance.Spec.Benchmark.Duration, url},
+									Image: "mutadev/muta-benchmark:latest",
+									Args:  []string{"-d", instance.Spec.Benchmark.Duration, "-c", "10", url},
 								},
 							},
 							RestartPolicy: corev1.RestartPolicyNever,
