@@ -265,6 +265,7 @@ func (r *ReconcileMuta) createNode(instance *nervosv1alpha1.Muta, name string) e
 						MountPath: "/app/devtools/chain",
 					},
 				},
+				Resources: instance.Spec.Resources,
 			},
 		},
 		Volumes: []corev1.Volume{
