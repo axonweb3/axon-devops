@@ -169,7 +169,7 @@ func (r *ReconcileMuta) createMutaChain(instance *nervosv1alpha1.Muta) error {
 
 	keypairs := nodeCrypto.Keypairs[:instance.Spec.Size]
 	chainName := instance.GetName()
-	addressList, blsPubkeyList := getAddressListAndBlsPubkeyList(keypairs)
+	addressList := getAddressListAndBlsPubkeyList(keypairs)
 
 	timestamp := uint64(time.Now().Unix())
 	for i, keypair := range keypairs {
@@ -178,7 +178,6 @@ func (r *ReconcileMuta) createMutaChain(instance *nervosv1alpha1.Muta) error {
 			return err
 		}
 		config.Privkey = keypair.Privkey
-		config.Consensus.BlsPublicKeys = blsPubkeyList
 
 		// set bootstrap
 		bootKeypair := keypairs[0]
@@ -460,20 +459,19 @@ func unmarshalNodeCrypto(cm *corev1.ConfigMap) (*nervosv1alpha1.NodeCrypto, erro
 	return nodeCrypto, nil
 }
 
-func getAddressListAndBlsPubkeyList(keypairs []nervosv1alpha1.KeyPair) ([]nervosv1alpha1.ConfigVerifier, []string) {
+func getAddressListAndBlsPubkeyList(keypairs []nervosv1alpha1.KeyPair) []nervosv1alpha1.ConfigVerifier {
 	addressList := []nervosv1alpha1.ConfigVerifier{}
-	blsPubkeyList := []string{}
 
 	for _, keypair := range keypairs {
 		addressList = append(addressList, nervosv1alpha1.ConfigVerifier{
 			Address:       keypair.Address,
+			BLSPubKey:     keypair.BlsPubkey,
 			ProposeWeight: 1,
 			VoteWeight:    1,
 		})
-		blsPubkeyList = append(blsPubkeyList, keypair.BlsPubkey)
 	}
 
-	return addressList, blsPubkeyList
+	return addressList
 }
 
 func copyConfig(config *nervosv1alpha1.Config) (nervosv1alpha1.Config, error) {
