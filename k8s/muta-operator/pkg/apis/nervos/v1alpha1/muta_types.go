@@ -85,14 +85,13 @@ type KeyPair struct {
 }
 
 type Config struct {
-	Privkey   string          `json:"privkey" toml:"privkey"`
-	DataPath  string          `json:"data_path" toml:"data_path"`
-	GraphQL   ConfigGraphQL   `json:"graphql" toml:"graphql"`
-	Network   ConfigNetwork   `json:"network" toml:"network"`
-	Mempool   ConfigMempool   `json:"mempool" toml:"mempool"`
-	Consensus ConfigConsensus `json:"consensus" toml:"consensus"`
-	Executor  ConfigExecutor  `json:"executor" toml:"executor"`
-	Logger    ConfigLogger    `json:"logger" toml:"logger"`
+	Privkey  string         `json:"privkey" toml:"privkey"`
+	DataPath string         `json:"data_path" toml:"data_path"`
+	GraphQL  ConfigGraphQL  `json:"graphql" toml:"graphql"`
+	Network  ConfigNetwork  `json:"network" toml:"network"`
+	Mempool  ConfigMempool  `json:"mempool" toml:"mempool"`
+	Executor ConfigExecutor `json:"executor" toml:"executor"`
+	Logger   ConfigLogger   `json:"logger" toml:"logger"`
 }
 
 type ConfigGenesis struct {
@@ -125,6 +124,7 @@ type ConfigVerifier struct {
 	Address       string `json:"address"`
 	ProposeWeight uint64 `json:"propose_weight"`
 	VoteWeight    uint64 `json:"vote_weight"`
+	BLSPubKey     string `json:"bls_pub_key"`
 }
 
 type ConfigGraphQL struct {
@@ -148,10 +148,6 @@ type ConfigMempool struct {
 	PoolSize             uint64 `json:"pool_size" toml:"pool_size"`
 	BroadcastTxsSize     uint64 `json:"broadcast_txs_size" toml:"broadcast_txs_size"`
 	BroadcastTxsInterval uint64 `json:"broadcast_txs_interval" toml:"broadcast_txs_interval"`
-}
-
-type ConfigConsensus struct {
-	BlsPublicKeys []string `json:"public_keys" toml:"public_keys"`
 }
 
 type ConfigExecutor struct {
