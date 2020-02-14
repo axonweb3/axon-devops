@@ -33,6 +33,10 @@ async function warn(text) {
     }
 }
 
+function formatData(nodeData) {
+    return nodeData.height;
+}
+
 async function getNodeData(name) {
     var res = await k8sCoreApi.readNamespacedService(name, cNameSpace);
 
@@ -79,7 +83,7 @@ async function getNodeDataList() {
 
 var records = new Map();
 async function watch_stopped() {
-    console.log(new Date(), "Check once")
+    console.log(new Date(), "Watch stopped")
     var running = await getNodeDataList()
     var stopped = new Map();
 
@@ -127,8 +131,9 @@ async function watch_alldata() {
 async function watch_request() {
     var update_id = 0;
     while (true) {
+        console.log(new Date(), "Watch request")
         const offset = update_id + 1;
-        const res = await request.get(`https://api.telegram.org/bot${cTgToken}/getUpdates?offset=${offset}&timeout=6`);
+        const res = await request.get(`https://api.telegram.org/bot${cTgToken}/getUpdates?offset=${offset}&timeout=300`);
         const data = JSON.parse(res);
 
         for (const e of data.result) {
@@ -149,6 +154,15 @@ async function watch_request() {
                 }
                 await warn(JSON.stringify(await getNodeData(nodename), undefined, 4))
             }
+            if (args[0] === '/get-node-all') {
+                const l = await getNodeDataList();
+                const b = new Map(Array.from(l.entries()));
+                const m = {};
+                for (const [k, v] of b.entries()) {
+                    m[k] = formatData(v);
+                }
+                await warn(JSON.stringify(m, undefined, 4));
+            }
             if (args[0] === '/get-node-list') {
                 const tagsname = args[1]
                 if (!tagsname) {
@@ -158,12 +172,12 @@ async function watch_request() {
                 const b = new Map(Array.from(l.entries()).filter(e => e[1].tagName === tagsname));
                 const m = {};
                 for (const [k, v] of b.entries()) {
-                    m[k] = v;
+                    m[k] = formatData(v);
                 }
                 await warn(JSON.stringify(m, undefined, 4));
             }
             if (args[0] === '/help') {
-                await warn('/get-node [node-name]\r\n/get-node-list [node-tags]');
+                await warn('/get-node [node-name]\r\n/get-node-all\r\n/get-node-list [node-tags]');
             }
         }
     }
