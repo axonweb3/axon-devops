@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: es0
+  labels:
+    type: local
+spec:
+  storageClassName: es
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/muta/docker/pv/es0"
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: es1
+  labels:
+    type: local
+spec:
+  storageClassName: es
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/muta/docker/pv/es1"
