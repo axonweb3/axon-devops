@@ -1,0 +1,16 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: es-crontab-clean
+  namespace: kube-system
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: es-crontab-clean
+            image: mutadev/es-crontab-clean:0.1.0
+            args: ["-n", "3", "-es", "http://elasticsearch-logging.kube-system:9200"]
+          restartPolicy: OnFailure
