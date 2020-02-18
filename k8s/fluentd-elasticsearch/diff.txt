@@ -1,0 +1,95 @@
+diff --git a/cluster/addons/fluentd-elasticsearch/es-statefulset.yaml b/cluster/addons/fluentd-elasticsearch/es-statefulset.yaml
+index 460386e8c86..e20189c09f5 100644
+--- a/cluster/addons/fluentd-elasticsearch/es-statefulset.yaml
++++ b/cluster/addons/fluentd-elasticsearch/es-statefulset.yaml
+@@ -86,16 +86,16 @@ spec:
+         - containerPort: 9300
+           name: transport
+           protocol: TCP
+-        livenessProbe:
+-          tcpSocket:
+-            port: transport
+-          initialDelaySeconds: 5
+-          timeoutSeconds: 10
+-        readinessProbe:
+-          tcpSocket:
+-            port: transport
+-          initialDelaySeconds: 5
+-          timeoutSeconds: 10
++          #livenessProbe:
++          #tcpSocket:
++          #port: transport
++          #initialDelaySeconds: 5
++          #timeoutSeconds: 10
++          #readinessProbe:
++          #tcpSocket:
++          #port: transport
++          #initialDelaySeconds: 5
++          #timeoutSeconds: 10
+         volumeMounts:
+         - name: elasticsearch-logging
+           mountPath: /data
+@@ -104,9 +104,9 @@ spec:
+           valueFrom:
+             fieldRef:
+               fieldPath: metadata.namespace
+-      volumes:
+-      - name: elasticsearch-logging
+-        emptyDir: {}
++      #volumes:
++      #- name: elasticsearch-logging
++      #  emptyDir: {}
+       # Elasticsearch requires vm.max_map_count to be at least 262144.
+       # If your OS already sets up this number to a higher value, feel free
+       # to remove this init container.
+@@ -116,3 +116,13 @@ spec:
+         name: elasticsearch-logging-init
+         securityContext:
+           privileged: true
++  volumeClaimTemplates:
++  - metadata:
++      name: elasticsearch-logging
++    spec:
++      accessModes:
++        - ReadWriteOnce
++      storageClassName: es
++      resources:
++        requests:
++          storage: 10Gi
+diff --git a/cluster/addons/fluentd-elasticsearch/fluentd-es-configmap.yaml b/cluster/addons/fluentd-elasticsearch/fluentd-es-configmap.yaml
+index bae130ffa63..935666bee81 100644
+--- a/cluster/addons/fluentd-elasticsearch/fluentd-es-configmap.yaml
++++ b/cluster/addons/fluentd-elasticsearch/fluentd-es-configmap.yaml
+@@ -460,7 +460,7 @@ data:
+       @log_level info
+       type_name _doc
+       include_tag_key true
+-      host elasticsearch-logging
++      host elasticsearch-logging.kube-system
+       port 9200
+       logstash_format true
+       <buffer>
+diff --git a/cluster/addons/fluentd-elasticsearch/fluentd-es-ds.yaml b/cluster/addons/fluentd-elasticsearch/fluentd-es-ds.yaml
+index bd703b07174..577f12d5171 100644
+--- a/cluster/addons/fluentd-elasticsearch/fluentd-es-ds.yaml
++++ b/cluster/addons/fluentd-elasticsearch/fluentd-es-ds.yaml
+@@ -86,7 +86,8 @@ spec:
+           mountPath: /var/log
+         - name: varlibdockercontainers
+           mountPath: /var/lib/docker/containers
+-          readOnly: true
++        - name: mutadockercontainers
++          mountPath: /muta/docker/containers
+         - name: config-volume
+           mountPath: /etc/fluent/config.d
+         ports:
+@@ -111,6 +112,9 @@ spec:
+       - name: varlibdockercontainers
+         hostPath:
+           path: /var/lib/docker/containers
++      - name: mutadockercontainers
++        hostPath:
++          path: /muta/docker/containers
+       - name: config-volume
+         configMap:
+           name: fluentd-es-config-v0.2.0
