@@ -7,13 +7,13 @@ spec:
   image: mutadev/muta:latest # docker image
   resources:
     limits:
-      cpu: 500m
+      cpu: 1100m
       memory: 1Gi
-      ephemeral-storage: 20Gi
+      ephemeral-storage: 5Gi
     requests:
-      cpu: 500m
+      cpu: 1100m
       memory: 1Gi
-      ephemeral-storage: 1Gi
+      ephemeral-storage: 5Gi
   chaos: # all / stable-network-corrupt / stable-network-delay / stable-network-duplicate / stable-network-loss / stable-network-partition / stable-node-failure / stable-node-kill
     - stable-network-loss
   benchmark: # Create cronjob to execute https://github.com/nervosnetwork/muta-benchmark
@@ -26,6 +26,8 @@ spec:
       listening_address: "0.0.0.0:8000"
       graphql_uri: "/graphql"
       graphiql_uri: "/"
+      workers: 2 # if 0, uses number of available logical cpu as threads count.
+      maxconn: 25000
     network:
       listening_address: "0.0.0.0:1337"
       rpc_timeout: 10
@@ -55,6 +57,8 @@ spec:
       propose_ratio: 15
       prevote_ratio: 15
       precommit_ratio: 10
+      tx_num_limit: 20000
+      max_tx_size: 1073741824
     services:
       - name: asset
         payload: '{ "id": "f56924db538e77bb5951eb5ff0d02b88983c49c45eea30e8ae3e7234b311436c", "name": "MutaToken", "symbol": "MT", "supply": 320000011, "issuer": "f8389d774afdad8755ef8e629e5a154fddc6325a" }'
