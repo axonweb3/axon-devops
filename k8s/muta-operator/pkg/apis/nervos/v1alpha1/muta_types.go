@@ -118,6 +118,8 @@ type ConfigMetadata struct {
 	PrevoteRatio   uint64           `json:"prevote_ratio"`
 	PrecommitRatio uint64           `json:"precommit_ratio"`
 	BrakeRatio     uint64           `json:"brake_ratio"`
+	TxNumLimit     uint64           `json:"tx_num_limit"`
+	MaxTxSize      uint64           `json:"max_tx_size"`
 }
 
 type ConfigVerifier struct {
@@ -131,6 +133,8 @@ type ConfigGraphQL struct {
 	ListeningAddress string `json:"listening_address" toml:"listening_address"`
 	GraphiqlURI      string `json:"graphiql_uri" toml:"graphiql_uri"`
 	GraphqlURI       string `json:"graphql_uri" toml:"graphql_uri"`
+	Workers          uint64 `json:"workers" toml:"workers"`
+	Maxconn          uint64 `json:"maxconn" toml:"maxconn"`
 }
 
 type ConfigNetwork struct {
