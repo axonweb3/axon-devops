@@ -1,0 +1,6 @@
+/res/secret.toml
+/res/id_rsa
+/res/id_rsa.pub
+/res/db/instance_list.json
+/res/muta_config_request.toml
+/res/config_*.toml
