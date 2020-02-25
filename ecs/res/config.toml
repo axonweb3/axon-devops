@@ -1,0 +1,17 @@
+[[ecs.node]]
+# https://www.alibabacloud.com/help/tc/doc-detail/40654.html
+region_id = "cn-qingdao"
+image = "ubuntu_18_04_x64_20G_alibase_20191225.vhd"
+instance_type = "ecs.g5.8xlarge"
+internet_max_bandwidth_out = 100
+
+[db]
+path = "./res/db"
+
+[muta]
+path = "/root/muta"
+docker_username = "mohanson"
+data_path = "/tmp/data"
+use_public_ip = 1
+config_template = "/root/muta/devtools/chain/config.toml"
+genesis_template = "/root/muta/devtools/chain/genesis.toml"
