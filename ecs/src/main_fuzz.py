@@ -19,11 +19,6 @@ from aliyunsdkecs.request.v20140526 import DeleteInstanceRequest
 import acdb
 import conf
 
-client = AcsClient(
-    conf.secret["aliyun"]["access_key"],
-    conf.secret["aliyun"]["access_secret"],
-    "cn-hangzhou",
-)
 
 # request = StartInstanceRequest.StartInstanceRequest()
 # request.set_accept_format("json")
@@ -39,12 +34,12 @@ client = AcsClient(
 # print(response)
 
 
-instance_id = "i-bp19a8519y3csy851bt7"
+instance_id = "i-8vb5o8yojgypj3ekjmpv"
 
 client = AcsClient(
     conf.secret["aliyun"]["access_key"],
     conf.secret["aliyun"]["access_secret"],
-    "cn-hangzhou",
+    "cn-zhangjiakou",
 )
 
 # request = StopInstanceRequest.StopInstanceRequest()

@@ -8,9 +8,12 @@ import conf
 import toml
 import util
 
-c_poolsize = 200000
-c_timeout_gap = 999999
-c_cycles_limit = 630000000
+
+def get_int(name, default):
+    s = input(f"{name}({default}): ")
+    if s:
+        return int(s)
+    return default
 
 
 def muta_docker():
@@ -30,6 +33,7 @@ def muta_binary():
         with util.chdir("./devtools/keypair"):
             subprocess.call("cargo build --release", shell=True)
 
+        subprocess.call("rm -rf build", shell=True)
         subprocess.call("mkdir -p build", shell=True)
         subprocess.call("cp ./target/release/examples/muta-chain ./build", shell=True)
         subprocess.call("cp ./target/release/muta-keypair ./build", shell=True)
@@ -39,23 +43,32 @@ def muta_config_request():
     use_public_ip = conf.config["muta"]["use_public_ip"] == 1
     instance_list = acdb.db.load("instance_list")
     node_list = {"node": []}
-    for instance in instance_list:
+    for i, instance in enumerate(instance_list):
         host = ""
         if use_public_ip:
             host = instance["PublicIpAddress"]["IpAddress"][0]
         else:
             host = instance["NetworkInterfaces"]["NetworkInterface"][0]["PrimaryIpAddress"]
-        node_list["node"].append({
+        data = {
             "host": host,
             "api_port": 8000,
             "p2p_port": 1337,
             "data": conf.config["muta"]["data_path"],
-        })
+            "bp": True,
+        }
+        if i >= (len(instance_list) - conf.config["muta"]["sync_node_number"]):
+            data["bp"] = False
+        node_list["node"].append(data)
     with open("./res/muta_config_request.toml", "w") as f:
         toml.dump(node_list, f)
 
 
 def muta_config():
+    c_poolsize = get_int("poolsize", 200000)
+    c_timeout_gap = get_int("timeout_gap", 999999)
+    c_cycles_limit = get_int("cycles_limit", 630000000)
+    c_tx_num_limit = get_int("tx_num_limit", 30000)
+
     with open("./res/muta_config_request.toml") as f:
         face_config_list = toml.load(f)["node"]
 
@@ -78,9 +91,12 @@ def muta_config():
         payload["common_ref"] = keypairs["common_ref"]
         payload["timeout_gap"] = c_timeout_gap
         payload["cycles_limit"] = c_cycles_limit
+        payload["tx_num_limit"] = c_tx_num_limit
         payload["verifier_list"] = []
 
-        for e in keypairs["keypairs"]:
+        for i, e in enumerate(keypairs["keypairs"]):
+            if i >= (len(face_config_list) - conf.config["muta"]["sync_node_number"]):
+                break
             a = {
                 "bls_pub_key":  e["bls_public_key"],
                 "address": e["address"],
@@ -103,13 +119,10 @@ def muta_config():
             node_config["network"]["listening_address"] = "0.0.0.0:" + str(host_config["p2p_port"])
             node_config["logger"]["log_path"] = os.path.join(host_config["data"], "logs")
             node_config["mempool"]["pool_size"] = c_poolsize
-            if i == 0:
-                del node_config["network"]["bootstraps"]
-            else:
-                node_config["network"]["bootstraps"] = [{
-                    "pubkey": keypairs["keypairs"][0]["public_key"],
-                    "address": face_config_list[0]["host"] + ":" + str(face_config_list[0]["p2p_port"]),
-                }]
+            node_config["network"]["bootstraps"] = [{
+                "pubkey": keypairs["keypairs"][0]["public_key"],
+                "address": face_config_list[0]["host"] + ":" + str(face_config_list[0]["p2p_port"]),
+            }]
 
             with open(f"./build/config_{i+1}.toml", "w") as f:
                 toml.dump(node_config, f)
