@@ -31,7 +31,7 @@ c_region_id_list = [
     "cn-shenzhen",
 ]
 c_keypair_name = "muta"
-c_system_disk_size = 120
+c_system_disk_size = 500
 
 
 def init():
@@ -94,6 +94,8 @@ def info(region_instance_id_list):
 def make():
     security_group_dict = acdb.db.load("security_group_dict")  # map[region_id]security_group_id
     region_instance_id_list = []
+
+    # Check image id is avaliable
     for node_conf in conf.config["ecs"]["node"]:
         print("Get request", node_conf)
         client = AcsClient(
@@ -101,8 +103,6 @@ def make():
             conf.secret["aliyun"]["access_secret"],
             node_conf["region_id"],
         )
-
-        # Check image id is avaliable
         req = DescribeImagesRequest()
         req.set_Status("Available")
         req.set_ImageOwnerAlias("system")
@@ -114,7 +114,13 @@ def make():
         all_avaliable_image = [e["ImageId"] for e in res["Images"]["Image"]]
         assert node_conf["image"] in all_avaliable_image
 
-        # Create ECS instance
+    # Create ECS instance
+    for node_conf in conf.config["ecs"]["node"]:
+        client = AcsClient(
+            conf.secret["aliyun"]["access_key"],
+            conf.secret["aliyun"]["access_secret"],
+            node_conf["region_id"],
+        )
         req = CreateInstanceRequest()
         req.set_ImageId(node_conf["image"])
         req.set_SecurityGroupId(security_group_dict[node_conf["region_id"]])
@@ -162,7 +168,7 @@ def make():
 
     # Get ECS info
     acdb.db.save("instance_list", info(region_instance_id_list))
-    print("Instance info saved at ./res/db/instance_list.json")
+    print(f"Instance info saved at {conf.config['db']['path']}/instance_list.json")
 
 
 def free():

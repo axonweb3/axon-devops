@@ -1,7 +1,7 @@
 import os
 import toml
 
-if os.environ["CONFIG"]:
+if "CONFIG" in os.environ:
     config_path = f"./res/{os.environ['CONFIG']}.toml"
 else:
     config_path = "./res/config.toml"
