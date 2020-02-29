@@ -61,7 +61,9 @@ async function getNodeData(name) {
     var ret = {};
     ret.tagName = tagName;
     try {
+        console.log("getNodeData", dst)
         var res = await sdk.getLatestBlockHeight();
+        console.log(res)
         ret.height = res;
     } catch (err) {
     }
@@ -71,9 +73,10 @@ async function getNodeData(name) {
 async function getNodeDataList() {
     var running = new Map();
     var res = await k8sCoreApi.listNamespacedService(cNameSpace);
+    console.log("getNodeDataList", res);
 
     for await (const e of res.body.items.filter((e) => {
-        return e.metadata.ownerReferences[0].kind === 'Muta'
+        return e.metadata.labels['muta.nervos.org']
     })) {
         const data = await getNodeData(e.metadata.name);
         running.set(e.metadata.name, data);
@@ -133,61 +136,65 @@ async function watch_request() {
     while (true) {
         console.log(new Date(), "Watch request")
         const offset = update_id + 1;
-        const res = await request.get(`https://api.telegram.org/bot${cTgToken}/getUpdates?offset=${offset}&timeout=300`);
-        const data = JSON.parse(res);
+        try {
+            const res = await request.get(`https://api.telegram.org/bot${cTgToken}/getUpdates?offset=${offset}&timeout=300`);
+            const data = JSON.parse(res);
 
-        for (const e of data.result) {
-            update_id = e.update_id;
-            message = e.message;
-            if (!message) {
-                continue
-            }
-            if (!message.text) {
-                continue
-            }
-            const args = message.text.split(' ');
-
-            if (args[0] === '/get-node') {
-                const nodename = args[1]
-                if (!nodename) {
+            for (const e of data.result) {
+                update_id = e.update_id;
+                message = e.message;
+                if (!message) {
                     continue
                 }
-                await warn(JSON.stringify(await getNodeData(nodename), undefined, 4))
-            }
-            if (args[0] === '/get-node-all') {
-                const l = await getNodeDataList();
-                const b = new Map(Array.from(l.entries()));
-                const m = {};
-                for (const [k, v] of b.entries()) {
-                    m[k] = formatData(v);
-                }
-                await warn(JSON.stringify(m, undefined, 4));
-            }
-            if (args[0] === '/get-node-list') {
-                const tagsname = args[1]
-                if (!tagsname) {
+                if (!message.text) {
                     continue
                 }
-                const l = await getNodeDataList();
-                const b = new Map(Array.from(l.entries()).filter(e => e[1].tagName === tagsname));
-                const m = {};
-                for (const [k, v] of b.entries()) {
-                    m[k] = formatData(v);
+                const args = message.text.split(' ');
+
+                if (args[0] === '/get-node') {
+                    const nodename = args[1]
+                    if (!nodename) {
+                        continue
+                    }
+                    await warn(JSON.stringify(await getNodeData(nodename), undefined, 4))
                 }
-                await warn(JSON.stringify(m, undefined, 4));
+                if (args[0] === '/get-node-all') {
+                    const l = await getNodeDataList();
+                    const b = new Map(Array.from(l.entries()));
+                    const m = {};
+                    for (const [k, v] of b.entries()) {
+                        m[k] = formatData(v);
+                    }
+                    await warn(JSON.stringify(m, undefined, 4));
+                }
+                if (args[0] === '/get-node-list') {
+                    const tagsname = args[1]
+                    if (!tagsname) {
+                        continue
+                    }
+                    const l = await getNodeDataList();
+                    const b = new Map(Array.from(l.entries()).filter(e => e[1].tagName === tagsname));
+                    const m = {};
+                    for (const [k, v] of b.entries()) {
+                        m[k] = formatData(v);
+                    }
+                    await warn(JSON.stringify(m, undefined, 4));
+                }
+                if (args[0] === '/help') {
+                    await warn('/get-node [node-name]\r\n/get-node-all\r\n/get-node-list [node-tags]');
+                }
             }
-            if (args[0] === '/help') {
-                await warn('/get-node [node-name]\r\n/get-node-all\r\n/get-node-list [node-tags]');
-            }
+        } catch (err) {
+            console.log(err)
         }
     }
 }
 
 async function main() {
-    await watch_stopped()
+    await watch_stopped().catch(new Function())
     setInterval(watch_stopped, cDuration * 1000)
     setInterval(watch_alldata, cDuration * 6 * 1000)
-    watch_request()
+    await watch_request()
 }
 
 main()
