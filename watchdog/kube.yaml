@@ -9,6 +9,11 @@ spec:
   containers:
   - name: watchdog
     image: mutadev/watchdog:0.1.0
+    resources:
+      requests:
+        ephemeral-storage: "8Mi"
+      limits:
+        ephemeral-storage: "1Gi"
     volumeMounts:
         - name: config
           mountPath: /src/config
