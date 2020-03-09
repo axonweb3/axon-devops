@@ -1,0 +1,16 @@
+- name: deploy blog
+  filters:
+    repository.url: https://github.com/npc/blog
+    ref: refs/heads/gh-pages
+  cmd: |
+    cd /tmp/repo
+    git checkout gh-pages
+    git fetch origin
+    git pull origin gh-pages
+- name: deploy web server
+  filters:
+    repository.url: https://github.com/npc/server
+    ref: refs/heads/master
+  cmd: |
+    echo '{"vhost": "localhost", "version": "${payload.after.slice(0, 7)}", "repo": "${payload.repository.url}"}'
+    echo 'do some deploy work'

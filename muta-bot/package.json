@@ -1,0 +1,70 @@
+{
+  "name": "muta-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "muta-bot",
+  "author": "yejiayu <yejiayu.fe@gmail.com>",
+  "license": "ISC",
+  "repository": "https://github.com/yejiayu/muta-bot.git",
+  "homepage": "https://github.com/yejiayu/muta-bot",
+  "bugs": "https://github.com/yejiayu/muta-bot/issues",
+  "keywords": [
+    "probot",
+    "github",
+    "probot-app"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "nodemon --exec \"npm start\"",
+    "start": "probot run ./lib/index.js",
+    "lint": "standard **/*.ts --fix",
+    "test": "jest && standard **/*.ts",
+    "test:watch": "jest --watch --notify --notifyMode=change --coverage"
+  },
+  "dependencies": {
+    "async": "^3.1.0",
+    "home": "^2.0.0",
+    "js-yaml": "^3.13.1",
+    "lowdb": "^1.0.0",
+    "moment": "^2.24.0",
+    "probot": "^9.5.3",
+    "probot-scheduler": "^2.0.0-beta.1",
+    "shelljs": "^0.8.3",
+    "simple-git": "^1.131.0",
+    "titleize": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/async": "^3.0.3",
+    "@types/js-yaml": "^3.12.1",
+    "@types/lodash": "^4.14.149",
+    "@types/lowdb": "^1.0.9",
+    "@types/jest": "^24.0.19",
+    "@types/nock": "^11.1.0",
+    "@types/node": "^12.11.1",
+    "@typescript-eslint/parser": "^2.4.0",
+    "eslint-plugin-typescript": "^0.14.0",
+    "jest": "^24.9.0",
+    "nock": "^11.4.0",
+    "nodemon": "^2.0.0",
+    "smee-client": "^1.1.0",
+    "standard": "^14.3.1",
+    "ts-jest": "^24.1.0",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.6.4"
+  },
+  "engines": {
+    "node": ">= 8.3.0"
+  },
+  "standard": {
+    "parser": "@typescript-eslint/parser",
+    "env": [
+      "jest"
+    ],
+    "plugins": [
+      "typescript"
+    ]
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
