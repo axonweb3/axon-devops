@@ -1,32 +1,37 @@
-// create configmap
-// kubectl create -n mutadev configmap kubeconfig --from-file=kube.config=~/.kube/config
+# create configmap
+# kubectl create -n mutadev configmap kubeconfig --from-file=kube.config=~/.kube/config
 
-apiVersion: v1
-kind: Pod
+kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: watchdog
 spec:
-  containers:
-  - name: watchdog
-    image: mutadev/watchdog:0.1.0
-    resources:
-      requests:
-        ephemeral-storage: "8Mi"
-      limits:
-        ephemeral-storage: "1Gi"
-    volumeMounts:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: watchdog
+  template:
+    metadata:
+      labels:
+        name: watchdog
+    spec:
+      containers:
+      - name: watchdog
+        image: mutadev/watchdog:0.1.6
+        resources:
+          requests:
+            ephemeral-storage: "8Mi"
+          limits:
+            ephemeral-storage: "1Gi"
+        volumeMounts:
+            - name: config
+              mountPath: /src/config
+        env:
+          - name: TG_TOKEN
+            value: ""
+          - name: CHAT_ID
+            value: ""
+      volumes:
         - name: config
-          mountPath: /src/config
-    env:
-      - name: USE_PROXY
-        value: ""
-      - name: PROXY_HOSTPORT
-        value: ""
-      - name: TG_TOKEN
-        value: ""
-      - name: CHAT_ID
-        value: ""
-  volumes:
-    - name: config
-      configMap:
-        name: kubeconfig
+          configMap:
+            name: kubeconfig
