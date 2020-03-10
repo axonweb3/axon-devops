@@ -18,7 +18,7 @@ spec:
     - stable-network-loss
   benchmark: # Create cronjob to execute https://github.com/nervosnetwork/muta-benchmark
     duration: "30s"
-    schedule: "*/5 * * * *"   # minutes, hours, days, months, weeks
+    schedule: "*/5 * * * *" # minutes, hours, days, months, weeks
   size: 8 # Node numbers
   config: # see https://github.com/nervosnetwork/muta/blob/master/devtools/chain/config.toml
     data_path: "/app/data"
@@ -47,9 +47,9 @@ spec:
       modules_level:
         "core_network": "debug"
   genesis: # https://github.com/nervosnetwork/muta/blob/master/devtools/chain/genesis.toml
-    prevhash: "44915be5b6c20b0678cf05fcddbbaa832e25d7e6ac538784cd5c24de00d47472"
+    prevhash: "0x44915be5b6c20b0678cf05fcddbbaa832e25d7e6ac538784cd5c24de00d47472"
     metadata:
-      chain_id: "b6a4d7da21443f5e816e8700eea87610e6d769657d6b8ec73028457bf2ca4036"
+      chain_id: "0xb6a4d7da21443f5e816e8700eea87610e6d769657d6b8ec73028457bf2ca4036"
       timeout_gap: 20
       cycles_limit: 99999999
       cycles_price: 1
@@ -61,4 +61,4 @@ spec:
       max_tx_size: 1073741824
     services:
       - name: asset
-        payload: '{ "id": "f56924db538e77bb5951eb5ff0d02b88983c49c45eea30e8ae3e7234b311436c", "name": "MutaToken", "symbol": "MT", "supply": 320000011, "issuer": "f8389d774afdad8755ef8e629e5a154fddc6325a" }'
+        payload: '{ "id": "0xf56924db538e77bb5951eb5ff0d02b88983c49c45eea30e8ae3e7234b311436c", "name": "MutaToken", "symbol": "MT", "supply": 320000011, "issuer": "0xf8389d774afdad8755ef8e629e5a154fddc6325a" }'
