@@ -57,13 +57,14 @@ type MutaSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
-	Resources corev1.ResourceRequirements `json:"resources"`
-	Image     string                      `json:"image"`
-	Chaos     []ChaosType                 `json:"chaos"`
-	Benchmark *Benchmark                  `json:"benchmark"`
-	Size      uint64                      `json:"size"`
-	Config    Config                      `json:"config"`
-	Genesis   ConfigGenesis               `json:"genesis" toml:"genesis"`
+	Resources  corev1.ResourceRequirements `json:"resources"`
+	Image      string                      `json:"image"`
+	Chaos      []ChaosType                 `json:"chaos"`
+	Benchmark  *Benchmark                  `json:"benchmark"`
+	Size       uint64                      `json:"size"`
+	Persistent bool                        `json:"persistent"`
+	Config     Config                      `json:"config"`
+	Genesis    ConfigGenesis               `json:"genesis" toml:"genesis"`
 }
 
 // Benchmark defines the parameters of benchmark
