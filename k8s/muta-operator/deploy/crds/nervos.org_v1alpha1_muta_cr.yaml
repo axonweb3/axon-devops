@@ -8,11 +8,11 @@ spec:
   resources:
     limits:
       cpu: 1100m
-      memory: 1Gi
+      memory: 3Gi
       ephemeral-storage: 5Gi
     requests:
       cpu: 1100m
-      memory: 1Gi
+      memory: 3Gi
       ephemeral-storage: 5Gi
   chaos: # all / stable-network-corrupt / stable-network-delay / stable-network-duplicate / stable-network-loss / stable-network-partition / stable-node-failure / stable-node-kill
     - stable-network-corrupt
@@ -21,6 +21,7 @@ spec:
     duration: "30s"
     schedule: "*/5 * * * *" # minutes, hours, days, months, weeks
   size: 3 # Node numbers
+  persistent: false # Persistent data
   config: # see https://github.com/nervosnetwork/muta/blob/master/devtools/chain/config.toml
     data_path: "/app/data"
     graphql:

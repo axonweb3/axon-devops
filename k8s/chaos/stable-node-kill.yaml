@@ -5,12 +5,11 @@ metadata:
   namespace: chaos-testing
 spec:
   action: pod-kill
-  mode: fixed-percent
-  value: "30"
+  mode: all
   selector:
     namespaces:
       - mutadev
     labelSelectors:
       stable-node-kill: "true"
   scheduler:
-    cron: "@every 30m"
+    cron: "@every 5m"

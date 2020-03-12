@@ -1,7 +1,7 @@
 apiVersion: nervos.org/v1alpha1
 kind: Muta
 metadata:
-  name: muta-4-chaos-stable-network-partition
+  name: muta-4-chaos-stable-node-kill
   namespace: mutadev # Only supports deployment to the mutadev namespace
 spec:
   image: mutadev/muta:latest # docker image
@@ -15,11 +15,12 @@ spec:
       memory: 3Gi
       ephemeral-storage: 5Gi
   chaos: # all / stable-network-corrupt / stable-network-delay / stable-network-duplicate / stable-network-loss / stable-network-partition / stable-node-failure / stable-node-kill
-    - stable-network-partition
+    - stable-node-kill
   benchmark: # Create cronjob to execute https://github.com/nervosnetwork/muta-benchmark
     duration: "30s"
     schedule: "*/5 * * * *" # minutes, hours, days, months, weeks
   size: 4 # Node numbers
+  persistent: true # Persistent data
   config: # see https://github.com/nervosnetwork/muta/blob/master/devtools/chain/config.toml
     data_path: "/app/data"
     graphql:

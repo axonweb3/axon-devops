@@ -15,6 +15,7 @@ import (
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -31,6 +32,8 @@ import (
 var log = logf.Log.WithName("controller_muta")
 
 var keypairName = types.NamespacedName{Name: "muta-keypairs-config", Namespace: "mutadev"}
+
+var storageClassName = "muta"
 
 /**
 * USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
@@ -211,15 +214,21 @@ func (r *ReconcileMuta) createMutaChain(instance *nervosv1alpha1.Muta) error {
 			Payload: string(metadata),
 		})
 
-		if err := r.createConfigMap(instance, fmt.Sprintf("%s-%d", chainName, i), &config, &genesis); err != nil {
+		nodeName := fmt.Sprintf("%s-%d", chainName, i)
+		if err := r.createConfigMap(instance, nodeName, &config, &genesis); err != nil {
 			return err
 		}
 
-		if err := r.createNodeService(instance, fmt.Sprintf("%s-%d", chainName, i)); err != nil {
+		if err := r.createNodeService(instance, nodeName); err != nil {
 			return err
 		}
 
-		if err := r.createNode(instance, fmt.Sprintf("%s-%d", chainName, i)); err != nil {
+		if instance.Spec.Persistent {
+			if err := r.createPersistent(instance, nodeName); err != nil {
+				return err
+			}
+		}
+		if err := r.createNode(instance, nodeName); err != nil {
 			return err
 		}
 	}
@@ -279,6 +288,19 @@ func (r *ReconcileMuta) createNode(instance *nervosv1alpha1.Muta, name string) e
 				},
 			},
 		},
+	}
+
+	if instance.Spec.Persistent {
+		pvcVolume := corev1.Volume{
+			Name: "muta-storage",
+			VolumeSource: corev1.VolumeSource{
+				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+					ClaimName: name,
+				},
+			},
+		}
+
+		podSpec.Volumes = append(podSpec.Volumes, pvcVolume)
 	}
 
 	labels := make(map[string]string)
@@ -446,6 +468,70 @@ func (r *ReconcileMuta) createBenchmark(instance *nervosv1alpha1.Muta, name stri
 	}
 
 	return r.client.Create(context.TODO(), benchmark)
+}
+
+func (r *ReconcileMuta) createPersistent(instance *nervosv1alpha1.Muta, name string) error {
+	labels := make(map[string]string)
+	labels["app"] = name
+	labels["muta.nervos.org"] = instance.Name
+
+	requestStorage := make(map[corev1.ResourceName]resource.Quantity)
+	requestStorage[corev1.ResourceStorage] = *instance.Spec.Resources.Requests.StorageEphemeral()
+
+	limitStorage := make(map[corev1.ResourceName]resource.Quantity)
+	limitStorage[corev1.ResourceStorage] = *instance.Spec.Resources.Limits.StorageEphemeral()
+
+	pv := &corev1.PersistentVolume{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: instance.Namespace,
+			Labels:    labels,
+		},
+		Spec: corev1.PersistentVolumeSpec{
+			Capacity:         limitStorage,
+			StorageClassName: storageClassName,
+			AccessModes: []corev1.PersistentVolumeAccessMode{
+				corev1.ReadWriteOnce,
+			},
+			PersistentVolumeSource: corev1.PersistentVolumeSource{
+				HostPath: &corev1.HostPathVolumeSource{
+					Path: fmt.Sprintf("/muta/docker/pv/%s", name),
+				},
+			},
+		},
+	}
+
+	if err := controllerutil.SetControllerReference(instance, pv, r.scheme); err != nil {
+		return err
+	}
+
+	if err := r.client.Create(context.TODO(), pv); err != nil {
+		return err
+	}
+
+	pvc := &corev1.PersistentVolumeClaim{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: instance.Namespace,
+			Labels:    labels,
+		},
+		Spec: corev1.PersistentVolumeClaimSpec{
+			StorageClassName: &storageClassName,
+			AccessModes: []corev1.PersistentVolumeAccessMode{
+				corev1.ReadWriteOnce,
+			},
+			Resources: corev1.ResourceRequirements{
+				Requests: requestStorage,
+				Limits:   limitStorage,
+			},
+		},
+	}
+
+	if err := controllerutil.SetControllerReference(instance, pvc, r.scheme); err != nil {
+		return err
+	}
+
+	return r.client.Create(context.TODO(), pvc)
 }
 
 func unmarshalNodeCrypto(cm *corev1.ConfigMap) (*nervosv1alpha1.NodeCrypto, error) {

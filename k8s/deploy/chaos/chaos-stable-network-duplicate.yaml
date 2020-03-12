@@ -1,25 +1,25 @@
 apiVersion: nervos.org/v1alpha1
 kind: Muta
 metadata:
-  name: muta-8-chaos-stable-network-duplicate
+  name: muta-4-chaos-stable-network-duplicate
   namespace: mutadev # Only supports deployment to the mutadev namespace
 spec:
   image: mutadev/muta:latest # docker image
   resources:
     limits:
       cpu: 1100m
-      memory: 1Gi
+      memory: 3Gi
       ephemeral-storage: 5Gi
     requests:
       cpu: 1100m
-      memory: 1Gi
+      memory: 3Gi
       ephemeral-storage: 5Gi
   chaos: # all / stable-network-corrupt / stable-network-delay / stable-network-duplicate / stable-network-loss / stable-network-partition / stable-node-failure / stable-node-kill
     - stable-network-duplicate
   benchmark: # Create cronjob to execute https://github.com/nervosnetwork/muta-benchmark
     duration: "30s"
     schedule: "*/5 * * * *" # minutes, hours, days, months, weeks
-  size: 8 # Node numbers
+  size: 4 # Node numbers
   config: # see https://github.com/nervosnetwork/muta/blob/master/devtools/chain/config.toml
     data_path: "/app/data"
     graphql:
@@ -57,6 +57,7 @@ spec:
       propose_ratio: 15
       prevote_ratio: 15
       precommit_ratio: 10
+      brake_ratio: 3
       tx_num_limit: 20000
       max_tx_size: 1073741824
     services:
