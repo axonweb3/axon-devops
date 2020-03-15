@@ -56,7 +56,7 @@ async function getNodeData(name) {
     }
     var sdk = new mutasdk.Muta({
         endpoint: dst + 'graphql',
-    }).client;
+    }).client();
 
     var ret = {};
     ret.tagName = tagName;

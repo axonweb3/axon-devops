@@ -31,7 +31,10 @@
     "probot-scheduler": "^2.0.0-beta.1",
     "shelljs": "^0.8.3",
     "simple-git": "^1.131.0",
-    "titleize": "^2.1.0"
+    "titleize": "^2.1.0",
+    "@kubernetes/client-node": "^0.11.1",
+    "muta-sdk": "^0.6.0",
+    "request-promise-native": "^1.0.8"
   },
   "devDependencies": {
     "@types/async": "^3.0.3",

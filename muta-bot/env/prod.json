@@ -1,5 +1,6 @@
 {
   "weekly_repo": "muta-internal",
   "code_repo": "nervosnetwork/muta",
-  "code_branch": "master"
+  "code_branch": "master",
+  "kube_host": "47.56.237.128"
 }

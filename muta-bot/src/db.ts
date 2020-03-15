@@ -1,8 +1,8 @@
-import fs from "fs";
 import path from "path";
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
-import home from "home";
+
+import * as config from "./config";
 
 import { IssueMeta, IssueWithProject, LatestWeekly } from "./types";
 
@@ -82,12 +82,7 @@ class FileDB {
   }
 }
 
-const rootPath = home.resolve("~/.muta-bot");
-if (!fs.existsSync(rootPath)) {
-  fs.mkdirSync(rootPath);
-}
-
-const dbFile = path.join(rootPath, "db.json");
+const dbFile = path.join(config.ROOT_PATH, "db.json");
 const fileDB = new FileDB(dbFile);
 console.log(`The data file of ${dbFile}`);
 export default fileDB;
