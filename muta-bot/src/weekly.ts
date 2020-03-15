@@ -3,7 +3,7 @@ import createScheduler from "probot-scheduler";
 import moment from "moment";
 
 import fileDB from "./db";
-import config from "./config";
+import * as config from "./config";
 
 const PREVIEW_HEADER = "application/vnd.github.elektra-preview+json";
 
@@ -14,7 +14,7 @@ const PROJECT_COLUMN_IN_PROGRESS = "In progress";
 const PROJECT_COLUMN_IN_REVIEW = "In review";
 const PROJECT_COLUMN_DONW = "Done";
 
-const REPO_NAME = config.weekly_repo;
+const REPO_NAME = config.WEEKLY_REPO;
 
 // GraphQL query to pin an issue
 const pinissue = `mutation ($input: PinIssueInput!) {

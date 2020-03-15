@@ -1,5 +1,6 @@
 {
   "weekly_repo": "muta-bot",
   "code_repo": "yejiayu/muta-bot",
-  "code_branch": "master"
+  "code_branch": "master",
+  "kube_host": "47.56.237.128"
 }
