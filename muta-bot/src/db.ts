@@ -4,7 +4,7 @@ import FileSync from "lowdb/adapters/FileSync";
 
 import * as config from "./config";
 
-import { IssueMeta, IssueWithProject, LatestWeekly } from "./types";
+import {IssueMeta, IssueWithProject, LatestWeekly} from "./types";
 
 class FileDB {
   private db: low.LowdbSync<any>;
@@ -79,6 +79,26 @@ class FileDB {
 
   public getLatestWeeklyIssue(): LatestWeekly {
     return this.db.get("latest_weekly_issue").value();
+  }
+
+  public saveLatestDailyIssue(
+    id: number,
+    number: number,
+    node_id: string,
+    last_number: number
+  ) {
+    this.db
+      .set("latest_daily_issue", {
+        id,
+        number,
+        node_id,
+        last_number
+      })
+      .write();
+  }
+
+  public getLatestDailyIssue(): LatestWeekly {
+    return this.db.get("latest_daily_issue").value();
   }
 }
 
