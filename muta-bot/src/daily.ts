@@ -25,7 +25,7 @@ export interface AllTasks {
   delayIssues: Octokit.IssuesGetResponse[];
 }
 
-const log = config.DEV_MODE ? (...p: any[]) => p : console.log
+const log = config.DEV_MODE ? console.log : (...p: any[]) => p
 
 export default function (app) {
   createScheduler(app, {
@@ -213,15 +213,12 @@ async function dailyReport(context: Context, allTasks: AllTasks, isYesterday: bo
   log('latestDailyIssue:')
   log(latestDailyIssue)
 
-  let daily_issue_number = -1
-
-
   const date = isYesterday ? moment().add(-1, 'days') : moment()
   const title = `[Daily-Report] ${date.format("YYYY-MM-DD")}`
 
-  if (!latestDailyIssue || latestDailyIssue.number == 0) {
-    daily_issue_number = findDailyTask(title, allTasks)
-  } else {
+  let daily_issue_number = findDailyTask(title, allTasks)
+
+  if (daily_issue_number < 0 && latestDailyIssue) {
     daily_issue_number = latestDailyIssue.number
   }
 
@@ -234,6 +231,10 @@ async function dailyReport(context: Context, allTasks: AllTasks, isYesterday: bo
       issue_number: daily_issue_number
     })
   );
+
+  if (!issue.title.startsWith('[Daily-Report]')) {
+    throw new Error(`Not found daily report issue ${title}, found ${issue.title}`);
+  }
 
   if (issue.title > title) {
     return
