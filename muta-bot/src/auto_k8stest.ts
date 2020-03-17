@@ -90,8 +90,13 @@ export async function buildChainByIssueComment(context: probot.Context) {
   const repoAddr = 'https://' + seps[0] + '/' + seps[1] + '/' + seps[2];
   const branch = seps[4];
   const commit = seps[6];
+  const timeout = parseInt(seps[8])
   setTimeout(async function () {
-    runOnK8s(context, repoAddr, branch, commit, "muta-" + commit, "muta-" + commit);
+    try {
+      runOnK8s(context, repoAddr, branch, commit, "muta-" + commit, "muta-" + commit, timeout * 3600 * 1000);
+    } catch (err) {
+      console.log(err)
+    }
   }, 1000)
 }
 
@@ -102,6 +107,7 @@ async function runOnK8s(
   commitID: string | undefined,
   destName: string,
   kubeName: string | undefined,
+  timeout: number,
 ) {
   shell.pushd(cData)
   await execAsync(`git clone -b ${remoteBranch} ${remoteRepoAddress} ${destName}`)
@@ -126,16 +132,17 @@ async function runOnK8s(
   txt = txt.replace('mutadev/muta:latest', 'mutadev/muta:' + commitID);
   txt = txt.replace('muta-example', kubeName);
   fs.writeFileSync(`${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`, txt);
-  await execAsync(`kubectl delete -n mutadev muta.nervos.org ${kubeName}`);
-  await sleep(60 * 1000);
   try {
-    await execAsync(`kubectl apply -f ${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`);
+    await execAsync(`kubectl delete -n mutadev muta.nervos.org ${kubeName}`);
   } catch (err) {
     // Safe to ignore
   }
+  await sleep(60 * 1000);
+  await execAsync(`kubectl apply -f ${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`);
+
   setTimeout(async function () {
     await execAsync(`kubectl delete -f ${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`);
-  }, cTimeout)
+  }, timeout)
 
   if (!vData.has(kubeName)) {
     vData.set(kubeName, new Array());
@@ -214,6 +221,10 @@ export async function pullRequestHandler(context: probot.Context) {
   console.log('Remote branch is', remoteBranch);
 
   setTimeout(async function () {
-    runOnK8s(context, remoteRepoAddress, remoteBranch, undefined, destPath, kubeName);
+    try {
+      runOnK8s(context, remoteRepoAddress, remoteBranch, undefined, destPath, kubeName, cTimeout);
+    } catch (err) {
+      console.log(err)
+    }
   }, 1000)
 }
