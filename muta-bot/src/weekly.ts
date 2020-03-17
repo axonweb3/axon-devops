@@ -8,13 +8,13 @@ import * as config from "./config";
 const PREVIEW_HEADER = "application/vnd.github.elektra-preview+json";
 
 const WEEKLY_PROJECT = "Weekly-reports";
-const WEEKLY_PROJECT_COLUMN_TODO = "To do";
+export const WEEKLY_PROJECT_COLUMN_TODO = "To do";
 
-const PROJECT_COLUMN_IN_PROGRESS = "In progress";
-const PROJECT_COLUMN_IN_REVIEW = "In review";
-const PROJECT_COLUMN_DONW = "Done";
+export const PROJECT_COLUMN_IN_PROGRESS = "In progress";
+export const PROJECT_COLUMN_IN_REVIEW = "In review";
+export const PROJECT_COLUMN_DONE = "Done";
 
-const REPO_NAME = config.WEEKLY_REPO;
+export const REPO_NAME = config.WEEKLY_REPO;
 
 // GraphQL query to pin an issue
 const pinissue = `mutation ($input: PinIssueInput!) {
@@ -34,12 +34,12 @@ const unpinissue = `mutation ($input: UnpinIssueInput!) {
   }
 }`;
 
-interface ListCard {
+export interface ListCard {
   cardType: string;
   list: Octokit.ProjectsListCardsResponseItem[];
 }
 
-interface IssueMeta {
+export interface IssueMeta {
   title: string;
   assignees: string[];
   reviewers: string[];
@@ -169,7 +169,7 @@ async function getLatestProjectID(context: Context): Promise<number> {
   return project.id;
 }
 
-async function listCardForProject(
+export async function listCardForProject(
   context: Context,
   id: number
 ): Promise<ListCard[]> {
@@ -180,7 +180,7 @@ async function listCardForProject(
   const promiseAll = [
     PROJECT_COLUMN_IN_PROGRESS,
     PROJECT_COLUMN_IN_REVIEW,
-    PROJECT_COLUMN_DONW
+    PROJECT_COLUMN_DONE
   ]
     .map(name => {
       return { column_id: findColumnID(listColumn, name), name };
@@ -197,12 +197,12 @@ async function listCardForProject(
   return Promise.all(promiseAll);
 }
 
-function findColumnID(listColumn: any[], columnName: string): number {
+export function findColumnID(listColumn: any[], columnName: string): number {
   const column = listColumn.find(column => column.name === columnName);
   return column.id;
 }
 
-async function getListIssueMeta(
+export async function getListIssueMeta(
   context: Context,
   list: Octokit.ProjectsListCardsResponseItem[]
 ): Promise<IssueMeta[]> {
@@ -336,7 +336,7 @@ async function getMDRender(context: Context): Promise<string> {
         const listReviewIssueMeta = await getListIssueMeta(context, cards.list);
         templateData.review = listReviewIssueMeta;
         break;
-      case PROJECT_COLUMN_DONW:
+      case PROJECT_COLUMN_DONE:
         const listDoneIssueMeta = await getListIssueMeta(
           context,
           cards.list.filter(card => isWeekIssue(card.updated_at, sunday))

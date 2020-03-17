@@ -9,6 +9,10 @@ console.log("bot config:", config);
 export const WEEKLY_REPO = config.weekly_repo;
 export const CODE_REPO = config.code_repo;
 export const CODE_BRANCH = config.code_branch;
+export const DEV_MODE = config.dev_mode;
+export const TELEGRAM_BOT_KEY = config.telegram_bot_key
+export const TELEGRAM_CHAT_ID = DEV_MODE ? config.telegram_channel_id : config.telegram_nervos_group;
+export const MEMBERS = config.members
 
 export const ROOT_PATH = home.resolve('~/.muta-bot');
 export const ROOT_K8SYAML_PATH = path.join(ROOT_PATH, 'k8s');

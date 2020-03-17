@@ -2,5 +2,59 @@
   "weekly_repo": "muta-internal",
   "code_repo": "nervosnetwork/muta",
   "code_branch": "master",
-  "kube_host": "47.56.237.128"
+  "kube_host": "47.56.237.128",
+  "dev_mode": false,
+  "telegram_bot_key": "",
+  "telegram_channel_id": -1001445330146,
+  "telegram_nervos_group": -315685254,
+  "members": [
+    {
+      "github": "lgn21st",
+      "telegram": "lgn21st"
+    },
+    {
+      "github": "huwenchao",
+      "telegram": "zjuhwc"
+    },
+    {
+      "github": "homura",
+      "telegram": ""
+    },
+    {
+      "github": "yejiayu",
+      "telegram": "Jiayufe"
+    },
+    {
+      "github": "mohanson",
+      "telegram": "mohanson"
+    },
+    {
+      "github": "fendouhyz",
+      "telegram": "cosinyouth"
+    },
+    {
+      "github": "zeroqn",
+      "telegram": "zeroqn"
+    },
+    {
+      "github": "LycrusHamster",
+      "telegram": ""
+    },
+    {
+      "github": "KaoImin",
+      "telegram": ""
+    },
+    {
+      "github": "rev-chaos",
+      "telegram": ""
+    },
+    {
+      "github": "mkxbl",
+      "telegram": ""
+    },
+    {
+      "github": "zhouyun-zoe",
+      "telegram": "zoezhou"
+    }
+  ]
 }

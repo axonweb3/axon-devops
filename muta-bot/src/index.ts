@@ -1,16 +1,18 @@
-import { Application, Context } from "probot"; // eslint-disable-line no-unused-vars
+import {Application, Context} from "probot"; // eslint-disable-line no-unused-vars
 import titleize from "titleize";
 
 import fileDB from "./db";
 import weekly from "./weekly";
-import { pushHandler } from "./push";
-import { pullRequestHandler, buildChainByIssueComment } from "./auto_k8stest";
+import {pushHandler} from "./push";
+import {pullRequestHandler, buildChainByIssueComment} from "./auto_k8stest";
 import * as config from "./config";
+import daily from './daily'
+import moment from "moment";
 
 const PROJECT_COLUMN_TODO = "To do";
 const PROJECT_COLUMN_IN_PROGRESS = "In progress";
 const PROJECT_COLUMN_IN_REVIEW = "In review";
-const PROJECT_COLUMN_DONW = "Done";
+const PROJECT_COLUMN_DONE = "Done";
 
 const LABEL_TODO = "bot:todo";
 const LABEL_IN_PROGRESS = "bot:in-progress";
@@ -26,6 +28,7 @@ interface IssueMeta {
 }
 
 export = (app: Application) => {
+  daily(app)
   weekly(app);
   app.on("push", async context => {
     await pushHandler(context.payload);
@@ -81,7 +84,7 @@ export = (app: Application) => {
     }
 
     const comment = context.payload.comment.body.toLowerCase();
-    if (comment.startsWith("/go")) {
+    if (comment.toLowerCase().startsWith("/go")) {
       if (!isOwnerMessage(context)) {
         return;
       }
@@ -91,6 +94,13 @@ export = (app: Application) => {
       ) {
         return;
       }
+
+      const startAt = moment()
+      const points = getPoints(context.payload.issue.body)
+      const deadline = getDeadline(startAt, points)
+      const body = `${context.payload.issue.body}\r\n\r\n## Bot updates\r\n` +
+        `**StartAt**    ${startAt.format("YYYY-MM-DD,  dddd")}\r\n` +
+        `**Deadline**  ${deadline.format("YYYY-MM-DD,  dddd")}`;
 
       labels.push(LABEL_IN_PROGRESS);
       if (
@@ -102,6 +112,7 @@ export = (app: Application) => {
       ) {
         await context.github.issues.update(
           context.issue({
+            body,
             labels: labels.filter(s => s !== LABEL_TODO)
           })
         );
@@ -114,7 +125,7 @@ export = (app: Application) => {
 
         fileDB.saveIssueStartAt(context.payload.issue.id, Date.now());
       }
-    } else if (comment.startsWith("/ptal")) {
+    } else if (comment.toLowerCase().startsWith("/ptal")) {
       console.log(isOwnerMessage(context));
       if (!isOwnerMessage(context)) {
         return;
@@ -148,7 +159,7 @@ export = (app: Application) => {
           })
         );
       }
-    } else if (comment.startsWith("/lgtm")) {
+    } else if (comment.toLowerCase().startsWith("/lgtm")) {
       if (!isReviewerMessage(context)) {
         return;
       }
@@ -181,7 +192,7 @@ export = (app: Application) => {
           await issueMoveColumn(
             context,
             context.payload.issue.milestone.title,
-            PROJECT_COLUMN_DONW
+            PROJECT_COLUMN_DONE
           )
         ) {
           labels.push(LABEL_DONE);
@@ -202,7 +213,7 @@ export = (app: Application) => {
           });
         }
       }
-    } else if (comment.startsWith("/baba")) {
+    } else if (comment.toLowerCase().startsWith("/baba")) {
       if (!isOwnerMessage(context)) {
         return;
       }
@@ -306,7 +317,7 @@ function approve(context: Context): string[] {
 async function removeCard(context: Context) {
   const projectInfo = fileDB.getIssueWithProject(context.payload.issue.id);
 
-  await context.github.projects.deleteCard({ card_id: projectInfo.cardID });
+  await context.github.projects.deleteCard({card_id: projectInfo.cardID});
 }
 
 async function updateIssue(context: Context): Promise<IssueMeta> {
@@ -376,7 +387,7 @@ async function issueMoveColumn(
   columnName: string
 ): Promise<boolean> {
   if (columnName === PROJECT_COLUMN_TODO) {
-    const { data: projects } = await context.github.projects.listForRepo(
+    const {data: projects} = await context.github.projects.listForRepo(
       context.issue()
     );
 
@@ -390,12 +401,12 @@ async function issueMoveColumn(
       return false;
     }
 
-    const { data: listColumn } = await context.github.projects.listColumns({
+    const {data: listColumn} = await context.github.projects.listColumns({
       project_id: project.id
     });
 
     const columnID = findColumnID(listColumn, columnName);
-    const { data: card } = await context.github.projects.createCard({
+    const {data: card} = await context.github.projects.createCard({
       column_id: columnID,
       content_id: context.payload.issue.id,
       content_type: "Issue"
@@ -410,7 +421,7 @@ async function issueMoveColumn(
   }
 
   const issueProject = fileDB.getIssueWithProject(context.payload.issue.id);
-  const { data: listColumn } = await context.github.projects.listColumns({
+  const {data: listColumn} = await context.github.projects.listColumns({
     project_id: issueProject.projectID
   });
 
@@ -454,4 +465,21 @@ function isLabelByName(source: string[], target: string[]): boolean {
     return true;
   }
   return false;
+}
+
+function getPoints(body: string): number {
+  const issueMeta = parseIssueBody(body);
+  return issueMeta.point
+}
+
+function getDeadline(startAt: moment.Moment, point: number): moment.Moment {
+  let deadline = startAt.clone()
+  for (let i = 0; i < point; i++) {
+    deadline = deadline.add(1, "days");
+    if (deadline.format("E") === "6" || deadline.format("E") === "7") {
+      i--;
+    }
+  }
+
+  return deadline
 }
