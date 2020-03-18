@@ -109,20 +109,16 @@ async function runOnK8s(
   kubeName: string | undefined,
   timeout: number,
 ) {
-  shell.pushd(cData)
-  await execAsync(`git clone -b ${remoteBranch} ${remoteRepoAddress} ${destName}`)
-  shell.pushd(destName)
+  await execAsync(`git clone -b ${remoteBranch} ${remoteRepoAddress} ${destName}`, { cwd: cData })
   if (commitID !== undefined) {
-    await execAsync(`git checkout ${commitID}`)
+    await execAsync(`git checkout ${commitID}`, { cwd: cData + '/' + destName })
   } else {
-    var _code, output = await execAsync('git rev-parse --short HEAD');
+    var _code, output = await execAsync('git rev-parse --short HEAD', { cwd: cData + '/' + destName });
     commitID = output.trim()
   }
-  await execAsync('make docker-build');
-  await execAsync('make docker-push');
-  shell.popd()
-  shell.rm('-rf', destName);
-  shell.popd()
+  await execAsync('make docker-build', { cwd: cData + '/' + destName });
+  await execAsync('make docker-push', { cwd: cData + '/' + destName });
+  shell.rm('-rf', cData + '/' + destName);
 
   var txt = "";
   if (!kubeName) {

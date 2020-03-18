@@ -7,11 +7,11 @@ spec:
   image: mutadev/muta:latest # docker image
   resources:
     limits:
-      cpu: 1100m
+      cpu: 500m
       memory: 5Gi
       ephemeral-storage: 5Gi
     requests:
-      cpu: 1100m
+      cpu: 500m
       memory: 1Gi
       ephemeral-storage: 5Gi
   chaos: # all / stable-network-corrupt / stable-network-delay / stable-network-duplicate / stable-network-loss / stable-network-partition / stable-node-failure / stable-node-kill
