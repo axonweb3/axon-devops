@@ -11,11 +11,14 @@ import {
 } from './weekly'
 
 import sendToTelegram from './notification'
+import {WEEKLY_MEETING_URL} from "./config";
 
 const LABEL_DELAY = "bot:delay";  // delay issue , not daily
 const LABEL_DAILY_REPORT = "k:daily-report";
 const DAILY_PROJECT = "Daily-reports";
 
+const dailyScheduleTimes = ['08:0', '10:0', '20:0']
+const weeklyScheduleTimes = ['09:3', '16:3'] // weekly meeting
 
 export interface AllTasks {
   progress: IssueMeta[];
@@ -25,11 +28,13 @@ export interface AllTasks {
   delayIssues: Octokit.IssuesGetResponse[];
 }
 
-const log = config.DEV_MODE ? console.log : (...p: any[]) => p
+//const log = config.DEV_MODE ? console.log : (...p: any[]) => p
+const log = console.log
 
 export default function (app) {
   createScheduler(app, {
     interval: 10 * 60 * 1000 // 10 minutes
+    // interval: 2 * 60 * 1000 // 2 minutes
   })
 
   app.on("schedule.repository", async (context: Context) => {
@@ -49,9 +54,13 @@ export default function (app) {
       delayIssues: [],
     }
 
+    let yesterdayDaily, todayDaily
     log(timeStr)
+
+    // scheduleTimes = ['08:0', '10:0', '20:0']
     switch (timeStr) {
-      case '08:0' : // 08:00 ~ 08:09
+      // daily schedules
+      case dailyScheduleTimes[0] : // 08:00 ~ 08:09
         log(timeStr)
         if (day == '7' || day == '1') {
           return
@@ -59,27 +68,58 @@ export default function (app) {
         await getAllTasks(context, allTasks)
         await notifyReviewers(context, allTasks)
         await addDelayLabelForTasks(context, allTasks)
-        await dailyReport(context, allTasks, true)
+        yesterdayDaily = await getDailyIssue(context, allTasks, true)
+        if (!checkValidDaily(yesterdayDaily, true)) {
+          return
+        }
+        // list all delay issues in daily issue body
+        await updateDailyIssue(context, allTasks, yesterdayDaily)
+        await remindDailyReportToTG(context, yesterdayDaily, timeStr)
         await createTodayDailyIssue(context, allTasks)
         break
 
-      case '10:0' : // 10:00 ~ 10:09
+      case dailyScheduleTimes[1] : // 10:00 ~ 10:09
         log(timeStr)
         if (day == '7' || day == '1') {
           return
         }
         await getAllTasks(context, allTasks)
-        await dailyReport(context, allTasks, true)
+        yesterdayDaily = await getDailyIssue(context, allTasks, true)
+        if (!checkValidDaily(yesterdayDaily, true)) {
+          return
+        }
+        await remindDailyReportToTG(context, yesterdayDaily, timeStr)
         break
 
-      case '22:0' : // 22:00 ~ 22:09
+      case dailyScheduleTimes[2] : // 20:00 ~ 20:09
         log(timeStr)
         if (day == '6' || day == '7') {
           return
         }
         await getAllTasks(context, allTasks)
         await createTodayDailyIssue(context, allTasks)
-        await dailyReport(context, allTasks, false)
+
+        todayDaily = await getDailyIssue(context, allTasks, false)
+        if (!checkValidDaily(todayDaily, false)) {
+          return
+        }
+
+        await remindDailyReportToTG(context, todayDaily, timeStr)
+        break
+
+      // weekly schedules
+      case weeklyScheduleTimes[0]:  // 09:30 Monday, prepare for the weekly meeting
+        if (day !== '1') {
+          return
+        }
+        await remindDailyReportToTG(context, todayDaily, timeStr)
+        break
+
+      case weeklyScheduleTimes[1]:  // 16:30 Friday, prepare for the weekly meeting
+        if (day !== '5') {
+          return
+        }
+        await remindDailyReportToTG(context, todayDaily, timeStr)
         break
 
       default:
@@ -134,6 +174,8 @@ async function listCardsToAllTasks(context: Context, listCards: ListCard[], allT
 
 async function notifyReviewers(context: Context, allTasks: AllTasks) {
   log('notifyReviewers')
+
+  log('--review tasks:')
   // notify reviewers for in-review task
   for (const task of allTasks.review) {
     const assigneeString = task.assignees
@@ -144,11 +186,17 @@ async function notifyReviewers(context: Context, allTasks: AllTasks) {
 
     const liveReviewers = fileDB.getIssueReviewers(task.id);
 
-    const liveReviewerString = liveReviewers
-      .map(s => {
+    const liveReviewerString = liveReviewers ?
+      liveReviewers.map(s => {
         return `- @${s}`;
       })
-      .join("\r\n");
+        .join("\r\n")
+      : "";
+
+    log('task:', task.title, '  liveReviewerString:', liveReviewerString)
+    if (liveReviewerString == '') {
+      continue
+    }
 
     await context.github.issues.createComment(
       context.issue({
@@ -204,13 +252,16 @@ async function addDelayLabelForTasks(context: Context, allTasks: AllTasks) {
 
 }
 
-async function dailyReport(context: Context, allTasks: AllTasks, isYesterday: boolean) {
-  log('dailyReport')
+async function getDailyIssue(
+  context: Context,
+  allTasks: AllTasks,
+  isYesterday: boolean
+): Promise<Octokit.IssuesGetResponse> {
+  log('getDailyIssue')
 
   const latestDailyIssue = fileDB.getLatestDailyIssue()
 
-
-  log('latestDailyIssue:')
+  log('--latestDailyIssue:')
   log(latestDailyIssue)
 
   const date = isYesterday ? moment().add(-1, 'days') : moment()
@@ -231,45 +282,34 @@ async function dailyReport(context: Context, allTasks: AllTasks, isYesterday: bo
       issue_number: daily_issue_number
     })
   );
+  return issue
+}
 
+function checkValidDaily(issue: Octokit.IssuesGetResponse, isYesterday: boolean): boolean {
   if (!issue.title.startsWith('[Daily-Report]')) {
-    throw new Error(`Not found daily report issue ${title}, found ${issue.title}`);
+    throw new Error(`daily report issue title not valid, found ${issue.title}`);
   }
 
+  const date = isYesterday ? moment().add(-1, 'days') : moment()
+  const title = `[Daily-Report] ${date.format("YYYY-MM-DD")}`
+
   if (issue.title > title) {
-    return
+    return false
   } else if (issue.title < title) {
     throw new Error(`daily report issue title wrong: ${issue.title}, should be ${title}`);
   }
-
-
-  // yesterday daily report issue update
-  if (isYesterday) {
-    log('--daily report issue: ', issue.title, issue.number)
-    const body = await getDailyReportText(context, allTasks)
-    await context.github.issues.update({
-      issue_number: daily_issue_number,
-      body: body,
-      owner: context.payload.repository.owner.login,
-      repo: context.payload.repository.name
-    })
-  }
-
-  // notification to telegram channel
-  // 1.report issue url remind
-  // 2.members who have not yet updated daily report issue
-  await remindDailyReportToTG(context, issue, isYesterday)
+  return true
 }
 
-async function remindDailyReportToTG(context: Context, issue: Octokit.IssuesGetResponse, isYesterday: boolean) {
-  let text: string
-  if (!isYesterday) {
-    text = `*${issue.title}* Start update\r\n${issue.html_url}\r\n`
-  } else {
-    const membersRemind = await getMembersRemind(context, issue)
-    text = `*${issue.title}* Waiting for updates\r\n${issue.html_url}\r\n` + `${membersRemind}`
-  }
-  sendToTelegram(text)
+async function updateDailyIssue(context: Context, allTasks: AllTasks, issue: Octokit.IssuesGetResponse) {
+  log('updateDailyIssue: ', issue.title, issue.number)
+  const body = await getDailyReportText(context, allTasks)
+  await context.github.issues.update({
+    issue_number: issue.number,
+    body: body,
+    owner: context.payload.repository.owner.login,
+    repo: context.payload.repository.name
+  })
 }
 
 async function getDailyReportText(context: Context, allTasks: AllTasks): Promise<string> {
@@ -285,6 +325,46 @@ async function getDailyReportText(context: Context, allTasks: AllTasks): Promise
 
   log('----getDailyReportText', text)
   return text
+}
+
+async function remindDailyReportToTG(context: Context, issue: Octokit.IssuesGetResponse, timeStr: string) {
+  log('remindDailyReportToTG', timeStr)
+  let text, membersRemind: string
+
+  switch (timeStr) {
+    // daily schedules
+    case dailyScheduleTimes[0]:  // 08:00
+      membersRemind = await getMembersRemind(context, issue)
+      text = `*${issue.title}* Waiting for updates\r\n${issue.html_url}\r\n` + `${membersRemind}`
+      break
+
+    case dailyScheduleTimes[1]:  // 10:00
+      membersRemind = await getMembersRemind(context, issue)
+      if (membersRemind === '') {
+        text = `*${issue.title}  Time out* \r\n${issue.html_url}\r\n`
+          + `*Congratulations! No one was late*\r\n`
+      } else {
+        text = `*${issue.title}  Time out* \r\n${issue.html_url}\r\n`
+          + `Waiting for *red pocket ^ ^*\r\n` + `${membersRemind}`
+      }
+      break
+
+    case dailyScheduleTimes[2]:  // 20:00
+      text = `*${issue.title}* Start update\r\n${issue.html_url}\r\n`
+      break
+
+
+    // weekly schedules
+    case weeklyScheduleTimes[0], weeklyScheduleTimes[1]:
+      text = `Weekly meeting is about to begin, please get ready\r\n` +
+        `${WEEKLY_MEETING_URL.replace('_', '\\_')}`
+      break
+
+    default:
+      return
+  }
+
+  sendToTelegram(text)
 }
 
 function findDailyTask(title: string, allTasks: AllTasks): number {
@@ -303,6 +383,9 @@ async function createTodayDailyIssue(context: Context, allTasks: AllTasks) {
   }
 
   const title = `[Daily-Report] ${today.format("YYYY-MM-DD")}`
+
+  log('createTodayDailyIssue:', title)
+
   const issuer_number = findDailyTask(title, allTasks)
   if (issuer_number > -1) {
     return
@@ -315,6 +398,8 @@ async function createTodayDailyIssue(context: Context, allTasks: AllTasks) {
       title: title
     })
   );
+
+  log('--created!', issueRes.html_url)
 
   await moveToDailyProject(context, issueRes.id)
   fileDB.saveLatestDailyIssue(
