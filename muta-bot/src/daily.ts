@@ -11,12 +11,14 @@ import {
 } from './weekly'
 
 import sendToTelegram from './notification'
+import {WEEKLY_MEETING_URL} from "./config";
 
 const LABEL_DELAY = "bot:delay";  // delay issue , not daily
 const LABEL_DAILY_REPORT = "k:daily-report";
 const DAILY_PROJECT = "Daily-reports";
 
-const scheduleTimes = ['08:0', '10:0', '20:0']
+const dailyScheduleTimes = ['08:0', '10:0', '20:0']
+const weeklyScheduleTimes = ['09:3', '16:3'] // weekly meeting
 
 export interface AllTasks {
   progress: IssueMeta[];
@@ -57,7 +59,8 @@ export default function (app) {
 
     // scheduleTimes = ['08:0', '10:0', '20:0']
     switch (timeStr) {
-      case scheduleTimes[0] : // 08:00 ~ 08:09
+      // daily schedules
+      case dailyScheduleTimes[0] : // 08:00 ~ 08:09
         log(timeStr)
         if (day == '7' || day == '1') {
           return
@@ -75,7 +78,7 @@ export default function (app) {
         await createTodayDailyIssue(context, allTasks)
         break
 
-      case scheduleTimes[1] : // 10:00 ~ 10:09
+      case dailyScheduleTimes[1] : // 10:00 ~ 10:09
         log(timeStr)
         if (day == '7' || day == '1') {
           return
@@ -88,7 +91,7 @@ export default function (app) {
         await remindDailyReportToTG(context, yesterdayDaily, timeStr)
         break
 
-      case scheduleTimes[2] : // 20:00 ~ 20:09
+      case dailyScheduleTimes[2] : // 20:00 ~ 20:09
         log(timeStr)
         if (day == '6' || day == '7') {
           return
@@ -101,6 +104,21 @@ export default function (app) {
           return
         }
 
+        await remindDailyReportToTG(context, todayDaily, timeStr)
+        break
+
+      // weekly schedules
+      case weeklyScheduleTimes[0]:  // 09:30 Monday, prepare for the weekly meeting
+        if (day !== '1') {
+          return
+        }
+        await remindDailyReportToTG(context, todayDaily, timeStr)
+        break
+
+      case weeklyScheduleTimes[1]:  // 16:30 Friday, prepare for the weekly meeting
+        if (day !== '5') {
+          return
+        }
         await remindDailyReportToTG(context, todayDaily, timeStr)
         break
 
@@ -314,25 +332,36 @@ async function remindDailyReportToTG(context: Context, issue: Octokit.IssuesGetR
   let text, membersRemind: string
 
   switch (timeStr) {
-    case scheduleTimes[0]:  // 08:00
+    // daily schedules
+    case dailyScheduleTimes[0]:  // 08:00
       membersRemind = await getMembersRemind(context, issue)
       text = `*${issue.title}* Waiting for updates\r\n${issue.html_url}\r\n` + `${membersRemind}`
       break
 
-    case scheduleTimes[1]:  // 10:00
+    case dailyScheduleTimes[1]:  // 10:00
       membersRemind = await getMembersRemind(context, issue)
       if (membersRemind === '') {
         text = `*${issue.title}  Time out* \r\n${issue.html_url}\r\n`
-          + `Congratulations!, no one was late\r\n`
+          + `*Congratulations! No one was late*\r\n`
       } else {
         text = `*${issue.title}  Time out* \r\n${issue.html_url}\r\n`
           + `Waiting for *red pocket ^ ^*\r\n` + `${membersRemind}`
       }
       break
 
-    case scheduleTimes[2]:  // 20:00
+    case dailyScheduleTimes[2]:  // 20:00
       text = `*${issue.title}* Start update\r\n${issue.html_url}\r\n`
       break
+
+
+    // weekly schedules
+    case weeklyScheduleTimes[0], weeklyScheduleTimes[1]:
+      text = `Weekly meeting is about to begin, please get ready\r\n` +
+        `${WEEKLY_MEETING_URL.replace('_', '\\_')}`
+      break
+
+    default:
+      return
   }
 
   sendToTelegram(text)
