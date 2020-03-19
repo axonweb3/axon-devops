@@ -34,7 +34,7 @@ const log = console.log
 export default function (app) {
   createScheduler(app, {
     interval: 10 * 60 * 1000 // 10 minutes
-    // interval: 2 * 60 * 1000 // 2 minutes
+    // interval: 1 * 60 * 1000 // 2 minutes
   })
 
   app.on("schedule.repository", async (context: Context) => {
@@ -59,6 +59,7 @@ export default function (app) {
 
     // scheduleTimes = ['08:0', '10:0', '20:0']
     switch (timeStr) {
+
       // daily schedules
       case dailyScheduleTimes[0] : // 08:00 ~ 08:09
         log(timeStr)
@@ -164,6 +165,15 @@ async function listCardsToAllTasks(context: Context, listCards: ListCard[], allT
       case PROJECT_COLUMN_IN_REVIEW:
         const listReviewIssueMeta = await getListIssueMeta(context, cards.list);
         allTasks.review = allTasks.review.concat(listReviewIssueMeta);
+        break;
+
+      case PROJECT_COLUMN_DONE:
+        const listDoneIssueMeta = await getListIssueMeta(context, cards.list);
+        if (isDailyProject) {
+          allTasks.daily = allTasks.daily.concat(listDoneIssueMeta);
+        } else {
+          allTasks.done = allTasks.done.concat(listDoneIssueMeta);
+        }
         break;
     }
   }
@@ -312,18 +322,40 @@ async function updateDailyIssue(context: Context, allTasks: AllTasks, issue: Oct
   })
 }
 
+function getIssueUrl(issue_number: number) {
+  return "https://github.com/nervosnetwork/muta-internal/issues/" + issue_number
+}
+
 async function getDailyReportText(context: Context, allTasks: AllTasks): Promise<string> {
-  // 1.delay issues remind
-  let text = "## Delay issues\r\n"
+  let text: string
+
+  const monday = moment().startOf("isoWeek")
+  const today = moment()
+  const startTitle = `[Daily-Report] ${monday.format("YYYY-MM-DD")}`
+  const todayTitle = `[Daily-Report] ${today.format("YYYY-MM-DD")}`
+
+  // 1.daily issue list in this week
+  text = `## Daily reports this week\r\n`
+    + allTasks.daily.filter(item =>
+      item.title >= startTitle && item.title < todayTitle
+    ).sort((a: IssueMeta, b: IssueMeta) => a.number - b.number
+    ).map(task => `- [${task.title}](${getIssueUrl(task.number)})`
+    ).join('\r\n')
+    + '\r\n'
+
+
+  // 2.delay issues remind
+  text += "## Delay issues\r\n"
     + allTasks.delayIssues
       .map(issue => `- [#${issue.number + '  ' + issue.title}](${issue.html_url})`)
       .join('\r\n')
 
-  if (text === "## Delay issues\r\n") {
+  if (allTasks.delayIssues.length == 0) {
     text = text + "- None"
   }
 
-  log('----getDailyReportText', text)
+  log('----getDailyReportText')
+  log(text)
   return text
 }
 
