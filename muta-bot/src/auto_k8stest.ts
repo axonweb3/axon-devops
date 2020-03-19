@@ -109,6 +109,9 @@ async function runOnK8s(
   kubeName: string | undefined,
   timeout: number,
 ) {
+  await context.github.issues.createComment(
+    context.issue({ body: "Accept request." })
+  );
   await execAsync(`git clone -b ${remoteBranch} ${remoteRepoAddress} ${destName}`, { cwd: cData })
   if (commitID !== undefined) {
     await execAsync(`git checkout ${commitID}`, { cwd: cData + '/' + destName })
