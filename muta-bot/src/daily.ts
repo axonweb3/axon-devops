@@ -11,7 +11,7 @@ import {
 } from './weekly'
 
 import sendToTelegram from './notification'
-import {WEEKLY_MEETING_URL} from "./config";
+import {WEEKLY_MEETING_URL, WEEKLY_MEETING_URL_FRIDAY} from "./config";
 
 const LABEL_DELAY = "bot:delay";  // delay issue , not daily
 const LABEL_DAILY_REPORT = "k:daily-report";
@@ -387,9 +387,14 @@ async function remindDailyReportToTG(context: Context, issue: Octokit.IssuesGetR
 
 
     // weekly schedules
-    case weeklyScheduleTimes[0], weeklyScheduleTimes[1]:
+    case weeklyScheduleTimes[0]:
       text = `Weekly meeting is about to begin, please get ready\r\n` +
         `${WEEKLY_MEETING_URL.replace('_', '\\_')}`
+      break
+
+    case weeklyScheduleTimes[1]:
+      text = `Weekly meeting is about to begin, please get ready\r\n` +
+        `${WEEKLY_MEETING_URL_FRIDAY.replace('_', '\\_')}`
       break
 
     default:
