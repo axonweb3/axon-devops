@@ -34,7 +34,7 @@ const log = console.log
 export default function (app) {
   createScheduler(app, {
     interval: 10 * 60 * 1000 // 10 minutes
-    // interval: 1 * 60 * 1000 // 2 minutes
+    // interval: 1 * 60 * 1000 // 1 minutes
   })
 
   app.on("schedule.repository", async (context: Context) => {
@@ -59,7 +59,6 @@ export default function (app) {
 
     // scheduleTimes = ['08:0', '10:0', '20:0']
     switch (timeStr) {
-
       // daily schedules
       case dailyScheduleTimes[0] : // 08:00 ~ 08:09
         log(timeStr)
@@ -90,6 +89,10 @@ export default function (app) {
           return
         }
         await remindDailyReportToTG(context, yesterdayDaily, timeStr)
+
+        if (day == '6') {
+          await weeklyAllDutyRedPocket(context, allTasks)
+        }
         break
 
       case dailyScheduleTimes[2] : // 20:00 ~ 20:09
@@ -401,7 +404,7 @@ async function remindDailyReportToTG(context: Context, issue: Octokit.IssuesGetR
       return
   }
 
-  sendToTelegram(text)
+  await sendToTelegram(text)
 }
 
 function findDailyTask(title: string, allTasks: AllTasks): number {
@@ -491,4 +494,54 @@ async function getMembersRemind(context: Context, daily_issue: Octokit.IssuesGet
   })
     .map(s => `- @${s['telegram'] ? s['telegram'] : s['github']}`)
     .join('\r\n')
+}
+
+async function weeklyAllDutyRedPocket(context: Context, allTasks: AllTasks) {
+  log('weeklyAllDutyRedPocket')
+  const monday = moment().startOf("isoWeek")
+  const today = moment()
+  const startTitle = `[Daily-Report] ${monday.format("YYYY-MM-DD")}`
+  const todayTitle = `[Daily-Report] ${today.format("YYYY-MM-DD")}`
+
+  // 1.daily issue list in this week
+  const tasks = allTasks.daily.filter(item =>
+    item.title >= startTitle && item.title < todayTitle
+  ).sort((a: IssueMeta, b: IssueMeta) => a.number - b.number
+  )
+
+  console.log(tasks)
+
+  for (const task of tasks) {
+    if (await someoneLate(context, task)) {
+      return
+    }
+  }
+
+  // All duty this week
+  const text = `*Wow, no one was late in daily reports of this week!*\r\n`
+    + tasks.map(task => `- [Daily-Report ${task.title.substring(15)}](${getIssueUrl(task.number)})\r\n`)
+    + `*Let boss give red pockets to everyone*`
+
+  await sendToTelegram(text)
+}
+
+async function someoneLate(context: Context, task: IssueMeta): Promise<boolean> {
+
+  const {data: listComments} = await context.github.issues.listComments(
+    context.issue({
+      issue_number: task.number
+    })
+  )
+
+  let hashCommented: { [index: string]: boolean } = {}
+  const deadline = moment(task.title.substring(15)).add(1, 'days').add(10, 'hours')
+
+  for (const comment of listComments) {
+    if (moment(comment.created_at) <= deadline) {
+      hashCommented[comment.user.login] = true
+    }
+  }
+  log(deadline.format("YYYY-MM-DD HH:mm"))
+  log('late people cnt: ', config.MEMBERS.filter(item => !hashCommented[item['github']]).length)
+  return config.MEMBERS.filter(item => !hashCommented[item['github']]).length > 0
 }

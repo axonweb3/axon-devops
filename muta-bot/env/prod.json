@@ -3,7 +3,7 @@
   "code_repo": "nervosnetwork/muta",
   "code_branch": "master",
   "kube_host": "47.56.237.128",
-  "dev_mode": false,
+  "dev_mode": true,
   "telegram_bot_key": "",
   "telegram_channel_id": -1001445330146,
   "telegram_nervos_group": -315685254,
@@ -32,7 +32,7 @@
     },
     {
       "github": "fendouhyz",
-      "telegram": "cosinyouth"
+      "telegram": "fendouhyz"
     },
     {
       "github": "zeroqn",
