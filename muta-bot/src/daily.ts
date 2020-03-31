@@ -380,11 +380,13 @@ async function remindDailyReportToTG(context: Context, issue: Octokit.IssuesGetR
           + `*Congratulations! No one was late*\r\n`
       } else {
         text = `*${issue.title}  Time out* \r\n${issue.html_url}\r\n`
-          + `Waiting for *red pocket ^ ^*\r\n` + `${membersRemind}`
+          + `${membersRemind}\r\n`
+          + `*You know what you have to do, right?*\r\n`
+          + `${config.RED_POCKET_ADDRESS}`
       }
       break
 
-    case dailyScheduleTimes[2]:  // 20:00
+    case dailyScheduleTimes[2]:  // 20:00`
       text = `*${issue.title}* Start update\r\n${issue.html_url}\r\n`
       break
 
@@ -520,7 +522,9 @@ async function weeklyAllDutyRedPocket(context: Context, allTasks: AllTasks) {
   // All duty this week
   const text = `*Wow, no one was late in daily reports of this week!*\r\n`
     + tasks.map(task => `- [Daily-Report ${task.title.substring(15)}](${getIssueUrl(task.number)})\r\n`)
-    + `*Let boss give red pockets to everyone*`
+    + `*Let boss gives red pockets to everyone*\r\n`
+    + `@${config.MEMBERS[0].github}\r\n`
+    + `${config.RED_POCKET_ADDRESS}`
 
   await sendToTelegram(text)
 }
