@@ -14,6 +14,7 @@ export const TELEGRAM_BOT_KEY = config.telegram_bot_key
 export const TELEGRAM_CHAT_ID = DEV_MODE ? config.telegram_channel_id : config.telegram_nervos_group;
 export const WEEKLY_MEETING_URL = config.weekly_meeting_url
 export const WEEKLY_MEETING_URL_FRIDAY = config.weekly_meeting_url_friday
+export const RED_POCKET_ADDRESS = config.red_pocket_address
 export const MEMBERS = config.members
 
 export const ROOT_PATH = home.resolve('~/.muta-bot');
