@@ -1,5 +1,7 @@
-# create configmap
-# kubectl create -n mutadev configmap kubeconfig --from-file=kube.config=~/.kube/config
+# First, create configmap:
+# $ kubectl create -n mutadev configmap kubeconfig --from-file=kube.config=~/.kube/config
+#
+# Then fill in TG_TOKEN and CHAT_ID.
 
 kind: Deployment
 apiVersion: apps/v1
@@ -7,6 +9,7 @@ metadata:
   name: watchdog
 spec:
   replicas: 1
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       name: watchdog
@@ -17,7 +20,7 @@ spec:
     spec:
       containers:
       - name: watchdog
-        image: mutadev/watchdog:0.1.6
+        image: mutadev/watchdog:0.1.17
         resources:
           requests:
             ephemeral-storage: "8Mi"
