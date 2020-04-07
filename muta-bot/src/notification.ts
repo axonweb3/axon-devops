@@ -2,7 +2,7 @@ import * as config from './config'
 
 import {TelegramClient} from 'messaging-api-telegram'
 
-export default function (text) {
+export default async function (text) {
   if (!config.TELEGRAM_BOT_KEY) {
     throw new Error('cannot find TELEGRAM_BOT_KEY config')
   }
@@ -12,7 +12,7 @@ export default function (text) {
 
   const client = TelegramClient.connect(config.TELEGRAM_BOT_KEY)
 
-  client.sendMessage(
+  await client.sendMessage(
     chat_id,
     text,
     {
@@ -20,5 +20,7 @@ export default function (text) {
       disable_web_page_preview: true,
       disable_notification: false,
     }
-  );
+  ).then(() => {
+    console.log('send', text)
+  })
 }

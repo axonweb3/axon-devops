@@ -11,7 +11,7 @@ import {
 } from './weekly'
 
 import sendToTelegram from './notification'
-import {WEEKLY_MEETING_URL} from "./config";
+import {WEEKLY_MEETING_URL, WEEKLY_MEETING_URL_FRIDAY} from "./config";
 
 const LABEL_DELAY = "bot:delay";  // delay issue , not daily
 const LABEL_DAILY_REPORT = "k:daily-report";
@@ -34,7 +34,7 @@ const log = console.log
 export default function (app) {
   createScheduler(app, {
     interval: 10 * 60 * 1000 // 10 minutes
-    // interval: 2 * 60 * 1000 // 2 minutes
+    // interval: 2 * 60 * 1000 // 1 minutes
   })
 
   app.on("schedule.repository", async (context: Context) => {
@@ -44,7 +44,8 @@ export default function (app) {
       return;
     }
     log('daily schedule')
-    const timeStr = moment().format("HH:mm").substr(0, 4)
+    const timeStrAll = moment().format("HH:mm")
+    const timeStr = timeStrAll.substr(0, 4)
     const day = moment().format("E");
     let allTasks: AllTasks = {
       progress: [],
@@ -55,13 +56,12 @@ export default function (app) {
     }
 
     let yesterdayDaily, todayDaily
-    log(timeStr)
+    log(timeStr, timeStrAll)
 
     // scheduleTimes = ['08:0', '10:0', '20:0']
     switch (timeStr) {
       // daily schedules
       case dailyScheduleTimes[0] : // 08:00 ~ 08:09
-        log(timeStr)
         if (day == '7' || day == '1') {
           return
         }
@@ -79,7 +79,6 @@ export default function (app) {
         break
 
       case dailyScheduleTimes[1] : // 10:00 ~ 10:09
-        log(timeStr)
         if (day == '7' || day == '1') {
           return
         }
@@ -89,10 +88,13 @@ export default function (app) {
           return
         }
         await remindDailyReportToTG(context, yesterdayDaily, timeStr)
+
+        if (day == '6') {
+          await weeklyAllDutyRedPocket(context, allTasks)
+        }
         break
 
       case dailyScheduleTimes[2] : // 20:00 ~ 20:09
-        log(timeStr)
         if (day == '6' || day == '7') {
           return
         }
@@ -164,6 +166,15 @@ async function listCardsToAllTasks(context: Context, listCards: ListCard[], allT
       case PROJECT_COLUMN_IN_REVIEW:
         const listReviewIssueMeta = await getListIssueMeta(context, cards.list);
         allTasks.review = allTasks.review.concat(listReviewIssueMeta);
+        break;
+
+      case PROJECT_COLUMN_DONE:
+        const listDoneIssueMeta = await getListIssueMeta(context, cards.list);
+        if (isDailyProject) {
+          allTasks.daily = allTasks.daily.concat(listDoneIssueMeta);
+        } else {
+          allTasks.done = allTasks.done.concat(listDoneIssueMeta);
+        }
         break;
     }
   }
@@ -312,18 +323,40 @@ async function updateDailyIssue(context: Context, allTasks: AllTasks, issue: Oct
   })
 }
 
+function getIssueUrl(issue_number: number) {
+  return "https://github.com/nervosnetwork/muta-internal/issues/" + issue_number
+}
+
 async function getDailyReportText(context: Context, allTasks: AllTasks): Promise<string> {
-  // 1.delay issues remind
-  let text = "## Delay issues\r\n"
+  let text: string
+
+  const monday = moment().startOf("isoWeek")
+  const today = moment()
+  const startTitle = `[Daily-Report] ${monday.format("YYYY-MM-DD")}`
+  const todayTitle = `[Daily-Report] ${today.format("YYYY-MM-DD")}`
+
+  // 1.daily issue list in this week
+  text = `## Daily reports this week\r\n`
+    + allTasks.daily.filter(item =>
+      item.title >= startTitle && item.title < todayTitle
+    ).sort((a: IssueMeta, b: IssueMeta) => a.number - b.number
+    ).map(task => `- [${task.title}](${getIssueUrl(task.number)})`
+    ).join('\r\n')
+    + '\r\n'
+
+
+  // 2.delay issues remind
+  text += "## Delay issues\r\n"
     + allTasks.delayIssues
       .map(issue => `- [#${issue.number + '  ' + issue.title}](${issue.html_url})`)
       .join('\r\n')
 
-  if (text === "## Delay issues\r\n") {
+  if (allTasks.delayIssues.length == 0) {
     text = text + "- None"
   }
 
-  log('----getDailyReportText', text)
+  log('----getDailyReportText')
+  log(text)
   return text
 }
 
@@ -345,26 +378,33 @@ async function remindDailyReportToTG(context: Context, issue: Octokit.IssuesGetR
           + `*Congratulations! No one was late*\r\n`
       } else {
         text = `*${issue.title}  Time out* \r\n${issue.html_url}\r\n`
-          + `Waiting for *red pocket ^ ^*\r\n` + `${membersRemind}`
+          + `${membersRemind}\r\n`
+          + `*You know what you have to do, right?*\r\n`
+          + `${config.RED_POCKET_ADDRESS}`
       }
       break
 
-    case dailyScheduleTimes[2]:  // 20:00
+    case dailyScheduleTimes[2]:  // 20:00`
       text = `*${issue.title}* Start update\r\n${issue.html_url}\r\n`
       break
 
 
     // weekly schedules
-    case weeklyScheduleTimes[0], weeklyScheduleTimes[1]:
+    case weeklyScheduleTimes[0]:
       text = `Weekly meeting is about to begin, please get ready\r\n` +
         `${WEEKLY_MEETING_URL.replace('_', '\\_')}`
+      break
+
+    case weeklyScheduleTimes[1]:
+      text = `Weekly meeting is about to begin, please get ready\r\n` +
+        `${WEEKLY_MEETING_URL_FRIDAY.replace('_', '\\_')}`
       break
 
     default:
       return
   }
 
-  sendToTelegram(text)
+  await sendToTelegram(text)
 }
 
 function findDailyTask(title: string, allTasks: AllTasks): number {
@@ -454,4 +494,56 @@ async function getMembersRemind(context: Context, daily_issue: Octokit.IssuesGet
   })
     .map(s => `- @${s['telegram'] ? s['telegram'] : s['github']}`)
     .join('\r\n')
+}
+
+async function weeklyAllDutyRedPocket(context: Context, allTasks: AllTasks) {
+  log('weeklyAllDutyRedPocket')
+  const monday = moment().startOf("isoWeek")
+  const today = moment()
+  const startTitle = `[Daily-Report] ${monday.format("YYYY-MM-DD")}`
+  const todayTitle = `[Daily-Report] ${today.format("YYYY-MM-DD")}`
+
+  // 1.daily issue list in this week
+  const tasks = allTasks.daily.filter(item =>
+    item.title >= startTitle && item.title < todayTitle
+  ).sort((a: IssueMeta, b: IssueMeta) => a.number - b.number
+  )
+
+  console.log(tasks)
+
+  for (const task of tasks) {
+    if (await someoneLate(context, task)) {
+      return
+    }
+  }
+
+  // All duty this week
+  const text = `*Wow, no one was late in daily reports of this week!*\r\n`
+    + tasks.map(task => `- [Daily-Report ${task.title.substring(15)}](${getIssueUrl(task.number)})\r\n`)
+    + `*Let boss gives red pockets to everyone*\r\n`
+    + `@${config.MEMBERS[0].github}\r\n`
+    + `${config.RED_POCKET_ADDRESS}`
+
+  await sendToTelegram(text)
+}
+
+async function someoneLate(context: Context, task: IssueMeta): Promise<boolean> {
+
+  const {data: listComments} = await context.github.issues.listComments(
+    context.issue({
+      issue_number: task.number
+    })
+  )
+
+  let hashCommented: { [index: string]: boolean } = {}
+  const deadline = moment(task.title.substring(15)).add(1, 'days').add(10, 'hours')
+
+  for (const comment of listComments) {
+    if (moment(comment.created_at) <= deadline) {
+      hashCommented[comment.user.login] = true
+    }
+  }
+  log(deadline.format("YYYY-MM-DD HH:mm"))
+  log('late people cnt: ', config.MEMBERS.filter(item => !hashCommented[item['github']]).length)
+  return config.MEMBERS.filter(item => !hashCommented[item['github']]).length > 0
 }

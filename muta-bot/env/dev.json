@@ -8,6 +8,8 @@
   "telegram_channel_id": -1001445330146,
   "telegram_nervos_group": -315685254,
   "weekly_meeting_url": "",
+  "weekly_meeting_url_friday": "",
+  "red_pocket_address": "ckb1qyqgvhr0kua99a40aw4rrw0nz8v5qac7728qda95s4",
   "members": [
     {
       "github": "lgn21st",
@@ -31,7 +33,7 @@
     },
     {
       "github": "fendouhyz",
-      "telegram": "cosinyouth"
+      "telegram": "fendouhyz"
     },
     {
       "github": "zeroqn",
