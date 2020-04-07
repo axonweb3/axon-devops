@@ -34,7 +34,7 @@ const log = console.log
 export default function (app) {
   createScheduler(app, {
     interval: 10 * 60 * 1000 // 10 minutes
-    // interval: 1 * 60 * 1000 // 1 minutes
+    // interval: 2 * 60 * 1000 // 1 minutes
   })
 
   app.on("schedule.repository", async (context: Context) => {
@@ -44,7 +44,8 @@ export default function (app) {
       return;
     }
     log('daily schedule')
-    const timeStr = moment().format("HH:mm").substr(0, 4)
+    const timeStrAll = moment().format("HH:mm")
+    const timeStr = timeStrAll.substr(0, 4)
     const day = moment().format("E");
     let allTasks: AllTasks = {
       progress: [],
@@ -55,13 +56,12 @@ export default function (app) {
     }
 
     let yesterdayDaily, todayDaily
-    log(timeStr)
+    log(timeStr, timeStrAll)
 
     // scheduleTimes = ['08:0', '10:0', '20:0']
     switch (timeStr) {
       // daily schedules
       case dailyScheduleTimes[0] : // 08:00 ~ 08:09
-        log(timeStr)
         if (day == '7' || day == '1') {
           return
         }
@@ -79,7 +79,6 @@ export default function (app) {
         break
 
       case dailyScheduleTimes[1] : // 10:00 ~ 10:09
-        log(timeStr)
         if (day == '7' || day == '1') {
           return
         }
@@ -96,7 +95,6 @@ export default function (app) {
         break
 
       case dailyScheduleTimes[2] : // 20:00 ~ 20:09
-        log(timeStr)
         if (day == '6' || day == '7') {
           return
         }
