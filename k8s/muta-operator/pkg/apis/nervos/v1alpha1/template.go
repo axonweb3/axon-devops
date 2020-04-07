@@ -41,6 +41,9 @@ log_to_file = true
 metrics = true
 # you can specify log level for modules with config below
 # modules_level = { "overlord::state::process" = "debug", core_consensus = "error" }
+
+[rocksdb]
+max_open_files = 64
 	`
 
 	ChainGenesisTemplate = `
