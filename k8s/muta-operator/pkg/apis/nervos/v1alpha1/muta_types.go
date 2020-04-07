@@ -93,6 +93,7 @@ type Config struct {
 	Mempool  ConfigMempool  `json:"mempool" toml:"mempool"`
 	Executor ConfigExecutor `json:"executor" toml:"executor"`
 	Logger   ConfigLogger   `json:"logger" toml:"logger"`
+	RocksDB  ConfigRocksDB  `json:"rocksdb" toml:"rocksdb"`
 }
 
 type ConfigGenesis struct {
@@ -167,6 +168,10 @@ type ConfigLogger struct {
 	LogToFile              bool              `json:"log_to_file" toml:"log_to_file"`
 	Metrics                bool              `json:"metrics" toml:"metrics"`
 	ModulesLevel           map[string]string `json:"modules_level,omitempty" toml:"modules_level,omitempty"`
+}
+
+type ConfigRocksDB struct {
+	MaxOpenFiles uint64 `json:"max_open_files" toml:"max_open_files"`
 }
 
 // MutaStatus defines the observed state of Muta
