@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
+import * as child_process from 'child_process';
 
 import * as probot from "probot";
 import * as shell from 'shelljs';
@@ -20,11 +21,35 @@ const kc = new k8s.KubeConfig();
 kc.loadFromFile(config.KUBE_CONFIG);
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 
-function sleep(ms) {
+async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 const execAsync = promisify(shell.exec);
+
+async function getBenchResult(name: string): Promise<string> {
+  const r = await k8sCoreApi.listNamespacedPod("mutadev")
+
+  var n = 0;
+
+  while (true) {
+    for (const e of r.body.items) {
+
+      if ((e.spec!.containers[0].image == "mutadev/muta-benchmark:latest") && (e.metadata!.name!.startsWith(name))) {
+        console.log(1)
+        if (e.status!.conditions![0].reason === 'PodCompleted') {
+          return (await k8sCoreApi.readNamespacedPodLog(e.metadata!.name!, 'mutadev')).body
+        }
+      }
+    }
+    n += 1
+    if (n > 64) {
+      return ''
+    }
+    await new Promise(resolve => setTimeout(resolve, 60 * 1000));
+  }
+}
+
 
 async function getNodeData(name) {
   var res = await k8sCoreApi.readNamespacedService(name, config.KUBE_NAMESPACE);
@@ -186,8 +211,9 @@ async function runOnK8s(
       txt += line.join('|')
       txt += '\n';
     }
+    const benchout = await getBenchResult(kubeName);
     await context.github.issues.createComment(
-      context.issue({ body: headLine.join('|') + '\n' + prefixLine.join('|') + '\n' + txt })
+      context.issue({ body: headLine.join('|') + '\n' + prefixLine.join('|') + '\n' + txt + '\n' + '```' + benchout + '```' })
     );
     vData.delete(kubeName);
   }
@@ -227,3 +253,18 @@ export async function pullRequestHandler(context: probot.Context) {
     }
   }, 1000)
 }
+
+
+function init() {
+  fs.readdirSync(config.ROOT_K8SYAML_PATH).forEach(file => {
+    console.log(`find ${file}, try release it`)
+    child_process.exec(`kubectl delete -f ${file}`, { cwd: config.ROOT_K8SYAML_PATH }, (err, stdout, stderr) => {
+      if (err) { console.log(err) }
+      child_process.exec(`rm ${file}`, { cwd: config.ROOT_K8SYAML_PATH }, (err, stdout, stderr) => {
+        if (err) { console.log(err) }
+      });
+    });
+  });
+}
+
+init();
