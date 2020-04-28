@@ -27,24 +27,33 @@ async function sleep(ms) {
 
 const execAsync = promisify(shell.exec);
 
-async function getBenchResult(name: string): Promise<string> {
+async function getBenchResult(name: string) {
   const r = await k8sCoreApi.listNamespacedPod("mutadev")
 
   var n = 0;
 
   while (true) {
     for (const e of r.body.items) {
-
-      if ((e.spec!.containers[0].image == "mutadev/muta-benchmark:latest") && (e.metadata!.name!.startsWith(name))) {
-        console.log(1)
+      if ((e.spec!.containers[0].image!.startsWith("mutadev/muta-benchmark")) && (e.metadata!.name!.startsWith(name))) {
         if (e.status!.conditions![0].reason === 'PodCompleted') {
-          return (await k8sCoreApi.readNamespacedPodLog(e.metadata!.name!, 'mutadev')).body
+          const a = (await k8sCoreApi.readNamespacedPodLog(e.metadata!.name!, 'mutadev')).body;
+          const b = a.split('\n').filter(e => e);
+          const c = JSON.parse(b[b.length - 1]);
+          var s = 0;
+          for (const e of c.blocks) {
+            s += e[2];
+          }
+          c.avg_round = s / c.blocks.length;
+          c.blocks = undefined;
+          c.start = undefined;
+          c.end = undefined;
+          return c;
         }
       }
     }
     n += 1
     if (n > 64) {
-      return ''
+      return {}
     }
     await new Promise(resolve => setTimeout(resolve, 60 * 1000));
   }
@@ -212,8 +221,11 @@ async function runOnK8s(
       txt += '\n';
     }
     const benchout = await getBenchResult(kubeName);
+    txt = headLine.join('|') + '\n' + prefixLine.join('|') + '\n' + txt + '\n\n'
+    txt = `tx_block|sec_block|tx_sec|avg_round\n---|---|---|---\n${benchout.tx_block}|${benchout.sec_block}|${benchout.tx_sec}|${benchout.avg_round}`
+
     await context.github.issues.createComment(
-      context.issue({ body: headLine.join('|') + '\n' + prefixLine.join('|') + '\n' + txt + '\n' + '```' + benchout + '```' })
+      context.issue({ body: txt })
     );
     vData.delete(kubeName);
   }
