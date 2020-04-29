@@ -222,7 +222,7 @@ async function runOnK8s(
     }
     const benchout = await getBenchResult(kubeName);
     txt = headLine.join('|') + '\n' + prefixLine.join('|') + '\n' + txt + '\n\n'
-    txt = `tx_block|sec_block|tx_sec|avg_round\n---|---|---|---\n${benchout.tx_block}|${benchout.sec_block}|${benchout.tx_sec}|${benchout.avg_round}`
+    txt = txt + `tx_block|sec_block|tx_sec|avg_round\n---|---|---|---\n${benchout.tx_block}|${benchout.sec_block}|${benchout.tx_sec}|${benchout.avg_round}`
 
     await context.github.issues.createComment(
       context.issue({ body: txt })
