@@ -11,9 +11,9 @@ import * as config from './config';
 const cAction = ['opened', 'synchronize'];
 const cBranch = ['master'];
 const cData = '/tmp/';
-const cTimeout = 4 * 3600 * 1000;
+const cTimeout = 2 * 3800 * 1000;
 const cSteps = 4 * 6;
-const cSleep = 10 * 60 * 1000;
+const cSleep = 5 * 60 * 1000;
 
 var vData = new Map<string, Array<{ stop: boolean, data: Array<any> }>>();
 
@@ -186,7 +186,7 @@ async function runOnK8s(
   const vDataIndex = vData.get(kubeName)!.push({ stop: false, data: new Array() }) - 1;
 
   await context.github.issues.createComment(
-    context.issue({ body: `Docker builded. "mutadev/muta:${commitID}"\nRun chaos test on k8s named "${kubeName}"\nTest lasts 4 hours` })
+    context.issue({ body: `Docker builded. "mutadev/muta:${commitID}"\nRun chaos test on k8s named "${kubeName}"\nTest lasts 2 hours` })
   );
   await sleep(60 * 1000);
 

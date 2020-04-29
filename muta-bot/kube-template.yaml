@@ -15,8 +15,7 @@ spec:
       memory: 1Gi
       ephemeral-storage: 5Gi
   chaos: # all / stable-network-corrupt / stable-network-delay / stable-network-duplicate / stable-network-loss / stable-network-partition / stable-node-failure / stable-node-kill
-    - stable-network-corrupt
-    - stable-network-delay
+    - all
   benchmark: # Create cronjob to execute https://github.com/nervosnetwork/muta-benchmark
     duration: "30s"
     schedule: "*/5 * * * *"   # minutes, hours, days, months, weeks
