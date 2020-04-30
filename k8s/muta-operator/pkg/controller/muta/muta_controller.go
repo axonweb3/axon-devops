@@ -301,6 +301,11 @@ func (r *ReconcileMuta) createNode(instance *nervosv1alpha1.Muta, name string) e
 		}
 
 		podSpec.Volumes = append(podSpec.Volumes, pvcVolume)
+
+		podSpec.Containers[0].VolumeMounts = append(podSpec.Containers[0].VolumeMounts, corev1.VolumeMount{
+			Name:      "muta-storage",
+			MountPath: "/app/data",
+		})
 	}
 
 	labels := make(map[string]string)
