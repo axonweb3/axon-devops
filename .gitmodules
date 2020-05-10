@@ -1,0 +1,3 @@
+[submodule "muta-alert"]
+	path = muta-alert
+	url = https://github.com/homura/muta-alert.git
