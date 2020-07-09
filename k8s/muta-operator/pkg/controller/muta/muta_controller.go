@@ -11,8 +11,6 @@ import (
 	nervosv1alpha1 "github.com/huwenchao/muta-devops/k8s/muta-operator/pkg/apis/nervos/v1alpha1"
 	"github.com/pelletier/go-toml"
 	appsv1 "k8s.io/api/apps/v1"
-	batchv1 "k8s.io/api/batch/v1"
-	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -119,41 +117,6 @@ func (r *ReconcileMuta) Reconcile(request reconcile.Request) (reconcile.Result, 
 		return reconcile.Result{}, nil
 	}
 	return reconcile.Result{}, nil
-	// log.Info("Reconcile %s status %s message %s", instance.GetName(), instance.Status.Status, instance.Status.Message)
-	// if instance.Status.Status == nervosv1alpha1.StatusCreated {
-	// 	// User mofidy crd
-	// 	if err := r.client.Delete(context.TODO(), instance); err != nil {
-	// 		instance.Status.Message = err.Error()
-	// 		instance.Status.Status = nervosv1alpha1.StatusFailure
-	// 	} else {
-	// 		if err := r.client.Create(context.TODO(), instance); err != nil {
-	// 			instance.Status.Message = err.Error()
-	// 			instance.Status.Status = nervosv1alpha1.StatusFailure
-	// 		} else {
-	// 			instance.Status.Message = "ok"
-	// 			instance.Status.Status = nervosv1alpha1.StatusCreated
-	// 		}
-	// 	}
-	// } else if instance.Status.Status == nervosv1alpha1.StatusFailure {
-	// 	return reconcile.Result{}, nil
-	// } else {
-	// 	err = r.createMutaChain(instance)
-	// 	if err != nil {
-	// 		instance.Status.Message = err.Error()
-	// 		instance.Status.Status = nervosv1alpha1.StatusFailure
-	// 	} else {
-	// 		instance.Status.Message = "ok"
-	// 		instance.Status.Status = nervosv1alpha1.StatusCreated
-	// 	}
-	// }
-
-	// if err := r.client.Update(context.TODO(), instance); err != nil {
-	// 	return reconcile.Result{}, err
-	// }
-
-	// log.Info("Reconcile done %s status %s message %s", instance.GetName(), instance.Status.Status, instance.Status.Message)
-
-	// return reconcile.Result{}, nil
 }
 
 func (r *ReconcileMuta) createMutaChain(instance *nervosv1alpha1.Muta) error {
@@ -233,12 +196,6 @@ func (r *ReconcileMuta) createMutaChain(instance *nervosv1alpha1.Muta) error {
 		}
 	}
 
-	if instance.Spec.Benchmark != nil {
-		firstNode := fmt.Sprintf("%s-%d", chainName, 0)
-		if err := r.createBenchmark(instance, firstNode); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
@@ -427,52 +384,6 @@ func (r *ReconcileMuta) createConfigMap(instance *nervosv1alpha1.Muta, name stri
 	}
 
 	return r.client.Create(context.TODO(), configMap)
-}
-
-func (r *ReconcileMuta) createBenchmark(instance *nervosv1alpha1.Muta, name string) error {
-	labels := make(map[string]string)
-	labels["app"] = name
-	labels["muta.nervos.org"] = instance.Name
-
-	apiTCPAddr, err := net.ResolveTCPAddr("tcp", instance.Spec.Config.GraphQL.ListeningAddress)
-	if err != nil {
-		return err
-	}
-
-	url := fmt.Sprintf("http://%s:%d%s", name, apiTCPAddr.Port, instance.Spec.Config.GraphQL.GraphqlURI)
-
-	benchmark := &batchv1beta1.CronJob{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: instance.Namespace,
-			Labels:    labels,
-		},
-		Spec: batchv1beta1.CronJobSpec{
-			Schedule: instance.Spec.Benchmark.Schedule,
-			JobTemplate: batchv1beta1.JobTemplateSpec{
-				Spec: batchv1.JobSpec{
-					Template: corev1.PodTemplateSpec{
-						Spec: corev1.PodSpec{
-							Containers: []corev1.Container{
-								{
-									Name:  fmt.Sprintf("%s-benchmark", name),
-									Image: "mutadev/muta-benchmark:019853b",
-									Args:  []string{"-d", instance.Spec.Benchmark.Duration, "-c", "10", "--endpoint", url},
-								},
-							},
-							RestartPolicy: corev1.RestartPolicyNever,
-						},
-					},
-				},
-			},
-		},
-	}
-
-	if err := controllerutil.SetControllerReference(instance, benchmark, r.scheme); err != nil {
-		return err
-	}
-
-	return r.client.Create(context.TODO(), benchmark)
 }
 
 func (r *ReconcileMuta) createPersistent(instance *nervosv1alpha1.Muta, name string) error {
