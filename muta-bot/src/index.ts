@@ -4,7 +4,6 @@ import titleize from "titleize";
 import fileDB from "./db";
 import weekly from "./weekly";
 import {pushHandler} from "./push";
-import {pullRequestHandler, buildChainByIssueComment} from "./auto_k8stest";
 import * as config from "./config";
 import daily from './daily'
 import moment from "moment";
@@ -73,7 +72,6 @@ export = (app: Application) => {
   app.on("issue_comment", async context => {
     const body = context.payload.issue.body;
     if (context.payload.issue.number === config.KUBE_WATCH_ISSUE_NUMBER) {
-      buildChainByIssueComment(context);
       return
     }
     if (!isTaskIssue(body)) {
@@ -242,7 +240,6 @@ export = (app: Application) => {
   });
 
   app.on("pull_request", async context => {
-    await pullRequestHandler(context);
   })
 
   // For more information on building apps:

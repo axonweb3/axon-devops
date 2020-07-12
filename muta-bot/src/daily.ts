@@ -110,19 +110,19 @@ export default function (app) {
         break
 
       // weekly schedules
-      case weeklyScheduleTimes[0]:  // 09:30 Monday, prepare for the weekly meeting
-        if (day !== '1') {
-          return
-        }
-        await remindDailyReportToTG(context, todayDaily, timeStr)
-        break
-
-      case weeklyScheduleTimes[1]:  // 16:30 Friday, prepare for the weekly meeting
-        if (day !== '5') {
-          return
-        }
-        await remindDailyReportToTG(context, todayDaily, timeStr)
-        break
+      // case weeklyScheduleTimes[0]:  // 09:30 Monday, prepare for the weekly meeting
+      //   if (day !== '1') {
+      //     return
+      //   }
+      //   await remindDailyReportToTG(context, todayDaily, timeStr)
+      //   break
+      //
+      // case weeklyScheduleTimes[1]:  // 16:30 Friday, prepare for the weekly meeting
+      //   if (day !== '5') {
+      //     return
+      //   }
+      //   await remindDailyReportToTG(context, todayDaily, timeStr)
+      //   break
 
       default:
         return
