@@ -11,7 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "@kubernetes/client-node": "^0.11.1",
-    "muta-sdk": "^0.6.0",
-    "request-promise-native": "^1.0.8"
+    "@mutadev/muta-sdk": "0.2.0-dev+pr315.0",
+    "graphql": "^15.2.0",
+    "shelljs": "^0.8.4",
+    "timestring": "^6.0.0"
   }
 }
