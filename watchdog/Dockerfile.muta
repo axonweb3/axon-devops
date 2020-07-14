@@ -1,0 +1,10 @@
+FROM node:alpine3.12
+
+WORKDIR /watchdog
+
+COPY . .
+
+RUN yarn global add muta-bench@0.1.10
+RUN yarn install
+
+CMD ["npm", "start"]
