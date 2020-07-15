@@ -15,7 +15,6 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 6,
   "links": [],
   "panels": [
     {
@@ -220,6 +219,100 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "hiddenSeries": false,
+      "id": 22,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "avg(histogram_quantile(0.90, sum(rate(muta_consensus_time_cost_seconds_bucket{type=\"exec\"}[5m])) by (le, instance)))",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Panel Title",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -233,7 +326,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 16
       },
       "hiddenSeries": false,
       "id": 20,
@@ -359,7 +452,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 24
       },
       "id": 10,
       "options": {
@@ -424,7 +517,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 26
+        "y": 34
       },
       "hiddenSeries": false,
       "id": 8,
@@ -523,7 +616,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 26
+        "y": 34
       },
       "hiddenSeries": false,
       "id": 4,
@@ -552,7 +645,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "((sum(muta_network_message_total{type=\"gossip\", direction=\"received\"}) / 20) +\n (sum(muta_network_message_total{type!=\"gossip\", direction=\"received\"})) )\n/\nsum(muta_network_message_total{direction=\"sent\"}) \n",
+          "expr": "((sum(muta_network_message_total{target=\"all\", direction=\"sent\"}) * 20) +\n (sum(muta_network_message_total{target=\"single\", direction=\"sent\"})) )\n/\nsum(muta_network_message_total{direction=\"received\"}) \n",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -620,7 +713,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 34
+        "y": 42
       },
       "hiddenSeries": false,
       "id": 16,
@@ -725,7 +818,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 42
+        "y": 50
       },
       "id": 18,
       "options": {
@@ -764,7 +857,7 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {
@@ -781,7 +874,7 @@
     ]
   },
   "timezone": "",
-  "title": "Dashboard v2",
-  "uid": "VLh5INkGk",
-  "version": 38
+  "title": "muta-benchmark",
+  "uid": "muta-benchmark",
+  "version": 2
 }
