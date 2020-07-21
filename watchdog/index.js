@@ -1,10 +1,11 @@
+const path = require('path');
 const k8s = require('@kubernetes/client-node');
 const { Muta } = require("@mutadev/muta-sdk");
 const shell = require('shelljs');
 const timestring = require('timestring')
 
 const WATCH_DURATION = process.env.WATCH_DURATION ? process.env.WATCH_DURATION : "3h";
-const APP_NAMESPACE = process.env.MUTA_NAMESPACE ? process.env.MUTA_NAMESPACE : 'mutadev';
+const APP_NAMESPACE = process.env.APP_NAMESPACE ? process.env.APP_NAMESPACE : 'mutadev';
 const APP_NAME = process.env.APP_NAME;
 const APP_PORT = process.env.APP_PORT ? process.env.APP_PORT : '8080';
 const APP_GRAPHQL_URL = process.env.APP_GRAPHQL_URL ? process.env.APP_GRAPHQL_URL : 'graphql';
@@ -20,6 +21,9 @@ const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 
 async function run() {
     console.log(process.env);
+    console.log("watchdog start, first sleep 5m");
+    await sleep(timestring("5m") * 1000);
+
     const nodeEndpoints = await getNodeEndPoints(APP_NAMESPACE, APP_NAME, APP_GRAPHQL_URL, APP_PORT);
 
     if (nodeEndpoints.length === 0) {
@@ -49,21 +53,24 @@ async function getNodeEndPoints(ns, appName, graphql, appPort) {
     const res = await k8sCoreApi.listNamespacedService(ns);
     const services = res.body.items.filter(e => e.metadata.name.startsWith(appName));
 
-    const nodeEndpoints = services.map(service => `http://${service.metadata.name}:${appPort}/${graphql}`);
+    const nodeEndpoints = services.map(service => `http://${service.metadata.name}.${ns}:${appPort}/${graphql}`);
     return nodeEndpoints;
 }
 
 async function runJob(nodeEndpoints, duration, gap, chainID, cpu) {
+    const benchJobPath = path.join(__dirname, "node_modules/.bin/muta-bench");
+    console.log(`[job:benchmark] bin path ${benchJobPath}`);
+
     while (true) {
         // run benchmark
-        console.log(`[job:benchmark] start`);
+        const command = `node ${benchJobPath} -d ${duration} -c ${nodeEndpoints.length * 3} --gap ${gap} --chain-id ${chainID} --cpu ${cpu} ${nodeEndpoints.join(" ")}`;
+        console.log(`[job:benchmark] start ${command}`);
         await new Promise((resolve) => {
-            const cp = shell.exec(`muta-bench -d ${duration} -c ${nodeEndpoints.length * 3} --gap ${gap} --chain-id ${chainID} --cpu ${cpu} ${nodeEndpoints.join(" ")}`, {
-                async: true,
-            });
+            const cp = shell.exec(command, { async: true });
 
-            cp.stdout.pipe(process.stdout);
-            cp.on('exit', function () {
+            cp.on("message", console.log);
+            cp.on('close', (code, signal) => {
+                console.log(`[job:benchmark] benchmark job close. code ${code} signal ${signal}`);
                 resolve()
             })
         });
