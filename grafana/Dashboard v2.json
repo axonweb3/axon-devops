@@ -15,6 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -92,7 +93,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:148",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -101,7 +101,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:149",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -190,7 +189,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:203",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -199,7 +197,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:204",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -230,7 +227,7 @@
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 12,
+        "x": 0,
         "y": 8
       },
       "hiddenSeries": false,
@@ -313,6 +310,194 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "hiddenSeries": false,
+      "id": 24,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "avg (sum by (instance) (increase(muta_storage_put_cf_seconds[5m]))) / avg(increase(muta_consensus_height[5m]))",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "put_cf_each_block_time_usage",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "hiddenSeries": false,
+      "id": 26,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "avg (sum by (instance) (increase(muta_storage_get_cf_seconds[5m]))) / avg(increase(muta_consensus_height[5m]))",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "get_cf_each_block_time_usage",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -326,7 +511,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 24
       },
       "hiddenSeries": false,
       "id": 20,
@@ -405,7 +590,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:464",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -414,7 +598,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:465",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -452,7 +635,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 24
+        "y": 32
       },
       "id": 10,
       "options": {
@@ -517,7 +700,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 34
+        "y": 42
       },
       "hiddenSeries": false,
       "id": 8,
@@ -574,7 +757,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:360",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -583,7 +765,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:361",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -616,7 +797,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 34
+        "y": 42
       },
       "hiddenSeries": false,
       "id": 4,
@@ -671,7 +852,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:300",
           "format": "none",
           "label": null,
           "logBase": 1,
@@ -680,7 +860,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:301",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -713,7 +892,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 42
+        "y": 50
       },
       "hiddenSeries": false,
       "id": 16,
@@ -769,7 +948,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:47",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -778,7 +956,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:48",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -818,7 +995,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 50
+        "y": 58
       },
       "id": 18,
       "options": {
