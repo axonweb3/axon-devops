@@ -1,0 +1,28 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  # 游标记录上一次同步位置
+  filename: /tmp/promtail/positions.yaml   
+  # 10秒钟同步一次
+  sync_period: 10s 
+
+clients:
+  # Loki 的 server 地址，这边 ip 为 server_ip, port 
+  # 对应 monitor docker-compose 中的 muta-loki
+  - url: http://192.168.20.211:3100/api/prom/push
+
+scrape_configs:
+  - job_name: test-log
+    entry_parser: raw
+    static_configs:
+      - targets:
+          - localhost
+        # 设置采集的 label，后续检索日志会用到
+        labels:
+          job: muta
+          app: muta
+          # 这里改成宿主机的 ip 方便日志查询用
+          hostip: host.docker.internal
+          __path__: /var/logs/*log
