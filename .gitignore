@@ -1,2 +1,4 @@
 .idea
 .vsc
+.DS_Store
+apm/agent/.env
