@@ -16,6 +16,8 @@
     - [docker-compose.yml](#docker-composeyml-1)
     - [config 目录](#config-目录-1)
       - [grafana](#grafana)
+        - [dashboard](#dashboard)
+        - [provisioning](#provisioning)
       - [loki](#loki)
         - [loki-local-config.yaml](#loki-local-configyaml)
       - [promethues](#promethues)
@@ -46,6 +48,7 @@ apm
      |___ docker-compose.yml
      |___ config
           |___ grafana
+          |    |___ grafana.ini
           |    |___ dashboards
           |    |    |___ muta-benchmark.json
           |    |    |___ muta-node.json
@@ -55,7 +58,11 @@ apm
           |          |    |___ dashboards.yaml
           |          |
           |          |___ datasources
-          |               |___ datasources.yaml                            
+          |          |    |___ datasources.yaml   
+          |          |
+          |          |___ notifiers
+          |               |___ notifiers.yaml                    
+          |
           |___ loki
           |    |___ loki-local-config.yaml
           |
@@ -169,6 +176,7 @@ scrape_configs:
      |___ docker-compose.yml
      |___ config
           |___ grafana
+          |    |___ grafana.ini
           |    |___ dashboards
           |    |    |___ muta-benchmark.json
           |    |    |___ muta-node.json
@@ -178,7 +186,11 @@ scrape_configs:
           |          |    |___ dashboards.yaml
           |          |
           |          |___ datasources
-          |               |___ datasources.yaml                            
+          |          |    |___ datasources.yaml   
+          |          |
+          |          |___ notifiers
+          |               |___ notifiers.yaml                    
+          |
           |___ loki
           |    |___ loki-local-config.yaml
           |
@@ -193,10 +205,29 @@ monitor 的 config 较多，以下按顺序描述每个目录的功能和文件�
 #### grafana
 该目录主要存在两个子目录
 1. dashboards 放置 dashboard 模板
-2. provisioning 初始化数据源和指定初始化 dashboard 的配置
+2. provisioning 初始化数据源、指定初始化 dashboard 的配置文件位置、初始化告警推送配置
 
-grafana 的配置目前主要是数据源和 dashboard 的配置文件，由于配置基本是固定的并不需要修改，直接使用即可
+##### dashboard
+dashboard 的配置基本是固定的并不需要修改，直接使用即可
 
+##### provisioning
+dashboards 和 datasources 目录无需修改，
+notifiers 目录下的 notifiers.yaml 文件用于配置告警信息推送
+```yaml
+apiVersion: 1
+
+notifiers:
+  # webhook模板
+  - name: notification-webhook
+    type: webhook
+    uid: notification-telegram
+    org_id: 1
+    is_default: false
+    settings:
+      url: http://47.56.233.149:4000/bot
+```
+
+[provisioning 配置参考](https://grafana.com/docs/grafana/latest/administration/provisioning/)
 
 
 #### loki
