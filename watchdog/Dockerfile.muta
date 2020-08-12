@@ -4,7 +4,6 @@ WORKDIR /watchdog
 
 COPY . .
 
-RUN yarn add muta-bench@0.1.10
 RUN yarn install
 
 CMD ["npm", "start"]

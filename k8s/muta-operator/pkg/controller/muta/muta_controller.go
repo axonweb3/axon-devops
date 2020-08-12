@@ -31,7 +31,7 @@ var log = logf.Log.WithName("controller_muta")
 
 var keypairName = types.NamespacedName{Name: "muta-keypairs-config", Namespace: "mutadev"}
 
-var storageClassName = "muta"
+var storageClassName = "muta-local"
 
 /**
 * USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
@@ -152,7 +152,7 @@ func (r *ReconcileMuta) createMutaChain(instance *nervosv1alpha1.Muta) error {
 			return err
 		}
 		networkBoot := nervosv1alpha1.ConfigNetworkBootstrap{
-			Pubkey:  bootKeypair.Pubkey,
+			PeerID:  bootKeypair.PeerID,
 			Address: fmt.Sprintf("%s-0:%d", chainName, pTCPAddr.Port),
 		}
 		config.Network.Bootstraps = []nervosv1alpha1.ConfigNetworkBootstrap{networkBoot}
@@ -227,7 +227,7 @@ func (r *ReconcileMuta) createNode(instance *nervosv1alpha1.Muta, name string) e
 				VolumeMounts: []corev1.VolumeMount{
 					{
 						Name:      "config",
-						MountPath: "/app/devtools/chain",
+						MountPath: "/devtools/chain",
 					},
 				},
 				Resources: instance.Spec.Resources,
@@ -261,7 +261,7 @@ func (r *ReconcileMuta) createNode(instance *nervosv1alpha1.Muta, name string) e
 
 		podSpec.Containers[0].VolumeMounts = append(podSpec.Containers[0].VolumeMounts, corev1.VolumeMount{
 			Name:      "muta-storage",
-			MountPath: "/app/data",
+			MountPath: "/muta-data",
 		})
 	}
 
@@ -409,9 +409,10 @@ func (r *ReconcileMuta) createPersistent(instance *nervosv1alpha1.Muta, name str
 			AccessModes: []corev1.PersistentVolumeAccessMode{
 				corev1.ReadWriteOnce,
 			},
+			PersistentVolumeReclaimPolicy: corev1.PersistentVolumeReclaimDelete,
 			PersistentVolumeSource: corev1.PersistentVolumeSource{
 				HostPath: &corev1.HostPathVolumeSource{
-					Path: fmt.Sprintf("/muta/docker/pv/%s", name),
+					Path: fmt.Sprintf("/tmp/%s", name),
 				},
 			},
 		},
@@ -468,6 +469,7 @@ func getAddressListAndBlsPubkeyList(keypairs []nervosv1alpha1.KeyPair) []nervosv
 		addressList = append(addressList, nervosv1alpha1.ConfigVerifier{
 			Address:       keypair.Address,
 			BLSPubKey:     keypair.BlsPubkey,
+			Pubkey:        keypair.Pubkey,
 			ProposeWeight: 1,
 			VoteWeight:    1,
 		})
