@@ -15,7 +15,6 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 3,
   "links": [],
   "panels": [
     {
@@ -826,7 +825,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "((sum(muta_network_message_total{target=\"all\", direction=\"sent\"}) * 20) +\n (sum(muta_network_message_total{target=\"single\", direction=\"sent\"})) )\n/\nsum(muta_network_message_total{direction=\"received\"}) \n",
+          "expr": "(\r\n  # broadcast_count * (instance_count - 1)\r\n  sum(increase(muta_network_message_total{target=\"all\", direction=\"sent\"}[5m])) * (count(count by (instance) (muta_network_message_total)) - 1)\r\n  # unicast_count\r\n  + sum(increase(muta_network_message_total{target=\"single\", direction=\"sent\"}[5m]))\r\n) \r\n/\r\n# received_count\r\n(sum(increase(muta_network_message_total{direction=\"received\"}[5m])))\n",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
