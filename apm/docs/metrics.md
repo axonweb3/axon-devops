@@ -686,24 +686,25 @@ avg(histogram_quantile(0.90, sum(rate(muta_consensus_time_cost_seconds_bucket{ty
 </details>
 
 #### put_cf_each_block_time_usage
-- description: Average time to write a block height
+- description: Average time per block for rocksdb running put_cf
 <details>
 <summary>Legende details</summary>
 
 ##### /
-Average time to write a block height
+Average time per block for rocksdb running put_cf
 ```
 avg (sum by (instance) (increase(muta_storage_put_cf_seconds[5m]))) / avg(increase(muta_consensus_height[5m]))
 ```
 </details>
 
 #### get_cf_each_block_time_usage
-- description: Average time to read a block height
+
+- description: Average time per block for rocksdb running get_cf
 <details>
 <summary>Legende details</summary>
 
 ##### /
-Average time to read a block height
+Average time per block for rocksdb running get_cf
 ```
 avg (sum by (instance) (increase(muta_storage_get_cf_seconds[5m]))) / avg(increase(muta_consensus_height[5m]))
 ```
@@ -711,7 +712,7 @@ avg (sum by (instance) (increase(muta_storage_get_cf_seconds[5m]))) / avg(increa
 
 
 #### processed_tx_request
-- description: Monitor transaction requests
+- description: received transaction request count in last 5 minutes (the unit is count/second)
 <details>
 <summary>Legende details</summary>
 
@@ -728,7 +729,7 @@ sum(rate(muta_api_request_result_total{result="success",type="send_transaction"}
 ```
 
 ##### instance
-Number of successful transaction requests sent by nodes
+processed transaction request count in last 5 minutes (the unit is count/second)
 ```
 rate(muta_api_request_result_total{result="success", type="send_transaction"}[5m])
 ```
@@ -768,11 +769,15 @@ muta_consensus_sync_block_total
 ##### /
 Estimate the network message arrival rate in the last five minutes
 ```
-((sum(muta_network_message_total{target="all", direction="sent"}) * 20) +
- (sum(muta_network_message_total{target="single", direction="sent"})) )
+(
+  # broadcast_count * (instance_count - 1)
+  sum(increase(muta_network_message_total{target="all", direction="sent"}[5m])) * (count(count by (instance) (muta_network_message_total)) - 1)
+  # unicast_count
+  + sum(increase(muta_network_message_total{target="single", direction="sent"}[5m]))
+) 
 /
-sum(muta_network_message_total{direction="received"}) 
-
+# received_count
+(sum(increase(muta_network_message_total{direction="received"}[5m])))
 ```
 </details>
 
@@ -790,24 +795,24 @@ Number of rounds needed to reach consensus
 </details>
 
 #### mempool_cached_tx
-- description: Number of transactions in the current trading pool
+- description: Number of transactions in the current mempool
 <details>
 <summary>Legende details</summary>
 
 ##### {{instance}}
-Number of transactions in the current trading pool
+Number of transactions in the current mempool
 ```
 muta_mempool_tx_count
 ```
 </details>
 
 #### Saved peers
-- description: Number of nodes saved
+- description: Number of nodes saved peers
 <details>
 <summary>Legende details</summary>
 
 ##### {{instance}}
-Number of nodes saved
+Number of nodes saved peers
 ```
 muta_network_saved_peer_count
 ```
