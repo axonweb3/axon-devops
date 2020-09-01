@@ -28,11 +28,14 @@
 
 <!-- /TOC -->
 
+<a id="markdown-muta-monitor-部署" name="muta-monitor-部署"></a>
 # muta monitor 部署
 
+<a id="markdown-架构" name="架构"></a>
 ## 架构
 ![](./asset/架构.jpg)
 
+<a id="markdown-工程目录结构" name="工程目录结构"></a>
 ## 工程目录结构
 ```
 apm
@@ -77,9 +80,11 @@ apm
 monitor 需要一台机器部署，主要运行目前的监控服务
 
 
+<a id="markdown-agent-详解" name="agent-详解"></a>
 ## Agent 详解
 agent 主要跟随 muta 部署，主要用于采集 muta 的监控指标
 
+<a id="markdown-主要-agent-如下" name="主要-agent-如下"></a>
 ### 主要 agent 如下:
 
 | agent | 功能 | 参考 |
@@ -88,6 +93,7 @@ agent 主要跟随 muta 部署，主要用于采集 muta 的监控指标
 | jaeger-agent | tracing | [jaeger-agent](https://www.jaegertracing.io/docs/1.16/getting-started/#all-in-one) |
 | promtail-agent | 采集日志 | [promtail-agent](https://grafana.com/docs/loki/latest/clients/promtail/) |
 
+<a id="markdown-agent-目录" name="agent-目录"></a>
 ### agent 目录
 ```
 |___ agent
@@ -101,9 +107,11 @@ agent 主要跟随 muta 部署，主要用于采集 muta 的监控指标
 
 
 
+<a id="markdown-docker-composeyml" name="docker-composeyml"></a>
 ### docker-compose.yml
 muta node 采集端程序, 内部配置在 .env.example
 
+<a id="markdown-env" name="env"></a>
 ### .env
 用于配置采集端的 docker-compose 环境变量
 
@@ -125,6 +133,7 @@ MUTA_LOG_PATH=muta/logs
 ```
 
 
+<a id="markdown-config-目录" name="config-目录"></a>
 ### config 目录
 该目录主要存放 agent 的配置，目前测试环境的版本比较简单，只需要配置 promtail 的配置文件 promtail-config.yaml 即可
 ```yml
@@ -157,9 +166,11 @@ scrape_configs:
           __path__: /var/logs/*log
 ```
 
+<a id="markdown-monitor-详解" name="monitor-详解"></a>
 ## Monitor 详解
 目前 muta 测试环境使用 docker-compose 的方式部署 monitor
 
+<a id="markdown-主要服务如下" name="主要服务如下"></a>
 ### 主要服务如下:
 
 | 服务名 | 功能 | 参考 |
@@ -170,6 +181,7 @@ scrape_configs:
 | jaeger | tracing 存储 | [jaeger](https://github.com/jaegertracing/jaeger) |
 
 
+<a id="markdown-monitor-目录" name="monitor-目录"></a>
 ### monitor 目录
 ```
 |___ monitor
@@ -197,19 +209,24 @@ scrape_configs:
           |___ promethues
                |___ prometheus.yml
 ```
+<a id="markdown-docker-composeyml-1" name="docker-composeyml-1"></a>
 ### docker-compose.yml
 monitor 所使用的组件, 可以直接使用
 
+<a id="markdown-config-目录-1" name="config-目录-1"></a>
 ### config 目录
 monitor 的 config 较多，以下按顺序描述每个目录的功能和文件内容
+<a id="markdown-grafana" name="grafana"></a>
 #### grafana
 该目录主要存在两个子目录
 1. dashboards 放置 dashboard 模板
 2. provisioning 初始化数据源、指定初始化 dashboard 的配置文件位置、初始化告警推送配置
 
+<a id="markdown-dashboard" name="dashboard"></a>
 ##### dashboard
 dashboard 的配置基本是固定的并不需要修改，直接使用即可
 
+<a id="markdown-provisioning" name="provisioning"></a>
 ##### provisioning
 dashboards 和 datasources 目录无需修改，
 notifiers 目录下的 notifiers.yaml 文件用于配置告警信息推送
@@ -230,7 +247,9 @@ notifiers:
 [provisioning 配置参考](https://grafana.com/docs/grafana/latest/administration/provisioning/)
 
 
+<a id="markdown-loki" name="loki"></a>
 #### loki
+<a id="markdown-loki-local-configyaml" name="loki-local-configyaml"></a>
 ##### loki-local-config.yaml
 该文件主要为 Loki 的运行配置
 ```yaml
@@ -274,12 +293,15 @@ limits_config:
   reject_old_samples: true
   reject_old_samples_max_age: 168h
   ingestion_rate_mb: 30
+  max_entries_limit_per_query: 0
 
 ```
 
 
 
+<a id="markdown-promethues" name="promethues"></a>
 #### promethues
+<a id="markdown-prometheusyml" name="prometheusyml"></a>
 ##### prometheus.yml
 该文件主要是 promethues 的运行配置，里面 job 部分为拉取配置
 ```yaml
@@ -331,7 +353,9 @@ scrape_configs:
 
 ```
 
+<a id="markdown-部署步骤" name="部署步骤"></a>
 ## 部署步骤
+<a id="markdown-monitor" name="monitor"></a>
 ### monitor 
 copy monitor 目录到指定机器上
 ```shell
@@ -363,6 +387,7 @@ jaeger 地址
 http://jarger_ip:16686
 ```
 
+<a id="markdown-agent" name="agent"></a>
 ### agent 
 
 copy agent 目录到 muta 节点上 

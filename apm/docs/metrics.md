@@ -658,6 +658,8 @@ TPS for consensus
 ```
 avg(rate(muta_consensus_committed_tx_total[5m]))
 ```
+###### Alert threshold:
+TPS is zero
 </details>
 
 
@@ -671,6 +673,15 @@ Consensus time for P90
 ```
 avg(histogram_quantile(0.90, sum(rate(muta_consensus_duration_seconds_bucket[5m])) by (le, instance)))
 ```
+
+##### /
+Not show, for alert
+```
+avg(histogram_quantile(0.90, sum(rate(muta_consensus_duration_seconds_bucket[5m])) by (le, instance))) / avg(histogram_quantile(0.90, sum(rate(muta_consensus_time_cost_seconds_bucket{type="exec"}[5m])) by (le, instance))) 
+```
+
+###### Alert threshold:
+More than three rounds of consensus
 </details>
 
 #### exec_p90
@@ -748,6 +759,28 @@ sort_desc(muta_consensus_height)
 ```
 </details>
 
+#### Liveness
+- description: Liveness
+<details>
+<summary>Legende details</summary>
+
+##### Liveness
+Growth in node height
+```
+increase(muta_consensus_height{job="muta_exporter"}[1m])
+```
+###### Alert threshold:
+Loss of Liveness
+
+##### /
+Not show, for alert
+```
+up{job="muta_exporter"} == 1
+```
+###### Alert threshold:
+Loss of Liveness
+</details>
+
 #### synced_block
 - description: Number of blocks synchronized by nodes
 <details>
@@ -792,6 +825,8 @@ Number of rounds needed to reach consensus
 ```
 (muta_consensus_round > 0 )
 ```
+###### Alert threshold:
+More than three rounds of consensus
 </details>
 
 #### mempool_cached_tx
