@@ -17,8 +17,8 @@
   "editable": true,
   "gnetId": 11074,
   "graphTooltip": 0,
-  "id": 5,
-  "iteration": 1597665421986,
+  "id": 10,
+  "iteration": 1598368970749,
   "links": [
     {
       "icon": "external link",
@@ -3059,6 +3059,7 @@
         "for": "5m",
         "frequency": "1m",
         "handler": 1,
+        "message": "Less than 30% of free disk space",
         "name": "Disk Space Used% Basic alert",
         "noDataState": "no_data",
         "notifications": []
@@ -5064,7 +5065,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "muta-node v2",
-  "uid": "muta-node-dev",
-  "version": 11
+  "title": "muta-node",
+  "uid": "muta-node",
+  "version": 2
 }

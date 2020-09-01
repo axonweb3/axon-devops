@@ -15,9 +15,47 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
+  "id": 9,
+  "iteration": 1598447014426,
   "links": [],
   "panels": [
     {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.1
+              ],
+              "type": "lt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "3m",
+        "frequency": "1m",
+        "handler": 1,
+        "message": "TPS is zero",
+        "name": "TPS alert",
+        "noDataState": "no_data",
+        "notifications": []
+      },
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -72,7 +110,15 @@
           "refId": "A"
         }
       ],
-      "thresholds": [],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "lt",
+          "value": 0.1
+        }
+      ],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
@@ -208,6 +254,41 @@
       }
     },
     {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                2.9
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "name": "consensus_round_cost alert",
+        "noDataState": "no_data",
+        "notifications": []
+      },
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -262,7 +343,15 @@
           "refId": "A"
         }
       ],
-      "thresholds": [],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 2.9
+        }
+      ],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
@@ -304,6 +393,42 @@
       }
     },
     {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                1
+              ],
+              "type": "lt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "B",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "message": "exec time is greater than consensus time",
+        "name": "consensus_p90 alert",
+        "noDataState": "no_data",
+        "notifications": []
+      },
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -356,9 +481,24 @@
           "interval": "",
           "legendFormat": "time_usage(s)",
           "refId": "A"
+        },
+        {
+          "expr": "avg(histogram_quantile(0.90, sum(rate(muta_consensus_duration_seconds_bucket[5m])) by (le, instance))) / avg(histogram_quantile(0.90, sum(rate(muta_consensus_time_cost_seconds_bucket{type=\"exec\"}[5m])) by (le, instance))) ",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "B"
         }
       ],
-      "thresholds": [],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "lt",
+          "value": 1
+        }
+      ],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
@@ -727,23 +867,22 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 24,
+        "h": 8,
+        "w": 12,
         "x": 0,
         "y": 32
       },
       "id": 10,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
             "mean"
           ],
           "values": false
-        }
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
       },
       "pluginVersion": "7.0.0",
       "targets": [
@@ -758,7 +897,175 @@
       "timeFrom": null,
       "timeShift": null,
       "title": "current_height",
-      "type": "stat"
+      "type": "gauge"
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.01
+              ],
+              "type": "lt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          },
+          {
+            "evaluator": {
+              "params": [
+                0.9
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "B",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "3m",
+        "frequency": "1m",
+        "handler": 1,
+        "message": "Loss of Liveness",
+        "name": "Liveness alert",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
+      "hiddenSeries": false,
+      "id": 56,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "increase(muta_consensus_height{job=\"muta_exporter\"}[1m])",
+          "interval": "",
+          "legendFormat": "Liveness",
+          "refId": "A"
+        },
+        {
+          "expr": "up{job=\"muta_exporter\"} == 1",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "B"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "lt",
+          "value": 0.01
+        }
+      ],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Liveness",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "aliasColors": {},
@@ -795,7 +1102,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 42
+        "y": 40
       },
       "hiddenSeries": false,
       "id": 8,
@@ -892,7 +1199,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 42
+        "y": 40
       },
       "hiddenSeries": false,
       "id": 4,
@@ -994,7 +1301,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 50
+        "y": 48
       },
       "id": 18,
       "options": {
@@ -1052,7 +1359,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 60
+        "y": 58
       },
       "id": 34,
       "options": {
@@ -1107,7 +1414,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 60
+        "y": 58
       },
       "id": 38,
       "options": {
@@ -1162,7 +1469,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 68
+        "y": 66
       },
       "id": 46,
       "options": {
@@ -1209,7 +1516,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "none"
         },
         "overrides": []
       },
@@ -1217,14 +1525,14 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 68
+        "y": 66
       },
       "id": 28,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "mean"
+            "last"
           ],
           "values": false
         },
@@ -1271,7 +1579,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 76
+        "y": 74
       },
       "id": 42,
       "options": {
@@ -1326,7 +1634,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 76
+        "y": 74
       },
       "id": 32,
       "options": {
@@ -1383,7 +1691,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 84
+        "y": 82
       },
       "id": 36,
       "options": {
@@ -1445,7 +1753,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 84
+        "y": 82
       },
       "hiddenSeries": false,
       "id": 48,
@@ -1562,7 +1870,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 92
+        "y": 90
       },
       "heatmap": {},
       "hideZeroBuckets": false,
@@ -1625,7 +1933,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 92
+        "y": 90
       },
       "hiddenSeries": false,
       "id": 50,
@@ -1729,7 +2037,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 100
+        "y": 98
       },
       "id": 44,
       "options": {
@@ -1770,7 +2078,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 100
+        "y": 98
       },
       "id": 52,
       "options": {
@@ -1791,12 +2099,39 @@
       "type": "logs"
     }
   ],
-  "refresh": "5s",
+  "refresh": false,
   "schemaVersion": 25,
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "120.24.110.154:8000",
+          "value": "120.24.110.154:8000"
+        },
+        "datasource": "Prometheus",
+        "definition": "label_values(muta_consensus_height, instance)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Instance",
+        "multi": true,
+        "name": "node",
+        "options": [],
+        "query": "label_values(muta_consensus_height, instance)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
   },
   "time": {
     "from": "now-5m",
@@ -1818,5 +2153,5 @@
   "timezone": "",
   "title": "muta-benchmark",
   "uid": "muta-benchmark",
-  "version": 2
+  "version": 20
 }
