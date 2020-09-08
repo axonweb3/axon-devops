@@ -18,6 +18,7 @@
       - [grafana](#grafana)
         - [dashboard](#dashboard)
         - [provisioning](#provisioning)
+        - [grafana.ini](#grafanaini)
       - [loki](#loki)
         - [loki-local-config.yaml](#loki-local-configyaml)
       - [promethues](#promethues)
@@ -218,9 +219,10 @@ monitor 所使用的组件, 可以直接使用
 monitor 的 config 较多，以下按顺序描述每个目录的功能和文件内容
 <a id="markdown-grafana" name="grafana"></a>
 #### grafana
-该目录主要存在两个子目录
+该目录主要存在两个子目录和一个配置文件
 1. dashboards 放置 dashboard 模板
 2. provisioning 初始化数据源、指定初始化 dashboard 的配置文件位置、初始化告警推送配置
+3. grafana.ini  Grafana 的配置文件 
 
 <a id="markdown-dashboard" name="dashboard"></a>
 ##### dashboard
@@ -243,8 +245,20 @@ notifiers:
     settings:
       url: http://47.56.233.149:4000/bot
 ```
-
 [provisioning 配置参考](https://grafana.com/docs/grafana/latest/administration/provisioning/)
+
+
+<a id="markdown-grafanaini" name="grafanaini"></a>
+##### grafana.ini
+和 grafana 相关的配置，目前比较主要的配置有 `[external_image_storage]`, 主要用于配合 alert 的 include image 功能(最少选一个否则 include image 功能不会生效)
+```ini
+#################################### External image storage ##########################
+[external_image_storage]
+# Used for uploading images to public servers so they can be included in slack/email messages.
+# you can choose between (s3, webdav, gcs, azure_blob, local)
+provider = local
+```
+[external_image_storage 配置参考](https://grafana.com/docs/grafana/latest/administration/configuration/#external_image_storage)
 
 
 <a id="markdown-loki" name="loki"></a>
