@@ -17,8 +17,8 @@
   "editable": true,
   "gnetId": 11074,
   "graphTooltip": 0,
-  "id": 10,
-  "iteration": 1598368970749,
+  "id": 23,
+  "iteration": 1599545869135,
   "links": [
     {
       "icon": "external link",
@@ -622,6 +622,7 @@
       "repeat": null,
       "seriesOverrides": [
         {
+          "$$hashKey": "object:457",
           "alias": "Overall average used%",
           "lines": false,
           "pointradius": 1,
@@ -629,6 +630,7 @@
           "yaxis": 2
         },
         {
+          "$$hashKey": "object:458",
           "alias": "CPU Cores",
           "color": "#C4162A"
         }
@@ -638,7 +640,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "count(node_cpu_seconds_total{job=~\"node_exporter\", mode='system'})",
+          "expr": "count(node_cpu_seconds_total{job=~\"$job\", mode='system'})",
           "format": "time_series",
           "hide": false,
           "interval": "",
@@ -677,11 +679,13 @@
       ],
       "thresholds": [
         {
+          "$$hashKey": "object:648",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 60
+          "value": 60,
+          "yaxis": "left"
         }
       ],
       "timeFrom": null,
@@ -827,11 +831,13 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
+          "$$hashKey": "object:727",
           "alias": "Total",
           "color": "#C4162A",
           "fill": 0
         },
         {
+          "$$hashKey": "object:728",
           "alias": "Overall Average Used%",
           "lines": false,
           "pointradius": 1,
@@ -876,11 +882,13 @@
       ],
       "thresholds": [
         {
+          "$$hashKey": "object:775",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 70
+          "value": 70,
+          "yaxis": "left"
         }
       ],
       "timeFrom": null,
@@ -902,6 +910,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:749",
           "decimals": null,
           "format": "bytes",
           "label": "Total",
@@ -911,6 +920,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:750",
           "decimals": null,
           "format": "percent",
           "label": "Overall Average Used%",
@@ -2160,7 +2170,7 @@
         "for": "5m",
         "frequency": "1m",
         "handler": 1,
-        "message": "The average CPU usage of {{instance}} nodes exceeds 60%",
+        "message": "The average CPU usage of nodes exceeds 60%",
         "name": "CPU% Basic alert",
         "noDataState": "no_data",
         "notifications": [
@@ -2380,9 +2390,14 @@
         "for": "5m",
         "frequency": "1m",
         "handler": 1,
+        "message": "The average memory usage of nodes exceeds 60%",
         "name": "Memory Basic alert",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "notification-telegram"
+          }
+        ]
       },
       "aliasColors": {
         "192.168.200.241:9100_总内存": "dark-red",
@@ -2719,7 +2734,7 @@
         "for": "5m",
         "frequency": "1m",
         "handler": 1,
-        "message": "The average CPU load5 of {{instance}} nodes exceeds 0.7",
+        "message": "The average CPU load5 of  nodes exceeds 0.7",
         "name": "System Load alert",
         "noDataState": "no_data",
         "notifications": [
@@ -3029,7 +3044,9 @@
     },
     {
       "alert": {
-        "alertRuleTags": {},
+        "alertRuleTags": {
+          "@zhengjianhui": "test"
+        },
         "conditions": [
           {
             "evaluator": {
@@ -3062,7 +3079,11 @@
         "message": "Less than 30% of free disk space",
         "name": "Disk Space Used% Basic alert",
         "noDataState": "no_data",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "notification-telegram"
+          }
+        ]
       },
       "aliasColors": {},
       "bars": false,
@@ -3348,7 +3369,7 @@
         "for": "5m",
         "frequency": "1m",
         "handler": 1,
-        "message": "{{instance}}-disk io usage exceeds 80%",
+        "message": "disk io usage exceeds 80%",
         "name": "Time Spent Doing I/Os alert",
         "noDataState": "no_data",
         "notifications": [
@@ -3962,9 +3983,9 @@
           {
             "evaluator": {
               "params": [
-                1
+                0.9
               ],
-              "type": "lt"
+              "type": "gt"
             },
             "operator": {
               "type": "and"
@@ -3978,7 +3999,7 @@
             },
             "reducer": {
               "params": [],
-              "type": "max"
+              "type": "avg"
             },
             "type": "query"
           }
@@ -4001,6 +4022,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "decimals": 0,
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -4036,6 +4058,7 @@
       "legend": {
         "avg": false,
         "current": false,
+        "hideEmpty": false,
         "max": false,
         "min": false,
         "show": true,
@@ -4085,8 +4108,8 @@
           "colorMode": "critical",
           "fill": true,
           "line": true,
-          "op": "lt",
-          "value": 1
+          "op": "gt",
+          "value": 0.9
         }
       ],
       "timeFrom": null,
@@ -4138,9 +4161,9 @@
           {
             "evaluator": {
               "params": [
-                1
+                0.9
               ],
-              "type": "lt"
+              "type": "gt"
             },
             "operator": {
               "type": "and"
@@ -4177,6 +4200,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "decimals": 0,
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -4258,11 +4282,13 @@
       ],
       "thresholds": [
         {
+          "$$hashKey": "object:737",
           "colorMode": "critical",
           "fill": true,
           "line": true,
-          "op": "lt",
-          "value": 1
+          "op": "gt",
+          "value": 0.9,
+          "yaxis": "left"
         }
       ],
       "timeFrom": null,
@@ -4284,6 +4310,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:708",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -4292,6 +4319,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:709",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -4312,9 +4340,9 @@
           {
             "evaluator": {
               "params": [
-                1
+                0.9
               ],
-              "type": "lt"
+              "type": "gt"
             },
             "operator": {
               "type": "and"
@@ -4436,8 +4464,8 @@
           "colorMode": "critical",
           "fill": true,
           "line": true,
-          "op": "lt",
-          "value": 1
+          "op": "gt",
+          "value": 0.9
         }
       ],
       "timeFrom": null,
@@ -4487,179 +4515,9 @@
           {
             "evaluator": {
               "params": [
-                1
+                0.9
               ],
-              "type": "lt"
-            },
-            "operator": {
-              "type": "and"
-            },
-            "query": {
-              "params": [
-                "A",
-                "5m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "last"
-            },
-            "type": "query"
-          }
-        ],
-        "executionErrorState": "alerting",
-        "for": "5m",
-        "frequency": "1m",
-        "handler": 1,
-        "message": "Log collection failed",
-        "name": "promtail status alert",
-        "noDataState": "alerting",
-        "notifications": [
-          {
-            "uid": "notification-telegram"
-          }
-        ]
-      },
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Prometheus-loki",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "align": null
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 0,
-        "y": 68
-      },
-      "hiddenSeries": false,
-      "id": 209,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
-      "percentage": false,
-      "pluginVersion": "7.0.0",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "count(count_over_time({job=\"muta\"}[5m]))",
-          "instant": false,
-          "interval": "",
-          "legendFormat": "active",
-          "refId": "B"
-        },
-        {
-          "expr": "count(count_over_time({job=\"muta\"}[5m])) by (hostip)",
-          "hide": true,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [
-        {
-          "colorMode": "critical",
-          "fill": true,
-          "line": true,
-          "op": "lt",
-          "value": 1
-        }
-      ],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Promtail Status",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "transformations": [],
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:1706",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:1707",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "alert": {
-        "alertRuleTags": {},
-        "conditions": [
-          {
-            "evaluator": {
-              "params": [
-                1
-              ],
-              "type": "lt"
+              "type": "gt"
             },
             "operator": {
               "type": "and"
@@ -4680,7 +4538,7 @@
           {
             "evaluator": {
               "params": [
-                1
+                0.9
               ],
               "type": "gt"
             },
@@ -4719,6 +4577,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "decimals": 0,
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -4747,7 +4606,7 @@
       "gridPos": {
         "h": 6,
         "w": 8,
-        "x": 8,
+        "x": 0,
         "y": 68
       },
       "hiddenSeries": false,
@@ -4824,14 +4683,187 @@
           "colorMode": "critical",
           "fill": true,
           "line": true,
-          "op": "lt",
-          "value": 1
+          "op": "gt",
+          "value": 0.9
         }
       ],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
       "title": "Jaeger Status",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:405",
+          "format": "none",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:406",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.9
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "F",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "message": "jaeger-agent is down",
+        "name": "Jaeger Agent alert",
+        "noDataState": "ok",
+        "notifications": []
+      },
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 68
+      },
+      "hiddenSeries": false,
+      "id": 213,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pluginVersion": "7.0.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "count(up{job=\"jaeger_agent\"} == 1) ",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "active",
+          "refId": "A"
+        },
+        {
+          "expr": "count(up{job=\"jaeger_agent\"} == 0) ",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "down",
+          "refId": "B"
+        },
+        {
+          "expr": "up{job=\"jaeger_agent\"} == 0",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "F"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 0.9
+        }
+      ],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Jaeger Agent Status",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -4855,6 +4887,354 @@
           "show": true
         },
         {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.9
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "F",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "message": "loki is down",
+        "name": "Jaeger Agent alert",
+        "noDataState": "ok",
+        "notifications": []
+      },
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 74
+      },
+      "hiddenSeries": false,
+      "id": 215,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pluginVersion": "7.0.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "count(up{job=\"loki\"} == 1) ",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "active",
+          "refId": "A"
+        },
+        {
+          "expr": "count(up{job=\"loki\"} == 0) ",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "down",
+          "refId": "B"
+        },
+        {
+          "expr": "up{job=\"loki\"} == 0",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "F"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 0.9
+        }
+      ],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Loki Status",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.9
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "C",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "message": "Log collection failed",
+        "name": "promtail status alert",
+        "noDataState": "ok",
+        "notifications": [
+          {
+            "uid": "notification-telegram"
+          }
+        ]
+      },
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 74
+      },
+      "hiddenSeries": false,
+      "id": 209,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pluginVersion": "7.0.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "count(up{job=\"promtail_agent\"} == 1) ",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "active",
+          "refId": "B"
+        },
+        {
+          "expr": "count(up{job=\"promtail_agent\"} == 0) ",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "down",
+          "refId": "A"
+        },
+        {
+          "expr": "up{job=\"promtail_agent\"} == 0",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "C"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 0.9
+        }
+      ],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Promtail Status",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transformations": [],
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:1706",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1707",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -4987,8 +5367,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "/muta",
-          "value": "/muta"
+          "text": "/",
+          "value": "/"
         },
         "datasource": "Prometheus",
         "definition": "query_result(topk(1,sort_desc (max(node_filesystem_size_bytes{instance=~'$node',fstype=~\"ext.?|xfs\",mountpoint!~\".*pods.*\"}) by (mountpoint))))",
@@ -5065,7 +5445,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "muta-node test2",
-  "uid": "muta-node-dev2",
-  "version": 2
+  "title": "muta-node",
+  "uid": "muta-node",
+  "version": 43
 }

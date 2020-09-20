@@ -343,27 +343,46 @@ rule_files:
 # Here it's Prometheus itself.
 scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  # Prometheus server 状态监控
   - job_name: 'prometheus'
     static_configs:
     - targets: ['127.0.0.1:9090']
 
   # 配置为 muta-jaeger-collector 和  muta-jaeger-query 所在 ip，端口和例子如下
+  # Jaeger server 状态监控
   - job_name: 'jaeger'
     static_configs:
     - targets: ['muta-jaeger-collector:14269','muta-jaeger-query:16687']
 
+  # 这里配置所有 muta 节点， ['node_id_1:14271, 'node_ip_2:14271', 'node_ip_3:14271']
+  # Jaeger 采集端状态监控
+  - job_name: 'jaeger_agent'
+    static_configs:
+    - targets: [jaeger_agent_ip]  
+
   # 这里配置所有 muta 节点， ['node_id_1:9100, 'node_ip_2:9100', 'node_ip_3:9100']
-  # node_exporter 的默认端点就是 9100
+  # Node_exporter 采集端状态监控
   - job_name: 'node_exporter'
     static_configs:
     - targets: [node_exporter_ip]
   
   # 这里配置所有 muta 节点， ['node_id_1:8000', 'node_ip_2:8000', 'node_ip_3:8000']
-  # 端口请查看 muta chain.toml 配置下 [graphql] listening_address 参数
+  # Muta 应用的状态监控
   - job_name: 'muta_exporter'
     static_configs:
-    - targets: ['muta_exporter_ip']
+    - targets: ['muta_exporter_ip:8000']
 
+  # 配置为 Loki server 所在 ip，端口和例子如下
+  # Loki server 的状态监控
+  - job_name: 'loki'
+    static_configs:
+    - targets: ['loki:3100']
+
+  # 这里配置所有 Muta 节点， ['node_id_1:9080', 'node_ip_2:9080', 'node_ip_3:9080']
+  # Loki 采集端 Promtail 的状态监控
+  - job_name: 'promtail_agent'
+    static_configs:
+    - targets: [promtail_agent_ip]
 
 ```
 

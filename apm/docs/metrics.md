@@ -576,28 +576,6 @@ The value of the Metric variable up is zero
 </details>	
 
 
-#### Promtail Status
-- type: Promtail
-- description: Promtail service status
-<details>
-<summary>Legende details</summary>
-
-##### active
-Number of Promtail services in up status
-```
-count(count_over_time({job="muta"}[5m]))
-```
-
-##### /
-Not show, for alert
-```
-count(count_over_time({job="muta"}[5m])) by (hostip)
-```
-###### Alert threshold:
-The value of the Metric variable count is zero
-
-</details>	
-
 
 #### Jaeger Status
 - type: Jaeger
@@ -645,6 +623,93 @@ up{instance=~"(.*):14269"} == 0
 The value of the Metric variable up is zero
 
 </details>	
+
+
+#### Jaeger Agent Status
+- type: Jaeger
+- description: Jaeger agent status
+<details>
+<summary>Legende details</summary>
+
+##### active
+Number of Jaeger-agent services in up status
+```
+count(up{job="jaeger_agent"} == 1) 
+```
+
+##### down
+Number of Jaeger-agent services in down status
+```
+count(up{job="jaeger_agent"} == 0) 
+```
+
+##### /
+Not show, for alert
+```
+up{job="jaeger_agent"} == 0
+```
+###### Alert threshold:
+The value of the Metric variable up is zero
+
+</details>	
+
+#### Loki Status
+- type: Promtail
+- description: Loki service status
+<details>
+<summary>Legende details</summary>
+
+##### active
+Number of Loki services in up status
+```
+count(up{job="loki"} == 1) 
+```
+
+##### down
+Number of Loki services in down status
+```
+count(up{job="loki"} == 0) 
+```
+
+##### /
+Not show, for alert
+```
+up{job="loki"} == 0
+```
+###### Alert threshold:
+The value of the Metric variable up is zero
+
+</details>	
+
+#### Promtail Status
+- type: Promtail
+- description: Promtail service status
+<details>
+<summary>Legende details</summary>
+
+##### active
+Number of Promtail services in up status
+```
+count(up{job="promtail_agent"} == 1) 
+```
+
+##### down
+Number of Promtail services in down status
+```
+count(up{job="promtail_agent"} == 0) 
+```
+
+##### /
+Not show, for alert
+```
+up{job="promtail_agent"} == 0
+```
+###### Alert threshold:
+The value of the Metric variable up is zero
+
+</details>	
+
+
 
 
 ## muta-benchmark
