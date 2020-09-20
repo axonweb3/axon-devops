@@ -29,6 +29,8 @@ services:
     image: grafana/promtail:master-9ad98df
     container_name: muta-promtail
     restart: on-failure
+    ports:
+      - '9080:9080'
     volumes:
       - ./data/promtail/positions:/tmp/promtail/
       - ./config/promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml
