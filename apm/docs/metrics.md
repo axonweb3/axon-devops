@@ -100,7 +100,8 @@ Utilization rate over 70%
 </details>
 
 
-### Resource Details					
+### Resource Details
+<a id="Internet-traffic-per-hour" name="Internet-traffic-per-hour"></a>					
 #### Internet traffic per hour 
 - type: Network
 - description: Traffic statistics
@@ -217,15 +218,7 @@ Utilization rate over 60%
 
 
 
-
-
-
-
-
-
-
-
-
+<a id="Network-bandwidth-usage-per-second-all" name="Network-bandwidth-usage-per-second-all"></a>
 #### Network bandwidth usage per second all
 - type: Network
 - description: Network bandwidth
@@ -787,6 +780,7 @@ avg (sum by (instance) (increase(muta_storage_get_cf_seconds[5m]))) / avg(increa
 </details>
 
 
+<a id="processed_tx_request" name="processed_tx_request"></a>
 #### processed_tx_request
 - description: received transaction request count in last 5 minutes (the unit is count/second)
 <details>
@@ -811,6 +805,8 @@ rate(muta_api_request_result_total{result="success", type="send_transaction"}[5m
 ```
 </details>
 
+
+<a id="current_height" name="current_height"></a>
 #### current_height
 - description: Chain current height
 <details>
@@ -846,6 +842,8 @@ up{job="muta_exporter"} == 1
 Loss of Liveness
 </details>
 
+
+<a id="synced_block" name="synced_block"></a>
 #### synced_block
 - description: Number of blocks synchronized by nodes
 <details>
@@ -880,6 +878,7 @@ Estimate the network message arrival rate in the last five minutes
 </details>
 
 
+<a id="consensus_round_cost" name="Network-bandwidth-usage-per-second-all"></a>
 #### consensus_round_cost
 - description: Number of rounds needed to reach consensus
 <details>
@@ -894,6 +893,7 @@ Number of rounds needed to reach consensus
 More than three rounds of consensus
 </details>
 
+<a id="mempool_cached_tx" name="mempool_cached_tx"></a>
 #### mempool_cached_tx
 - description: Number of transactions in the current mempool
 <details>
@@ -905,6 +905,78 @@ Number of transactions in the current mempool
 muta_mempool_tx_count
 ```
 </details>
+
+#### Connected Peers(Gauge)
+- description: Number of nodes on the current connection
+<details>
+<summary>Legende details</summary>
+
+##### {{instance}}
+Number of nodes on the current connection
+```
+muta_network_connected_peers
+```
+</details>
+
+#### Connected Peers(Graph)
+- description: Number of nodes on the current connection
+<details>
+<summary>Legende details</summary>
+
+##### Saved peers
+Total number of peers
+```
+max(muta_network_saved_peer_count)
+```
+
+##### Connected Peers
+Number of nodes on the current connection
+```
+muta_network_connected_peers
+```
+</details>
+
+
+#### Consensus peers(gauge)
+- description: Number of consensus nodes
+<details>
+<summary>Legende details</summary>
+
+##### {{instance}}
+Number of consensus nodes
+```
+muta_network_tagged_consensus_peers
+```
+</details>
+
+#### Consensus peers(Graph)
+- description: Number of consensus nodes
+<details>
+<summary>Legende details</summary>
+
+##### Consensus peers
+Total number of consensus peers
+```
+max(muta_network_tagged_consensus_peers)
+```
+
+##### {{instance}}-Connected Consensus Peers (Minus itself)
+Number of consensus nodes
+```
+muta_network_connected_consensus_peers
+```
+
+##### /
+Average utilization of all CPUs
+```
+(sum(muta_network_tagged_consensus_peers
+) by (instance) - 1)
+- sum(muta_network_connected_consensus_peers) by (instance)
+```
+###### Alert threshold:
+Alert on loss of connection to a consensus node
+</details>
+
 
 #### Saved peers
 - description: Number of nodes saved peers
@@ -918,31 +990,8 @@ muta_network_saved_peer_count
 ```
 </details>
 
-#### Consensus peers
-- description: Number of consensus nodes
-<details>
-<summary>Legende details</summary>
 
-##### {{instance}}
-Number of consensus nodes
-```
-muta_network_tagged_consensus_peers
-```
-</details>
-
-#### Connected Peers
-- description: Number of nodes on the current connection
-<details>
-<summary>Legende details</summary>
-
-##### {{instance}}
-Number of nodes on the current connection
-```
-muta_network_connected_peers
-```
-</details>
-
-#### Connected Consensus Peers (Minus itself)
+<!-- #### Connected Consensus Peers (Minus itself)
 - description: Number of consensus nodes on the current connection
 <details>
 <summary>Legende details</summary>
@@ -952,8 +1001,19 @@ Number of consensus nodes on the current connection
 ```
 muta_network_connected_consensus_peers
 ```
-</details>
+</details> -->
 
+#### Unidentified Connections
+- description: The number of connections in the handshake, requiring verification of the chain id
+<details>
+<summary>Legende details</summary>
+
+##### {{instance}}
+The number of connections in the handshake, requiring verification of the chain id
+```
+muta_network_unidentified_connections
+```
+</details>
 
 #### Connecting Peers
 - description: Number of active initiations to establish connections with other machines
@@ -967,15 +1027,15 @@ muta_network_outbound_connecting_peers
 ```
 </details>
 
-#### Unidentified Connections
-- description: The number of connections in the handshake, requiring verification of the chain id
+#### Disconnected count(To other peers)
+- description: Disconnected count
 <details>
 <summary>Legende details</summary>
 
 ##### {{instance}}
-The number of connections in the handshake, requiring verification of the chain id
+Disconnected count
 ```
-muta_network_unidentified_connections
+muta_network_ip_disconnected_count
 ```
 </details>
 
@@ -999,23 +1059,23 @@ muta_network_received_message_in_processing_guage
 ##### {{instance}}
 Number of messages being processed (based on IP of received messages)
 ```
-muta_network_received_ip_message_in_processing_guage
+muta_network_received_ip_message_in_processing_guage{instance=~"$node"}
 ```
 </details>
 
-#### Ping (ms)
-- description: Response duration distribution of ping
+#### Ping (ms)_p90
+- description: p90 for P2p Ping
 <details>
 <summary>Legende details</summary>
 
 ##### {{instance}}
-Response duration distribution of ping
+p90 for P2p Ping
 ```
-muta_network_ip_ping_in_ms
+avg(histogram_quantile(0.90, sum(rate(muta_network_ping_in_ms_bucket[5m])) by (le, instance)))
 ```
 </details>
 
-#### Ping by ip
+<!-- #### Ping by ip
 - description: ping response time of the current node and other nodes
 <details>
 <summary>Legende details</summary>
@@ -1025,20 +1085,8 @@ ping response time of the current node and other nodes
 ```
 muta_network_ip_ping_in_ms
 ```
-</details>
+</details> -->
 
-
-#### Disconnected count(To other peers)
-- description: Disconnected count
-<details>
-<summary>Legende details</summary>
-
-##### {{instance}}
-Disconnected count
-```
-muta_network_ip_disconnected_count
-```
-</details>
 
 #### Peer give up warnings
 - description: Peer give up warnings
@@ -1053,14 +1101,114 @@ Peer give up warnings
 </details>
 
 
+## muta-network
+#### Network bandwidth usage per second all
+[link muta-node (Network bandwidth usage per second all)](#Network-bandwidth-usage-per-second-all)
+
+#### Internet traffic per hour
+[link muta-node (Internet traffic per hour)](#Internet-traffic-per-hour)
+
+
+#### mempool_cached_tx
+[link muta-benchmark (mempool_cached_tx)](#mempool_cached_tx)
+
+#### consensus_round_cost
+[link muta-benchmark (consensus_round_cost)](#consensus_round_cost)
+
+#### current_height
+[link muta-benchmark (current_height)](#current_height)
+
+#### synced_block
+[link muta-benchmark (synced_block)](#synced_block)
+
+#### processed_tx_request
+[link muta-benchmark (processed_tx_request)](#processed_tx_request)
+
+
+#### height and round
+- description: Height of consensus and rounds of consensus
+<details>
+<summary>Legende details</summary>
+
+##### height
+Height of consensus
+```
+muta_consensus_height{instance=~"$node"}
+```
+
+##### round
+Rounds of consensus
+```
+(muta_consensus_round{instance=~"$node"} > 0 )
+```
+</details>
 
 
 
+#### muta_network_message_size
+- description: Network transmission size statistics
+<details>
+<summary>Legende details</summary>
+
+##### send-total-{{instance}}
+Each node send statistics
+```
+sum(url:muta_network_message_size:sum5m{direction="send"}) by (instance)
+```
+
+##### received-total-{{instance}}
+Each node received statistics
+```
+sum(url:muta_network_message_size:sum5m{direction="received"}) by (instance)
+```
+
+##### send-total
+Total send
+```
+sum(url:muta_network_message_size:sum5m{direction="send"})
+```
+
+##### received-total
+Total received
+```
+sum(url:muta_network_message_size:sum5m{direction="received"})
+```
+
+</details>
 
 
+#### network_send_by_url_size_and_count
+- description: Statistics on the number and size of network send
+<details>
+<summary>Legende details</summary>
 
+##### {{url}}
+Size of each url send
+```
+sum(url:muta_network_message_size:sum5m{direction="send",instance=~"$node"}) by (url)
+```
 
+##### count_{{action}}
+Count of each url send
+```
+sum(rate(muta_network_message_total{direction="sent"}[5m])) by (action)
+```
+</details>
 
+#### network_received_by_url_size_and_count
+- description: Statistics on the number and size of network send
+<details>
+<summary>Legende details</summary>
 
+##### {{url}}
+Size of each url received
+```
+sum(url:muta_network_message_size:sum5m{direction="received",instance=~"$node"}) by (url)
+```
 
-
+##### count_{{action}}
+Count of each url received
+```
+sum(rate(muta_network_message_total{direction="received"}[5m])) by (action)
+```
+</details>

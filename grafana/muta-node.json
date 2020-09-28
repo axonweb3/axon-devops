@@ -17,8 +17,8 @@
   "editable": true,
   "gnetId": 11074,
   "graphTooltip": 0,
-  "id": 23,
-  "iteration": 1599646960034,
+  "id": 28,
+  "iteration": 1600613892386,
   "links": [
     {
       "icon": "external link",
@@ -622,7 +622,7 @@
       "repeat": null,
       "seriesOverrides": [
         {
-          "$$hashKey": "object:457",
+          "$$hashKey": "object:1090",
           "alias": "Overall average used%",
           "lines": false,
           "pointradius": 1,
@@ -630,7 +630,7 @@
           "yaxis": 2
         },
         {
-          "$$hashKey": "object:458",
+          "$$hashKey": "object:1091",
           "alias": "CPU Cores",
           "color": "#C4162A"
         }
@@ -679,7 +679,7 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:2544",
+          "$$hashKey": "object:708",
           "colorMode": "critical",
           "fill": true,
           "line": true,
@@ -831,13 +831,13 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
-          "$$hashKey": "object:727",
+          "$$hashKey": "object:1183",
           "alias": "Total",
           "color": "#C4162A",
           "fill": 0
         },
         {
-          "$$hashKey": "object:728",
+          "$$hashKey": "object:1184",
           "alias": "Overall Average Used%",
           "lines": false,
           "pointradius": 1,
@@ -882,13 +882,11 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:2677",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 70,
-          "yaxis": "left"
+          "value": 90
         }
       ],
       "timeFrom": null,
@@ -910,7 +908,7 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:749",
+          "$$hashKey": "object:1205",
           "decimals": null,
           "format": "bytes",
           "label": "Total",
@@ -920,7 +918,7 @@
           "show": true
         },
         {
-          "$$hashKey": "object:750",
+          "$$hashKey": "object:1206",
           "decimals": null,
           "format": "percent",
           "label": "Overall Average Used%",
@@ -1028,7 +1026,7 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
-          "$$hashKey": "object:2733",
+          "$$hashKey": "object:1271",
           "alias": "Overall Average Used%",
           "lines": false,
           "pointradius": 1,
@@ -1036,7 +1034,7 @@
           "yaxis": 2
         },
         {
-          "$$hashKey": "object:2734",
+          "$$hashKey": "object:1272",
           "alias": "Total",
           "color": "#C4162A"
         }
@@ -1075,13 +1073,11 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:2813",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 90,
-          "yaxis": "left"
+          "value": 90
         }
       ],
       "timeFrom": null,
@@ -1103,7 +1099,7 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:2753",
+          "$$hashKey": "object:1291",
           "decimals": 1,
           "format": "bytes",
           "label": "Total",
@@ -1113,7 +1109,7 @@
           "show": true
         },
         {
-          "$$hashKey": "object:2754",
+          "$$hashKey": "object:1292",
           "decimals": null,
           "format": "percent",
           "label": "Overall Average Used%",
@@ -2253,7 +2249,7 @@
       "repeat": null,
       "seriesOverrides": [
         {
-          "$$hashKey": "object:2870",
+          "$$hashKey": "object:1378",
           "alias": "/.*Total/",
           "color": "#C4162A",
           "fill": 0
@@ -2315,13 +2311,11 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:2934",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 90,
-          "yaxis": "left"
+          "value": 90
         }
       ],
       "timeFrom": null,
@@ -2469,13 +2463,13 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
-          "$$hashKey": "object:2991",
+          "$$hashKey": "object:1449",
           "alias": "Total",
           "color": "#C4162A",
           "fill": 0
         },
         {
-          "$$hashKey": "object:2992",
+          "$$hashKey": "object:1450",
           "alias": "Used%",
           "color": "rgb(0, 209, 255)",
           "lines": false,
@@ -2539,13 +2533,11 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:3187",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 90,
-          "yaxis": "left"
+          "value": 90
         }
       ],
       "timeFrom": null,
@@ -2816,7 +2808,7 @@
       "repeat": null,
       "seriesOverrides": [
         {
-          "$$hashKey": "object:3254",
+          "$$hashKey": "object:1538",
           "alias": "/.*CPU cores/",
           "color": "#C4162A"
         }
@@ -2884,13 +2876,11 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:3319",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 0.9,
-          "yaxis": "left"
+          "value": 0.9
         }
       ],
       "timeFrom": null,
@@ -3175,13 +3165,11 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:3431",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 90,
-          "yaxis": "left"
+          "value": 90
         }
       ],
       "timeFrom": null,
@@ -3483,13 +3471,11 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:3521",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 80,
-          "yaxis": "left"
+          "value": 80
         }
       ],
       "timeFrom": null,
@@ -4873,13 +4859,11 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:2292",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 0.9,
-          "yaxis": "left"
+          "value": 0.9
         }
       ],
       "timeFrom": null,
@@ -4901,7 +4885,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:931",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -4910,7 +4893,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:932",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -5048,13 +5030,11 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:2391",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 0.9,
-          "yaxis": "left"
+          "value": 0.9
         }
       ],
       "timeFrom": null,
@@ -5076,8 +5056,6 @@
       },
       "yaxes": [
         {
-
-          "$$hashKey": "object:1014",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -5086,7 +5064,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:1015",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -5227,13 +5204,11 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:1121",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 0.9,
-          "yaxis": "left"
+          "value": 0.9
         }
       ],
       "timeFrom": null,
@@ -5478,5 +5453,5 @@
   "timezone": "browser",
   "title": "muta-node",
   "uid": "muta-node",
-  "version": 51
+  "version": 13
 }

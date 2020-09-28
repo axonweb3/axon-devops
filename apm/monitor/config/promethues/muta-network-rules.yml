@@ -1,0 +1,5 @@
+groups:
+  - name: example
+    rules:
+      - record: url:muta_network_message_size:sum5m
+        expr: sum(rate(muta_network_message_size[5m])) by (url, direction,instance)
