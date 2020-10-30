@@ -11,7 +11,7 @@ positions:
 clients:
   # Loki 的 server 地址，这边 ip 为 server_ip, port 
   # 对应 monitor docker-compose 中的 muta-loki
-  - url: http://192.168.20.211:3100/api/prom/push
+  - url: http://LOKI_ADDRESS:3100/api/prom/push
 
 scrape_configs:
   - job_name: test-log

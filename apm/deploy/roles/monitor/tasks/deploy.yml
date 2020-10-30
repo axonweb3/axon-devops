@@ -1,0 +1,53 @@
+---
+- name: set node exporter ip:port
+  shell: sh init_config.sh set_exporter
+
+- name: mkdir grafana provisioning dir
+  file: path={{ monitor_dir }}/config/grafana/provisioning/{{ item }}  state=directory mode=0755 recurse=yes
+  with_items:
+      - dashboards
+      - datasources
+      - notifiers
+      
+- name: mkdir grafana dashboards dir
+  file: path={{ monitor_dir }}/config/grafana/dashboards state=directory mode=0755 recurse=yes
+
+- name: mkdir prometheus dir
+  file: path={{ monitor_dir }}/config/promethues state=directory mode=0755 recurse=yes  
+
+- name: mkdir loki dir
+  file: path={{ monitor_dir }}/config/loki state=directory mode=0755 recurse=yes 
+
+- name: copy docker-compose.yml
+  template: src=docker-compose.yml.j2 dest={{ monitor_dir }}/docker-compose.yml
+
+- name: copy prometheus.yml
+  template: src=prometheus.yml.j2 dest={{ monitor_dir }}/config/promethues/prometheus.yml
+
+- name: copy grafana.ini
+  template: src=grafana.ini.j2 dest={{ monitor_dir }}/config/grafana/grafana.ini
+
+- name: copy dashboards.yaml
+  template: src=dashboards.yaml.j2 dest={{ monitor_dir }}/config/grafana/provisioning/dashboards/dashboards.yaml
+
+- name: copy datasources.yml
+  template: src=datasources.yaml.j2 dest={{ monitor_dir }}/config/grafana/provisioning/datasources/datasources.yaml
+
+- name: copy notifiers.yml
+  template: src=datasources.yaml.j2 dest={{ monitor_dir }}/config/grafana/provisioning/notifiers/notifiers.yaml
+
+- name: copy loki-config.yaml
+  template: src=loki-local-config.yaml.j2 dest={{ monitor_dir }}/config/loki/loki-local-config.yaml
+  
+- name: copy muta-benchmark.json
+  copy: src=muta-benchmark.json dest={{ monitor_dir }}/config/grafana/dashboards/muta-benchmark.json
+
+- name: copy muta-node.json
+  copy: src=muta-node.json dest={{ monitor_dir }}/config/grafana/dashboards/muta-node.json
+
+- name: copy muta-network.json
+  copy: src=muta-network.json dest={{ monitor_dir }}/config/grafana/dashboards/muta-network.json
+
+- name: start prometheus grafana
+  shell: cd {{ monitor_dir }} && docker-compose up -d
+  # shell: cd {{ monitor_dir }} && sed -i "s/jaeger_ip/{{ ansible_default_ipv4.address }}/g" prometheus.yml && docker-compose up -d

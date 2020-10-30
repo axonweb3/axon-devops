@@ -35,19 +35,19 @@ scrape_configs:
   # Jaeger 采集端状态监控
   - job_name: 'jaeger_agent'
     static_configs:
-    - targets: [jaeger_agent_ip]  
+    - targets: [jaeger_agent_ip:14271]  
 
   # 这里配置所有 muta 节点， ['node_id_1:9100, 'node_ip_2:9100', 'node_ip_3:9100']
   # Node_exporter 采集端状态监控
   - job_name: 'node_exporter'
     static_configs:
-    - targets: [node_exporter_ip]
+    - targets: [node_exporter_ip:9100]
   
   # 这里配置所有 muta 节点， ['node_id_1:8000', 'node_ip_2:8000', 'node_ip_3:8000']
   # Muta 应用的状态监控
   - job_name: 'muta_exporter'
     static_configs:
-    - targets: ['muta_exporter_ip:8000']
+    - targets: [muta_exporter_ip:8000]
 
   # 配置为 Loki server 所在 ip，端口和例子如下
   # Loki server 的状态监控
@@ -59,4 +59,4 @@ scrape_configs:
   # Loki 采集端 Promtail 的状态监控
   - job_name: 'promtail_agent'
     static_configs:
-    - targets: [promtail_agent_ip]
+    - targets: [promtail_agent_ip:9080]
