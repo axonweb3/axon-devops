@@ -1,0 +1,28 @@
+---
+- name: copy dashboard json
+  shell: cp -r ../monitor/config/grafana/dashboards/* roles/monitor/files/
+  tags: copy_config
+
+- name: copy grafana.ini
+  shell: cp -r ../monitor/config/grafana/grafana.ini roles/monitor/templates/grafana.ini.j2
+
+- name: copy provisioning dashboards
+  shell: cp -r ../monitor/config/grafana/provisioning/dashboards/dashboards.yaml roles/monitor/templates/dashboards.yaml.j2
+
+- name: copy provisioning datasources
+  shell: cp -r ../monitor/config/grafana/provisioning/datasources/datasources.yaml roles/monitor/templates/datasources.yaml.j2
+
+- name: copy provisioning notifiers
+  shell: cp -r ../monitor/config/grafana/provisioning/notifiers/notifiers.yaml roles/monitor/templates/notifiers.yaml.j2
+
+- name: copy loki-local-config.yaml
+  shell: cp -r ../monitor/config/loki/loki-local-config.yaml roles/monitor/templates/loki-local-config.yaml.j2
+
+- name: copy prometheus.yml
+  shell: cp -r ../monitor/config/promethues/prometheus.yml roles/monitor/templates/prometheus.yml.j2
+
+- name: copy muta-network-rules.yml
+  shell: cp -r ../monitor/config/promethues/muta-network-rules.yml roles/monitor/templates/muta-network-rules.yml.j2
+
+- name: copy docker-compose.yml
+  shell: cp -r ../monitor/docker-compose.yml roles/monitor/templates/docker-compose.yml.j2

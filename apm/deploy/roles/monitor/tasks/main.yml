@@ -1,0 +1,10 @@
+---
+- include_tasks: copy_config.yml
+- include_tasks: deploy.yml
+- include_tasks: clean_config.yml
+
+
+
+
+
+
