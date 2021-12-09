@@ -1,10 +1,46 @@
----
-- include_tasks: copy_config.yml
-- include_tasks: deploy.yml
-- include_tasks: clean_config.yml
+- name: down 
+  shell: "docker-compose -f {{ monitor_dir }}/docker-compose.yml down"
+  ignore_errors: yes
+  become: yes
+  become_method: sudo
 
+- name: check monitor dir
+  stat:
+    path: "{{ monitor_dir }}"
+  register: file_status
+- name: create monitor dir
+  file:
+    path: "{{ monitor_dir }}"
+    state: directory
+  when:
+    file_status.stat.exists == False
 
+- name: copy docker-compose.yml
+  copy:
+    src: ../monitor/docker-compose.yml
+    dest: "{{ monitor_dir }}/docker-compose.yml"
+    mode: 0755
+- name: copy config
+  copy:
+    src: ../monitor/config
+    dest: "{{ monitor_dir }}"
+    mode: 0755
 
+- name: set node exporter ip:port
+  shell: sh init_config.sh "{{ monitor_dir }}"
+  # become: yes
+  # become_method: sudo
 
+- name: start 
+  shell: "cd {{ monitor_dir }} && docker-compose up -d"
+  # become: yes
+  # become_method: sudo
 
+- name: pause for 30 seconds 
+  pause:
+    seconds: 30  
 
+- name: chmod apm data
+  shell: "chmod 777 {{ monitor_dir }}/data/**"
+  # become: yes
+  # become_method: sudo

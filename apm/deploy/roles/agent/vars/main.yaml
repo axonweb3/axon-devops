@@ -1,4 +1,4 @@
 monitor_dir: /Users/zjh/Desktop/agent
 log_path: \/Users\/zjh\/Documents\/cryptape\/muta\/logs
-loki_address: 192.168.1.2
+monitor_address: 192.168.1.2
 # collector_port: 14250

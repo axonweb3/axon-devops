@@ -1,4 +1,0 @@
----
-- name: clean templates
-  shell: rm -rf roles/agent/templates/*
-  tags: clean_config  
