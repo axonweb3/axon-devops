@@ -1,8 +1,0 @@
----
-- name: clean files
-  shell: rm -rf roles/monitor/files/*
-  tags: clean_config
-
-- name: clean templates
-  shell: rm -rf roles/monitor/templates/*
-  tags: clean_config  

@@ -1,5 +1,40 @@
 ---
-- include_tasks: copy_config.yml
-- include_tasks: deploy.yml
-- include_tasks: clean_config.yml
+- name: down 
+  shell: "docker-compose -f {{ monitor_dir }}/docker-compose.yml down"
+  ignore_errors: yes
+  become: yes
+  become_method: sudo
+- name: check monitor dir
+  stat:
+    path: "{{ monitor_dir }}"
+  register: file_status
+- name: create monitor dir
+  file:
+    path: "{{ monitor_dir }}"
+    state: directory
+  when:
+    file_status.stat.exists == False
 
+- name: copy docker-compose.yml
+  copy:
+    src: ../agent/docker-compose.yml
+    dest: "{{ monitor_dir }}/docker-compose.yml"
+    mode: 0755
+- name: copy config
+  copy:
+    src: ../agent/config
+    dest: "{{ monitor_dir }}"
+    mode: 0755
+- name: copy env
+  copy:
+    src: ../agent/.env.example
+    dest: "{{ monitor_dir }}/.env"
+    mode: 0755
+- name: sed env
+  shell: sed -i '' 's/LOG_COLLECT_PATH/{{ log_path }}/' "{{ monitor_dir }}/.env" && sed -i '' 's/jaeger-collector/{{monitor_address}}:14250/' "{{ monitor_dir }}/.env"
+- name: sed promtail
+  shell: sed -i '' 's/LOKI_ADDRESS/{{ monitor_address }}/' "{{ monitor_dir }}/config/promtail/promtail-config.yaml"
+- name: start 
+  shell: "cd {{ monitor_dir }} && docker-compose up -d"
+  # become: yes
+  # become_method: sudo

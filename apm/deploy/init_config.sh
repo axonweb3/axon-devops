@@ -27,10 +27,10 @@ set_exporter() {
     promtail_agents=`echo ${promtail_agents} | sed 's/^.//1'`
     
     # cp -rp ./roles/prometheus/templates/prometheus.yml.j2 ./roles/prometheus/templates/prometheus.yml_new.j2
-    sed -i '' "s/jaeger_agent_ip:14271/${jaeger_agents}/g" roles/monitor/templates/prometheus.yml.j2
-    sed -i '' "s/node_exporter_ip:9100/${node_exporters}/g" roles/monitor/templates/prometheus.yml.j2
-    sed -i '' "s/muta_exporter_ip:8000/${muta_exporters}/g" roles/monitor/templates/prometheus.yml.j2
-    sed -i '' "s/promtail_agent_ip:9080/${promtail_agents}/g" roles/monitor/templates/prometheus.yml.j2
+    sed -i '' "s/jaeger_agent_ip:14271/${jaeger_agents}/g" "$1/config/promethues/prometheus.yml"
+    sed -i '' "s/node_exporter_ip:9100/${node_exporters}/g" "$1/config/promethues/prometheus.yml"
+    sed -i '' "s/muta_exporter_ip:8000/${muta_exporters}/g" "$1/config/promethues/prometheus.yml"
+    sed -i '' "s/promtail_agent_ip:9080/${promtail_agents}/g" "$1/config/promethues/prometheus.yml"
 }
 
-set_exporter
+set_exporter $1
