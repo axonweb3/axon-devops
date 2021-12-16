@@ -1,9 +1,0 @@
-FROM node:alpine3.12
-
-WORKDIR /watchdog
-
-COPY . .
-
-RUN yarn install
-
-CMD ["npm", "start"]
