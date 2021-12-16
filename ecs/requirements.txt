@@ -1,6 +1,0 @@
-aliyun-python-sdk-core
-aliyun-python-sdk-ecs
-toml
-paramiko
-requests
-fabric
