@@ -1,0 +1,4 @@
+deploy_path: "/home/ckb/axon"
+axon_repo: "https://github.com/nervosnetwork/axon.git"
+axon_branch: "main"
+bootstraps: "xxx.xxx.xxx.xxx"
