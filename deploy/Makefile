@@ -1,17 +1,14 @@
-all: init_server init_project start_chain
-	@echo "done"
+deploy: 
+	ansible-playbook deploy.yml --tags build,shutdown,start 
 
-create_user:
-	ansible-playbook create_user.yml
+clean: 
+	ansible-playbook deploy.yml --tags shutdown,clean 
 
-init_server:
-	ansible-playbook init_server.yml
+start: 
+	ansible-playbook deploy.yml --tags start
 
-init_project:
-	ansible-playbook init_project.yml
+stop: 
+	ansible-playbook deploy.yml --tags shutdown
 
-start_chain:
-	ansible-playbook start_chain.yml
-
-test:
-	ansible muta-dev -m ping
+config: 
+	ansible-playbook deploy.yml --tags config

@@ -1,2 +1,1 @@
-.ansible_fact_cache/
-.vagrant/
+hosts

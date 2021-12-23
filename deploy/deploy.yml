@@ -1,0 +1,109 @@
+---
+- name: axon service
+  hosts: axon
+  remote_user: ckb
+  become: yes
+  become_method: sudo
+  vars_files:
+    - config.yml
+  tasks:
+  ###############################################################################################################
+    - name: Pull code
+      git:
+        repo: "{{ axon_repo }}"
+        dest: "{{ deploy_path }}"
+        version: "{{ axon_branch }}"
+        force: yes
+      become: yes
+      become_method: sudo
+      tags: 
+        - build
+        - priv
+
+###############################################################################################################
+    - name: Shutdown 
+      shell: cd {{ deploy_path }} && docker-compose down
+      ignore_errors: yes
+      tags: 
+        - shutdown
+###############################################################################################################
+    - name: Clean axon data
+      shell: rm -rf  {{ deploy_path }}/devtools/chain/data
+      tags: 
+        - clean
+    - name: Clean axon logs
+      shell: rm -rf  {{ deploy_path }}/logs
+      tags: 
+        - clean
+
+###############################################################################################################
+    - name: Copy docker configuration file
+      copy:
+        src: ./templates/docker-compose.yml
+        dest: "{{ deploy_path }}/docker-compose.yml"
+        mode: 0755
+      tags: 
+        - build
+        - config
+
+###############################################################################################################
+    - name: Copy the axon configuration file
+      copy:
+        src: ./templates/config.toml
+        dest: "{{ deploy_path }}/devtools/chain/config.toml"
+        mode: 0755
+      tags: 
+        - build
+        - config
+
+    - name: Copy node_prvi_key.yml
+      copy:
+        src: node_priv_key.yml
+        dest: "{{ deploy_path }}/node_priv_key.yml"
+        mode: 0755
+      tags: 
+        - build
+        - config
+
+    - name: Register hostname
+      shell: hostname
+      register: hostname
+      tags: 
+        - build
+        - config
+
+    - name: Register privKey
+      shell: "cat {{ deploy_path }}/node_prvi_key.yml | grep '{{ hostname.stdout }}' | awk '{print $2}' "
+      register: privKey
+      tags: 
+        - build
+        - config
+
+    - name: Replace privKey
+      shell:  sed -i "s/#private_key/{{ privKey.stdout }}/g" "{{ deploy_path }}/devtools/chain/config.toml"
+      tags: 
+        - build
+        - config
+
+    - name: Replace bootstraps
+      shell:  sed -i "s/#bootstraps/{{ bootstraps }}/g" "{{ deploy_path }}/devtools/chain/config.toml"
+      tags: 
+        - build
+        - config
+
+###############################################################################################################
+    - name: Build 
+      shell: cd {{ deploy_path }} && docker-compose build
+      tags: 
+        - build
+
+    - name: Clear build images
+      shell: docker rmi $(docker images | awk '/^<none>/ { print $3 }')
+      ignore_errors: yes
+      tags: 
+        - build
+###############################################################################################################
+    - name: Start mercury
+      shell: cd {{ deploy_path }} && docker-compose up -d
+      tags: 
+        - start
