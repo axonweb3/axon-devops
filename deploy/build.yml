@@ -1,0 +1,36 @@
+---
+- name: axon service
+  hosts: localhost
+  become: yes
+  become_method: sudo
+  vars_files:
+    - config.yml
+
+  tasks:
+  ###############################################################################################################
+    - name: Pull code
+      git:
+        repo: "{{ axon_repo }}"
+        dest: "{{ deploy_path }}"
+        version: "{{ axon_branch }}"
+        force: yes
+      become: yes
+      become_method: sudo
+      tags: 
+        - build
+    - name: Build image
+      shell: cd {{ deploy_path }} && docker build -t nervos/axon .
+      ignore_errors: yes
+      tags: 
+        - build
+    - name: Clear build images
+      shell: docker rmi $(docker images | awk '/^<none>/ { print $3 }')
+      ignore_errors: yes
+      tags: 
+        - build
+    - name: Image push
+      shell: docker push nervos/axon:latest
+      ignore_errors: yes
+      tags: 
+        - build
+    
