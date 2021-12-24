@@ -19,7 +19,7 @@
       tags: 
         - build
     - name: Build image
-      shell: cd {{ deploy_path }} && docker build -t nervos/axon .
+      shell: cd {{ deploy_path }} && docker build -t zhengjianhui/axon:axon .
       ignore_errors: yes
       tags: 
         - build
