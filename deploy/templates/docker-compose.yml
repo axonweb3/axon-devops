@@ -3,7 +3,7 @@ version: '3'
 services:
   axon:
     container_name: axon
-    build: .
+    image: nervos/axon:latest
     restart: always
     privileged: true
     ports:
