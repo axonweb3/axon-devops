@@ -3,7 +3,7 @@ version: '3'
 services:
   axon:
     container_name: axon
-    image: zhengjianhui/axon:axon
+    image: zhengjianhui/axon:latest
     restart: always
     privileged: true
     ports:

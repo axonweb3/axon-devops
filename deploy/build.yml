@@ -1,8 +1,6 @@
 ---
 - name: axon service
   hosts: localhost
-  become: yes
-  become_method: sudo
   vars_files:
     - config.yml
 
@@ -19,7 +17,7 @@
       tags: 
         - build
     - name: Build image
-      shell: cd {{ deploy_path }} && docker build -t zhengjianhui/axon:axon .
+      shell: cd {{ deploy_path }} && docker build -t zhengjianhui/axon:latest .
       ignore_errors: yes
       tags: 
         - build
@@ -29,7 +27,7 @@
       tags: 
         - build
     - name: Image push
-      shell: docker push zhengjianhui/axon:axon
+      shell: docker push zhengjianhui/axon:latest
       ignore_errors: yes
       tags: 
         - build
