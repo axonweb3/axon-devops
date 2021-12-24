@@ -29,7 +29,7 @@
       tags: 
         - build
     - name: Image push
-      shell: docker push nervos/axon:latest
+      shell: docker push zhengjianhui/axon:axon
       ignore_errors: yes
       tags: 
         - build
