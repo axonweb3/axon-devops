@@ -12,6 +12,6 @@
       become: yes
       become_method: sudo
     - name: npm install
-      shell: yarn add web3 && node deploy.js
+      shell: yarn add web3 ethers && node deploy.js
       become: yes
       become_method: sudo
