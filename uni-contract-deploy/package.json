@@ -1,4 +1,9 @@
 {
+  "name": "uni-contract-deploy",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
   "dependencies": {
     "web3": "^1.6.1"
   }
