@@ -1,13 +1,13 @@
 ---
 - name: uni contract
   hosts: localhost
-  # become: yes
-  # become_method: sudo
+  become: yes
+  become_method: sudo
   vars_files:
     - config.yml
   tasks:
   ###############################################################################################################
     - name: Replace url
-      shell: sed -i '' "s/node_address/{{ node_address }}/g" "./deploy.js"
+      shell: sed -i "s/node_address/{{ node_address }}/g" "./deploy.js"
     - name: npm install
       shell: npm install web3 && node deploy.js
