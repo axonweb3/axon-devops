@@ -7,6 +7,11 @@
     - config.yml
   tasks:
   ###############################################################################################################
+    - name: Copy the axon file
+      copy:
+        src: ./templates/deploy.js
+        dest: ./deploy.js
+        mode: 0755
     - name: Replace url
       shell: sed -i "s/node_address/{{ node_address }}/g" "./deploy.js"
       become: yes
