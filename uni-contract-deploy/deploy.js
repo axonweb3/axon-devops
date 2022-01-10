@@ -1,5 +1,4 @@
 const Web3 = require('web3')
-const ethers = require("ethers");
 const WETH9 = require('./build/WETH9.json')
 const UniswapV2Pair = require('./build/UniswapV2Pair.json')
 const UniswapV2Factory = require('./build/UniswapV2Factory.json')
