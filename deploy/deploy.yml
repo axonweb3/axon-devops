@@ -67,7 +67,7 @@
         - config
 
     - name: Register privKey
-      shell: "cat {{ deploy_path }}/node_prvi_key.yml | grep '{{ hostname.stdout }}' | awk '{print $2}' "
+      shell: "cat {{ deploy_path }}/node_priv_key.yml | grep '{{ hostname.stdout }}' | awk '{print $2}' "
       register: privKey
       tags: 
         - deploy
@@ -86,6 +86,12 @@
         - config
 
 ###############################################################################################################
+    - name: chmon axon
+      shell: "chmod 777 -R {{ deploy_path }}"
+      become: yes
+      become_method: sudo
+      tags: 
+        - start
     - name: Start axon
       shell: cd {{ deploy_path }} && echo "nohup {{ deploy_path }}/axon -c={{ deploy_path }}/config.toml -g={{ deploy_path }}/genesis.json -m={{ deploy_path }}/metadata.json &" > run.sh && sh run.sh
       tags: 
