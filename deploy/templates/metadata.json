@@ -44,5 +44,5 @@
     "precommit_ratio": 10,
     "brake_ratio": 10,
     "tx_num_limit": 20000,
-    "max_tx_size": 1000000
+    "max_tx_size": 10000000000
   }
