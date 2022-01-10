@@ -9,5 +9,9 @@
   ###############################################################################################################
     - name: Replace url
       shell: sed -i "s/node_address/{{ node_address }}/g" "./deploy.js"
+      become: yes
+      become_method: sudo
     - name: npm install
-      shell: npm install web3 && node deploy.js
+      shell: yarn install web3 && node deploy.js
+      become: yes
+      become_method: sudo
