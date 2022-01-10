@@ -1,13 +1,27 @@
 ---
 - name: uni contract
   hosts: localhost
-  # become: yes
-  # become_method: sudo
+  become: yes
+  become_method: sudo
   vars_files:
     - config.yml
   tasks:
   ###############################################################################################################
+    - name: Copy the axon file
+      copy:
+        src: ./templates/deploy.js
+        dest: ./deploy.js
+        mode: 0755
     - name: Replace url
-      shell: sed -i '' "s/node_address/{{ node_address }}/g" "./deploy.js"
-    - name: npm install
-      shell: npm install web3 && node deploy.js
+      shell: sed -i "s/node_address/{{ node_address }}/g" "./deploy.js"
+      become: yes
+      become_method: sudo
+    - name: yarn install
+      shell: yarn install
+      become: yes
+      become_method: sudo
+    - name: run deploy
+      shell: node deploy.js
+      become: yes
+      become_method: sudo
+
