@@ -1,11 +1,12 @@
 const Web3 = require('web3')
+const ethers = require("ethers");
 const WETH9 = require('./build/WETH9.json')
 const UniswapV2Pair = require('./build/UniswapV2Pair.json')
 const UniswapV2Factory = require('./build/UniswapV2Factory.json')
 const UniswapV2Router01 = require('./build/UniswapV2Router01.json')
 const UniswapV2Router02 = require('./build/UniswapV2Router02.json')
 
-const endpoint = 'http://127.0.0.1:8000';
+const endpoint = 'http://node_address7:8000';
 const hexPrivateKey = '0x95500289866f83502cc1fb894ef5e2b840ca5f867cc9e84ab32fb8872b5dd36c';
 
 async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
@@ -16,7 +17,7 @@ async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
         maxPriorityFeePerGas: 215573697772, // Recommended maxPriorityFeePerGas
         maxFeePerGas: 215573697772, // Recommended maxFeePerGas
         // value: ethers.utils.parseEther("0.01"), // .01 ETH
-        gasLimit: web3.utils.stringToHex("1000000000000"), // basic transaction costs exactly 21000
+        gasLimit: web3.utils.stringToHex("21000"), // basic transaction costs exactly 21000
         chainId: 1337, // Ethereum network id
         data: data
     };
