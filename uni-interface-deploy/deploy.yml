@@ -1,0 +1,64 @@
+---
+- name: uni contract
+  hosts: localhost
+  # become: yes
+  # become_method: sudo
+  vars_files:
+    - config.yml
+  tasks:
+  ###############################################################################################################
+    - name: Pull code
+      git:
+        repo: "https://github.com/Uniswap/uniswap-interface.git"
+        dest: "{{ deploy_path }}"
+        version: "v2.6.5"
+        force: yes
+      # become: yes
+      # become_method: sudo
+    - name: yarn install
+      shell: "cd {{ deploy_path }} && yarn install" 
+
+  ###############################################################################################################
+    - name: Replace ROUTER_ADDRESS
+      shell: sed -i '' "s/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D/0x8CB3685aF6F758b6514800d80cCFC041dbB0D34c/g" "{{ deploy_path }}/src/constants/index.ts"
+
+    - name: Replace BAD_RECIPIENT_ADDRESSES 1
+      shell: sed -i '' "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/0x8b5E2da10c7cDe6ac51c4cf29FdcF6c32834322a/g" "{{ deploy_path }}/src/state/swap/hooks.ts"
+
+    - name: Replace BAD_RECIPIENT_ADDRESSES 2
+      shell: sed -i '' "s/0xf164fC0Ec4E93095b804a4795bBe1e041497b92a/0xfafBa4e1a67596f694bA88c03E6c1a9bFa2c0513/g" "{{ deploy_path }}/src/state/swap/hooks.ts"
+
+    - name: Replace BAD_RECIPIENT_ADDRESSES 3
+      shell: sed -i '' "s/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D/0x8CB3685aF6F758b6514800d80cCFC041dbB0D34c/g" "{{ deploy_path }}/src/state/swap/hooks.ts"
+      
+    - name: Replace sdk.cjs.development.js 1
+      shell: sed -i '' "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/0x8b5E2da10c7cDe6ac51c4cf29FdcF6c32834322a/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+      
+    - name: Replace sdk.cjs.development.js 2
+      shell: sed -i '' "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+      
+    - name: Replace sdk.esm.js 1
+      shell: sed -i '' "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/0x8b5E2da10c7cDe6ac51c4cf29FdcF6c32834322a/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
+      
+    - name: Replace sdk.esm.js 2
+      shell: sed -i '' "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
+
+    - name: Replace WETH 1
+      shell: sed -i '' "s/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/0x63EB27D64fb063EBE84658e28Ae6bd8d26cCE46D/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+      
+    - name: Replace WETH 2
+      shell: sed -i '' "s/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/0x63EB27D64fb063EBE84658e28Ae6bd8d26cCE46D/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
+      
+
+###############################################################################################################
+    - name: yarn build
+      shell: "cd {{ deploy_path }} && yarn build" 
+    
+    - name: uni-interface docker config
+      copy:
+        src: ./templates/docker-compose.yml
+        dest: "{{ deploy_path }}/docker-compose.yml"
+        mode: 0755
+
+    - name: uni-interface deploy
+      shell: "cd {{ deploy_path }} && docker-compose up -d"
