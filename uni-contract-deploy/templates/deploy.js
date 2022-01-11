@@ -7,7 +7,7 @@ const UniswapV2Router01 = require('./build/UniswapV2Router01.json')
 const UniswapV2Router02 = require('./build/UniswapV2Router02.json')
 
 const endpoint = 'node_address';
-const hexPrivateKey = '0x95500289866f83502cc1fb894ef5e2b840ca5f867cc9e84ab32fb8872b5dd36c';
+const hexPrivateKey = '0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d';
 
 async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
     const tx = {
