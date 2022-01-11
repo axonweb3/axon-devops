@@ -25,7 +25,7 @@ sync_txs_chunk_size = 5000
 
 
 [[network.bootstraps]]
-multi_address = "/ip4/#bootstraps/tcp/8001/p2p/QmW2m2iqnodYFHXcsvaxKNXSibBqsySPkyqxRm3tXRDVfK"
+multi_address = "/ip4/#bootstraps/tcp/8001/p2p/QmXoSkz4zkHHiFZqmDZQ4gFYtJ72uqtp4m6FX373X4VkRq"
 
 [mempool]
 timeout_gap = 20
