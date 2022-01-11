@@ -67,7 +67,7 @@
         - config
 
     - name: Register privKey
-      shell: "cat {{ deploy_path }}/node_prvi_key.yml | grep '{{ hostname.stdout }}' | awk '{print $2}' "
+      shell: "cat {{ deploy_path }}/node_priv_key.yml | grep '{{ hostname.stdout }}' | awk '{print $2}' "
       register: privKey
       tags: 
         - deploy
