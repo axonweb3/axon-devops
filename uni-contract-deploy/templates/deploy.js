@@ -18,7 +18,7 @@ async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
         maxFeePerGas: 215573697772, // Recommended maxFeePerGas
         // value: ethers.utils.parseEther("0.01"), // .01 ETH
         gasLimit: web3.utils.stringToHex("21000"), // basic transaction costs exactly 21000
-        chainId: 1337, // Ethereum network id
+        chainId: 5, // Ethereum network id
         data: data
     };
     const transaction = await account.signTransaction(tx)
