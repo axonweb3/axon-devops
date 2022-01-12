@@ -16,7 +16,12 @@
       shell: sed -i "s/node_address/{{ node_address }}/g" "./deploy.js"
       become: yes
       become_method: sudo
-    - name: npm install
-      shell: yarn add web3 ethers && node deploy.js
+    - name: yarn install
+      shell: yarn install
       become: yes
       become_method: sudo
+    - name: run deploy
+      shell: node deploy.js
+      become: yes
+      become_method: sudo
+

@@ -5,6 +5,8 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "ethers": "^5.5.3",
+    "js-yaml": "^4.1.0",
     "web3": "^1.6.1"
   }
 }
