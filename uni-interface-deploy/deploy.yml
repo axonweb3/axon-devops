@@ -8,6 +8,14 @@
     - ../uni-contract-deploy/contract_address.yaml
   tasks:
   ###############################################################################################################
+    - name: uni-interface shutdown
+      shell: "cd {{ deploy_path }} && docker-compose up down"
+
+    - name: rm uni-interface
+      shell: "rm -rf {{ deploy_path }}"
+      become: yes
+      become_method: sudo
+
     - name: Pull code
       git:
         repo: "https://github.com/Uniswap/uniswap-interface.git"
