@@ -35,13 +35,13 @@
       shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
       
     - name: Replace `INIT_CODE_HASH` in the sdk.cjs.development.js with `${INIT_CODE_HASH}` 
-      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ INIT_CODE_HASH }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
       
     - name: Replace `FACTORY_ADDRESS` in the sdk.esm.js with `UniswapV2Factory`  
       shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
       
     - name: Replace `INIT_CODE_HASH` in the sdk.esm.js with `${INIT_CODE_HASH}`
-      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ INIT_CODE_HASH }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
 
     - name: Replace WETH 1
       shell: sed -i "s/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/{{ WETH }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
