@@ -1,25 +1,11 @@
 ---
 - name: uni contract
   hosts: localhost
-  # become: yes
-  # become_method: sudo
-  vars_files:
-    - config.yml
-  tasks:
-  ###############################################################################################################
-    - name: Copy contract config
-      copy:
-        src: ../uni-contract-deploy/contract_address.yaml
-        dest: ./contract_address.yaml
-        mode: 0755
-
-
-- name: uni contract
-  hosts: localhost
   become: yes
   become_method: sudo
   vars_files:
-    - contract_address.yaml
+    - config.yml
+    - ../uni-contract-deploy/contract_address.yaml
   tasks:
   ###############################################################################################################
     - name: Pull code
