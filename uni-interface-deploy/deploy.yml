@@ -1,10 +1,26 @@
 ---
 - name: uni contract
   hosts: localhost
-  become: yes
-  become_method: sudo
+  # become: yes
+  # become_method: sudo
   vars_files:
     - config.yml
+  tasks:
+  ###############################################################################################################
+    - name: Copy contract config
+      copy:
+        src: ../uni-contract-deploy/contract_address.yaml
+        dest: ./contract_address.yaml
+        mode: 0755
+
+
+- name: uni contract
+  hosts: localhost
+  # become: yes
+  # become_method: sudo
+  # become_method: sudo
+  vars_files:
+    - contract_address.yaml
   tasks:
   ###############################################################################################################
     - name: Pull code
@@ -13,41 +29,40 @@
         dest: "{{ deploy_path }}"
         version: "v2.6.5"
         force: yes
-      become: yes
-      become_method: sudo
+      # become: yes
+      # become_method: sudo
     - name: yarn install
       shell: "cd {{ deploy_path }} && yarn install" 
-
   ###############################################################################################################
     - name: Replace ROUTER_ADDRESS to UniswapV2Router02
-      shell: sed -i "s/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D/0x470D31cff6468ecaf36B10C6F8Ab5F66e90007bA/g" "{{ deploy_path }}/src/constants/index.ts"
+      shell: sed -i "s/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D/{{ UniswapV2Router02 }}/g" "{{ deploy_path }}/src/constants/index.ts"
 
     - name: Replace `BAD_RECIPIENT_ADDRESSES` to `${UniswapV2Factory}` 
-      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/0x6652C25170803e616A58848047eb8b66923D5E7C/g" "{{ deploy_path }}/src/state/swap/hooks.ts"
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/src/state/swap/hooks.ts"
 
     - name: Replace `BAD_RECIPIENT_ADDRESSES` to `${UniswapV2Router01}`
-      shell: sed -i "s/0xf164fC0Ec4E93095b804a4795bBe1e041497b92a/0x619B95521C2d05C2edfbD11a696496D6dDcD22E8/g" "{{ deploy_path }}/src/state/swap/hooks.ts"
+      shell: sed -i "s/0xf164fC0Ec4E93095b804a4795bBe1e041497b92a/{{ UniswapV2Router01 }}/g" "{{ deploy_path }}/src/state/swap/hooks.ts"
 
     - name: Replace `BAD_RECIPIENT_ADDRESSES` to `${UniswapV2Router02}`
-      shell: sed -i "s/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D/0x470D31cff6468ecaf36B10C6F8Ab5F66e90007bA/g" "{{ deploy_path }}/src/state/swap/hooks.ts"
+      shell: sed -i "s/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D/{{ UniswapV2Router02 }}/g" "{{ deploy_path }}/src/state/swap/hooks.ts"
       
     - name: Replace `FACTORY_ADDRESS` in the sdk.cjs.development.js with `UniswapV2Factory` 
-      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/0x6652C25170803e616A58848047eb8b66923D5E7C/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
       
     - name: Replace `INIT_CODE_HASH` in the sdk.cjs.development.js with `${INIT_CODE_HASH}` 
-      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ INIT_CODE_HASH }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
       
     - name: Replace `FACTORY_ADDRESS` in the sdk.esm.js with `UniswapV2Factory`  
-      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/0x6652C25170803e616A58848047eb8b66923D5E7C/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
       
     - name: Replace `INIT_CODE_HASH` in the sdk.esm.js with `${INIT_CODE_HASH}`
-      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ INIT_CODE_HASH }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
 
     - name: Replace WETH 1
-      shell: sed -i "s/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/0x2e9E379d8a7dc3AdCF4B6e056692792BA60E0827/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+      shell: sed -i "s/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/{{ WETH }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
       
     - name: Replace WETH 2
-      shell: sed -i "s/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/0x2e9E379d8a7dc3AdCF4B6e056692792BA60E0827/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
+      shell: sed -i "s/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/{{ WETH }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
       
 
 ###############################################################################################################
