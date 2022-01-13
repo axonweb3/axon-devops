@@ -28,8 +28,8 @@
         dest: "{{ deploy_path }}"
         version: "v2.6.5"
         force: yes
-      # become: yes
-      # become_method: sudo
+      become: yes
+      become_method: sudo
     - name: yarn install
       shell: "cd {{ deploy_path }} && yarn install" 
   ###############################################################################################################
