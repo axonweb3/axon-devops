@@ -9,7 +9,7 @@
   tasks:
   ###############################################################################################################
     - name: uni-interface shutdown
-      shell: "cd {{ deploy_path }} && docker-compose up down"
+      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yml down"
 
     - name: rm uni-interface
       shell: "rm -rf {{ deploy_path }}"
