@@ -3,3 +3,5 @@
 .DS_Store
 apm/agent/.env
 hosts
+node_modules
+artifacts

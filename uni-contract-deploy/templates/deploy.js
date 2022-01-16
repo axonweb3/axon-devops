@@ -2,13 +2,14 @@ const Web3 = require('web3')
 const ethers = require("ethers");
 const fs = require('fs');
 const yaml = require('js-yaml');
-const WETH9 = require('./build/WETH9.json')
-const UniswapV2Pair = require('./build/UniswapV2Pair.json')
-const UniswapV2Factory = require('./build/UniswapV2Factory.json')
-const UniswapV2Router01 = require('./build/UniswapV2Router01.json')
-const UniswapV2Router02 = require('./build/UniswapV2Router02.json')
 
-const endpoint = 'node_address';
+const WETH9 = require('../././uni-test/artifacts/contracts/Weth.sol/WETH9.json');
+const UniswapV2Factory = require('../././uni-test/artifacts/contracts/Factory.sol/UniswapV2Factory.json');
+const UniswapV2Router02 = require('../././uni-test/artifacts/contracts/UniswapV2Router02.sol/UniswapV2Router02.json');
+const Multicall = require('../././uni-test/artifacts/contracts/MultilCall.sol/Multicall.json');
+
+
+const endpoint = 'http://127.0.0.1:8000';
 const hexPrivateKey = '0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d';
 
 async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
@@ -39,12 +40,23 @@ async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
         WETH_TX_HASH: "",
         UniswapV2Factory: '',
         UniswapV2Factory_TX_HASH: '',
-        UniswapV2Router01:'',
-        UniswapV2Router01_TX_HASH:'',
         UniswapV2Router02: '',
         UniswapV2Router02_TX_HASH: '',
-        InitCodeHash:''
-        
+        Multicall: '',
+        Multicall_TX_HASH: '',
+        InitCodeHash: ''
+
+    }
+
+
+    // deploy Multicall contract
+    {
+        const contract = new web3.eth.Contract(Multicall.abi)
+        const data = contract.deploy({ data: Multicall.bytecode }).encodeABI()
+        const receipt = await sendTransaction(web3, chainId, account, data, nonce, gasPrice)
+        nonce = nonce + 1
+        contract_address.Multicall = receipt.contractAddress
+        contract_address.Multicall_TX_HASH = receipt.transactionHash
     }
 
     // deploy WETH contract
@@ -69,16 +81,7 @@ async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
         contract_address.UniswapV2Factory_TX_HASH = receipt.transactionHash
     }
 
-    // deploy UniswapV2Router01 contract
-    {
-        const contract = new web3.eth.Contract(UniswapV2Router01.abi)
-        const options = { data: UniswapV2Router01.bytecode, arguments: [contract_address.UniswapV2Factory, contract_address.WETH] }
-        const data = contract.deploy(options).encodeABI()
-        const receipt = await sendTransaction(web3, chainId, account, data, nonce, gasPrice)
-        nonce = nonce + 1
-        contract_address.UniswapV2Router01 = receipt.contractAddress
-        contract_address.UniswapV2Router01_TX_HASH = receipt.transactionHash
-    }
+
 
     // deploy UniswapV2Router02 contract
     {
@@ -91,9 +94,9 @@ async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
         contract_address.UniswapV2Router02_TX_HASH = receipt.transactionHash
     }
 
-    let data = UniswapV2Pair.bytecode
-    if (!data.startsWith('0x')) data = '0x' + data
-    contract_address.InitCodeHash =  web3.utils.keccak256(data)
+    // let data = UniswapV2Pair.bytecode
+    // if (!data.startsWith('0x')) data = '0x' + data
+    // contract_address.InitCodeHash =  web3.utils.keccak256(data)
 
     console.log(contract_address);
 
