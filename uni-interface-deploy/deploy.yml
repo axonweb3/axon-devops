@@ -8,9 +8,6 @@
     - ../uni-contract-deploy/contract_address.yaml
   tasks:
   ###############################################################################################################
-    - name: uni-interface shutdown
-      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yml down"
-
     - name: rm uni-interface
       shell: "rm -rf {{ deploy_path }}"
       become: yes
@@ -29,10 +26,13 @@
       become: yes
       become_method: sudo
 
-  #   - name: docker-compose
-  #    shell: "cp ./templates/docker-compose.yml {{ deploy_path }}"
-  #    become: yes
-  #    become_method: sudo
+    - name: docker-compose
+      shell: "cp ./templates/docker-compose.yml {{ deploy_path }}"
+      become: yes
+      become_method: sudo
+      
+    - name: uni-interface shutdown
+      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yml down"
 
     - name: yarn install
       shell: "cd {{ deploy_path }} && sudo yarn install" 
