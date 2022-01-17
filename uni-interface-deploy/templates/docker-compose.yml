@@ -7,5 +7,5 @@ services:
     volumes:
       - ./build:/usr/share/nginx/html
     ports:
-      - "8511:80"
+      - "8513:80"
     restart: on-failure
