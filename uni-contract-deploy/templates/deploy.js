@@ -3,10 +3,11 @@ const ethers = require("ethers");
 const fs = require('fs');
 const yaml = require('js-yaml');
 
-const WETH9 = require('../././uni-test/artifacts/contracts/Weth.sol/WETH9.json');
-const UniswapV2Factory = require('../././uni-test/artifacts/contracts/Factory.sol/UniswapV2Factory.json');
-const UniswapV2Router02 = require('../././uni-test/artifacts/contracts/UniswapV2Router02.sol/UniswapV2Router02.json');
-const Multicall = require('../././uni-test/artifacts/contracts/MultilCall.sol/Multicall.json');
+const WETH9 = require('../.././uni-test/artifacts/contracts/Weth.sol/WETH9.json');
+const UniswapV2Factory = require('../.././uni-test/artifacts/contracts/Factory.sol/UniswapV2Factory.json');
+const UniswapV2Router02 = require('../.././uni-test/artifacts/contracts/UniswapV2Router02.sol/UniswapV2Router02.json');
+const UniswapV2Pair = require('../.././uni-test/artifacts/contracts/Factory.sol/IUniswapV2Pair.json');
+const Multicall = require('../.././uni-test/artifacts/contracts/MultilCall.sol/Multicall.json');
 
 
 const endpoint = 'http://127.0.0.1:8000';
@@ -29,11 +30,11 @@ async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
 (async () => {
     const options = { timeout: 1000 * 30 }
     const web3 = new Web3(new Web3.providers.HttpProvider(endpoint, options))
-    const account = web3.eth.accounts.privateKeyToAccount(hexPrivateKey)
+    // const account = web3.eth.accounts.privateKeyToAccount(hexPrivateKey)
 
-    const chainId = await web3.eth.getChainId()
-    const gasPrice = await web3.eth.getGasPrice()
-    let nonce = await web3.eth.getTransactionCount(account.address) + 1
+    // const chainId = await web3.eth.getChainId()
+    // const gasPrice = await web3.eth.getGasPrice()
+    // let nonce = await web3.eth.getTransactionCount(account.address) + 1
 
     let contract_address = {
         WETH: '',
@@ -94,9 +95,9 @@ async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
         contract_address.UniswapV2Router02_TX_HASH = receipt.transactionHash
     }
 
-    // let data = UniswapV2Pair.bytecode
-    // if (!data.startsWith('0x')) data = '0x' + data
-    // contract_address.InitCodeHash =  web3.utils.keccak256(data)
+    // let data = UniswapV2Pair.bytecode;
+    // if (!data.startsWith('0x')) data = '0x' + data;
+    // contract_address.InitCodeHash =  web3.utils.keccak256(data);
 
     console.log(contract_address);
 
