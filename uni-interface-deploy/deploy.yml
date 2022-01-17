@@ -29,10 +29,10 @@
       become: yes
       become_method: sudo
 
-    - name: docker-compose
-      shell: "cp ./templates/docker-compose.yml {{ deploy_path }}"
-      become: yes
-      become_method: sudo
+  #   - name: docker-compose
+  #    shell: "cp ./templates/docker-compose.yml {{ deploy_path }}"
+  #    become: yes
+  #    become_method: sudo
 
     - name: yarn install
       shell: "cd {{ deploy_path }} && sudo yarn install" 
