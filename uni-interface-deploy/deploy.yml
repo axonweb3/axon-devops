@@ -48,15 +48,18 @@
 
     - name: Replace `INIT_CODE_HASH` in the axonuniswapsdk.cjs.development.js with `${INIT_CODE_HASH}` 
       shell: sed -i "s/0xfe5c25035eb1580fcbc8496a5d5423870718fac54c9d582b43039dbce6afc72f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/axonuniswapsdk/dist/axonuniswapsdk.cjs.development.js"
-      
+                       
     - name: Replace MuiltiCall_ADDRESS to MuiltiCall
       shell: sed -i "s/0x77787c7473CCd42B815d974f11BcbB1792635082/{{ Multicall }}/g" "{{ deploy_path }}/src/constants/multicall/index.ts"
 
     - name: Replace  Uniswap start port
-      shell: sed -i "s/react-scripts start/PORT={{ PORT }} react-scripts start/g" "{{ deploy_path }}/src/package.json"
+      shell: sed -i "s/react-scripts start/PORT={{ PORT }} react-scripts start/g" "{{ deploy_path }}/package.json"
       
 ###############################################################################################################
     - name: yarn build
-      shell: "cd {{ deploy_path }} && yarn build" 
+      shell: "cd {{ deploy_path }} && yarn build"
+      become_method: sudo
+      
     - name: yarn start
-      shell: "cd {{ deploy_path }} && yarn start" 
+      shell: "cd {{ deploy_path }} && yarn start"
+      become_method: sudo 
