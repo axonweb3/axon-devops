@@ -35,7 +35,7 @@
       become_method: sudo
 
     - name: yarn install
-      shell: "cd {{ deploy_path }} && yarn install" 
+      shell: "cd {{ deploy_path }} && sudo yarn install" 
   ###############################################################################################################
     - name: Replace ROUTER_ADDRESS to UniswapV2Router02
       shell: sed -i "s/0x12fE4028b3799420D1C17a09D10EB72b976ec729/{{ UniswapV2Router02 }}/g" "{{ deploy_path }}/src/constants/index.ts"
