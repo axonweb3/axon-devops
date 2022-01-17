@@ -30,7 +30,7 @@
       shell: "cp ./templates/docker-compose.yml {{ deploy_path }}"
       become: yes
       become_method: sudo
-      
+
     - name: uni-interface shutdown
       shell: "docker-compose -f {{ deploy_path }}/docker-compose.yml down"
 
@@ -48,7 +48,7 @@
 
     - name: Replace `INIT_CODE_HASH` in the axonuniswapsdk.cjs.development.js with `${INIT_CODE_HASH}` 
       shell: sed -i "s/0xfe5c25035eb1580fcbc8496a5d5423870718fac54c9d582b43039dbce6afc72f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/axonuniswapsdk/dist/axonuniswapsdk.cjs.development.js"
-                       
+
     - name: Replace MuiltiCall_ADDRESS to MuiltiCall
       shell: sed -i "s/0x77787c7473CCd42B815d974f11BcbB1792635082/{{ Multicall }}/g" "{{ deploy_path }}/src/constants/multicall/index.ts"
 
