@@ -45,7 +45,7 @@ async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
         UniswapV2Router02_TX_HASH: '',
         Multicall: '',
         Multicall_TX_HASH: '',
-        InitCodeHash: ''
+        InitCodeHash: '0xfe5c25035eb1580fcbc8496a5d5423870718fac54c9d582b43039dbce6afc72f'
 
     }
 
