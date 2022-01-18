@@ -30,11 +30,11 @@ async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
 (async () => {
     const options = { timeout: 1000 * 30 }
     const web3 = new Web3(new Web3.providers.HttpProvider(endpoint, options))
-    // const account = web3.eth.accounts.privateKeyToAccount(hexPrivateKey)
+    const account = web3.eth.accounts.privateKeyToAccount(hexPrivateKey)
 
-    // const chainId = await web3.eth.getChainId()
-    // const gasPrice = await web3.eth.getGasPrice()
-    // let nonce = await web3.eth.getTransactionCount(account.address) + 1
+    const chainId = await web3.eth.getChainId()
+    const gasPrice = await web3.eth.getGasPrice()
+    let nonce = await web3.eth.getTransactionCount(account.address) + 1
 
     let contract_address = {
         WETH: '',
