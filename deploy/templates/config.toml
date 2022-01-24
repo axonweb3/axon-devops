@@ -4,6 +4,8 @@ privkey = "#private_key"
 # db config
 data_path = "./devtools/chain/data"
 
+asset_contract_address = "0xc2fd48d60ae16b3fe6e333a9a13763691970d9373d4fab7cc323d7ba06fa9986"
+
 [rpc]
 http_listening_address = "0.0.0.0:8000"
 ws_listening_address = "0.0.0.0:8010"
@@ -55,3 +57,16 @@ max_open_files = 64
 # service_name = "muta"
 # tracing_address = "127.0.0.1:6831"
 # tracing_batch_size = 50
+
+[cross_client]
+axon_udt_hash = "0xccca1b5cdede63c5cce826947dc4165e8bd0731c6e88636f3c47e8bc6a58ef03"
+ckb_uri = "https://mercury-testnet.ckbapp.dev/rpc"
+mercury_uri = "#mercury_uri"
+start_block_number = 4096800
+checkpoint_interval = 5
+pk = "0x6fc935dad260867c749cf1ba6602d5f5ed7fb1131f1beb65be2d342e912eaafe"
+enable = #enable_cross_client
+admin_address = "0x8ab0CF264DF99D83525e9E11c7e4db01558AE1b1"
+node_address = "0x8ab0CF264DF99D83525e9E11c7e4db01558AE1b1"
+selection_lock_hash = "0x32b7eebcc847220291d01191c37831f608d8b1d0eecd28f25a96d8f9f8e2482b"
+checkpoint_type_hash = "0xbc3b9e93e517482862e5928419b624b90e2824988c8f3f0e056bccaa2e4eb02b"

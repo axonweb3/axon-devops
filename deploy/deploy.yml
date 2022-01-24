@@ -85,6 +85,24 @@
         - deploy
         - config
 
+    - name: Replace mercury
+      replace:
+        path: "{{ deploy_path }}/config.toml"
+        regexp: '#mercury_uri'
+        replace: "{{ mercury_uri }}"
+      tags:
+        - deploy
+        - config
+
+    - name: Replace enable_cross_client
+      replace:
+        path: "{{ deploy_path }}/config.toml"
+        regexp: '#enable_cross_client'
+        replace: "{{ enable_cross_client }}"
+      tags:
+        - deploy
+        - config   
+
 ###############################################################################################################
     - name: chmon axon
       shell: "chmod 777 -R {{ deploy_path }}"
