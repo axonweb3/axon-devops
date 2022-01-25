@@ -3,11 +3,10 @@
   hosts: localhost
   become: yes
   become_method: sudo
-  vars_files:
-    - config.yml
   tasks:
   ###############################################################################################################
-    - name: star docker
-      shell: "docker run -p {{ localport }}:80 -e APP_NODE_URL={{ eth_rpc }} alethio/ethereum-lite-explorer"
-      become: yes
-      become_method: sudo
+    - name: explorer  shutdown
+  #    shell: "docker run -p {{ localport }}:80 -e APP_NODE_URL={{ eth_rpc }} alethio/ethereum-lite-explorer"
+      shell: "docker-compose -f ./templates/docker-compose.yml down"
+    - name:  explorer  start
+      shell: "docker-compose -f ./templates/docker-compose.yml up -d"
