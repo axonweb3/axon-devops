@@ -18,3 +18,4 @@ jobs:
 
           # if the PR contains a single commit, fail if the commit message and the PR title do not match
           commitTitleMatch: "true"
+          
