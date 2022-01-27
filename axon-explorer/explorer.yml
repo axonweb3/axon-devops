@@ -6,7 +6,11 @@
   tasks:
   ###############################################################################################################
     - name: explorer  shutdown
-  #    shell: "docker run -p {{ localport }}:80 -e APP_NODE_URL={{ eth_rpc }} alethio/ethereum-lite-explorer"
       shell: "docker-compose -f ./templates/docker-compose.yml down"
+      tags: 
+        - down
+  ###############################################################################################################
     - name:  explorer  start
       shell: "docker-compose -f ./templates/docker-compose.yml up -d"
+      tags:
+        - up

@@ -3,7 +3,7 @@ version: '3'
 services:
   uni-interface:
     image: nginx:latest
-    container_name: uni-interface-v2
+    container_name: uni-interface
     volumes:
       - ./build:/usr/share/nginx/html
     ports:

@@ -8,10 +8,13 @@ const UniswapV2Factory = require('../.././uni-test/artifacts/contracts/Factory.s
 const UniswapV2Router02 = require('../.././uni-test/artifacts/contracts/UniswapV2Router02.sol/UniswapV2Router02.json');
 const UniswapV2Pair = require('../.././uni-test/artifacts/contracts/Factory.sol/IUniswapV2Pair.json');
 const Multicall = require('../.././uni-test/artifacts/contracts/MultilCall.sol/Multicall.json');
-
-
-const endpoint = 'http://127.0.0.1:8000';
-const hexPrivateKey = '0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d';
+const configdata = fs.readFileSync('config.yml','utf8');
+const configsetting=yaml.load(configdata);
+console.log(configsetting);
+console.log(configsetting.node_address);
+console.log(configsetting.hex_private_key);
+const endpoint = configsetting.node_address;
+const hexPrivateKey =configsetting.hex_private_key;
 
 async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
     const tx = {

@@ -1,2 +1,4 @@
-deploy: 
-	ansible-playbook start.yml
+start: 
+	ansible-playbook explorer.yml --tags dwon,up
+down: 
+	ansible-playbook explorer.yml --tags down
