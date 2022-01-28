@@ -14,3 +14,4 @@
       shell: "docker-compose -f ./templates/docker-compose.yml up -d"
       tags:
         - up
+        
