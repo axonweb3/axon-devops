@@ -3,11 +3,11 @@ const ethers = require("ethers");
 const fs = require('fs');
 const yaml = require('js-yaml');
 
-const WETH9 = require('../.././uni-test/artifacts/contracts/Weth.sol/WETH9.json');
-const UniswapV2Factory = require('../.././uni-test/artifacts/contracts/Factory.sol/UniswapV2Factory.json');
-const UniswapV2Router02 = require('../.././uni-test/artifacts/contracts/UniswapV2Router02.sol/UniswapV2Router02.json');
-const UniswapV2Pair = require('../.././uni-test/artifacts/contracts/Factory.sol/IUniswapV2Pair.json');
-const Multicall = require('../.././uni-test/artifacts/contracts/MultilCall.sol/Multicall.json');
+const WETH9 = require('.././uni-test/artifacts/contracts/Weth.sol/WETH9.json');
+const UniswapV2Factory = require('.././uni-test/artifacts/contracts/Factory.sol/UniswapV2Factory.json');
+const UniswapV2Router02 = require('.././uni-test/artifacts/contracts/UniswapV2Router02.sol/UniswapV2Router02.json');
+const UniswapV2Pair = require('.././uni-test/artifacts/contracts/Factory.sol/IUniswapV2Pair.json');
+const Multicall = require('.././uni-test/artifacts/contracts/MultilCall.sol/Multicall.json');
 const configdata = fs.readFileSync('config.yml','utf8');
 const configsetting=yaml.load(configdata);
 console.log(configsetting);
