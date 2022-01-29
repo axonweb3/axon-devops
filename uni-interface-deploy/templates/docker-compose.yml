@@ -9,3 +9,7 @@ services:
     ports:
       - "8513:80"
     restart: on-failure
+    networks:
+      - uni-net
+networks:
+  uni-net:
