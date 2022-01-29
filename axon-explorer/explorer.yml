@@ -1,0 +1,17 @@
+---
+- name: start explorer
+  hosts: localhost
+  become: yes
+  become_method: sudo
+  tasks:
+  ###############################################################################################################
+    - name: explorer  shutdown
+      shell: "docker-compose -f ./templates/docker-compose.yml down"
+      tags: 
+        - down
+  ###############################################################################################################
+    - name:  explorer  start
+      shell: "docker-compose -f ./templates/docker-compose.yml up -d"
+      tags:
+        - up
+        
