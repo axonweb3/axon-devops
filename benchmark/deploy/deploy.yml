@@ -1,0 +1,74 @@
+---
+- name: axon service
+  hosts: localhost
+  become: yes
+  become_method: sudo
+  vars_files:
+    - config.yml
+  tasks:
+  ###############################################################################################################
+    # - name: Pull code
+    #   git:
+    #     repo: "{{ axon_repo }}"
+    #     dest: "{{ deploy_path }}"
+    #     version: "{{ axon_branch }}"
+    #     force: yes
+    #   become: yes
+    #   become_method: sudo
+    #   tags: 
+    #     - deploy
+
+
+###############################################################################################################
+    - name: Copy docker configuration file
+      copy:
+        src: ./templates/docker-compose.yml
+        dest: "{{ deploy_path }}/docker-compose.yml"
+        mode: 0755
+      tags: 
+        - deploy
+        - config
+
+###############################################################################################################
+    - name: Copy the axon configuration file
+      copy:
+        src: ./templates/config.toml
+        dest: "{{ deploy_path }}/devtools/chain/config.toml"
+        mode: 0755
+      tags: 
+        - deploy
+        - config
+
+###############################################################################################################
+    - name: Start axon
+      shell: cd {{ deploy_path }} && docker-compose up -d
+      tags: 
+        - start
+    - name: Clear none images
+      shell: docker rmi $(docker images | awk '/^<none>/ { print $3 }')
+      ignore_errors: yes
+      tags: 
+        - start
+##############################################################################################################
+    - name: Benchmark 
+      shell: cd ../benchmark && yarn install && node index.js
+      ignore_errors: yes
+      tags: 
+        - benchmark
+        
+##############################################################################################################
+    - name: Shutdown 
+      shell: cd {{ deploy_path }} && docker-compose down
+      ignore_errors: yes
+      tags: 
+        - shutdown
+##############################################################################################################
+    - name: Clean axon data
+      shell: rm -rf  {{ deploy_path }}/devtools/chain/data
+      tags: 
+        - clean
+    - name: Clean axon logs
+      shell: rm -rf  {{ deploy_path }}/logs
+      tags: 
+        - clean
+        
