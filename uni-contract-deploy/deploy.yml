@@ -7,21 +7,12 @@
     - config.yml
   tasks:
   ###############################################################################################################
-    - name: Copy the axon file
-      copy:
-        src: ./templates/deploy.js
-        dest: ./deploy.js
-        mode: 0755
-    - name: Replace url
-      shell: sed -i "s/node_address/{{ node_address }}/g" "./deploy.js"
-      become: yes
-      become_method: sudo
     - name: yarn install
       shell: yarn install
       become: yes
       become_method: sudo
-    - name: run deploy
+    - name: deploy uniswap constracts.
       shell: node deploy.js
       become: yes
-      become_method: sudo
+      become_method: sudo      
 
