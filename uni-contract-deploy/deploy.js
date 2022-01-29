@@ -9,12 +9,12 @@ const UniswapV2Router02 = require('.././uni-test/artifacts/contracts/UniswapV2Ro
 const UniswapV2Pair = require('.././uni-test/artifacts/contracts/Factory.sol/IUniswapV2Pair.json');
 const Multicall = require('.././uni-test/artifacts/contracts/MultilCall.sol/Multicall.json');
 const configdata = fs.readFileSync('config.yml','utf8');
-const configsetting=yaml.load(configdata);
+const configsetting = yaml.load(configdata);
 console.log(configsetting);
 console.log(configsetting.node_address);
 console.log(configsetting.hex_private_key);
 const endpoint = configsetting.node_address;
-const hexPrivateKey =configsetting.hex_private_key;
+const hexPrivateKey = configsetting.hex_private_key;
 
 async function sendTransaction(web3, chainId, account, data, nonce, gasPrice) {
     const tx = {
