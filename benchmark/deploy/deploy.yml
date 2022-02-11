@@ -30,7 +30,7 @@
       tags: 
         - build
     - name: Clear build images
-      shell: docker rmi $(docker images | awk '/^<none>/ { print $3 }')
+      shell: docker images | grep none | awk '{print $3 }' | xargs docker rmi
       ignore_errors: yes
       tags: 
         - build
