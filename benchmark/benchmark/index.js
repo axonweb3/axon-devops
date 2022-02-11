@@ -63,7 +63,7 @@ async function benchmark(benchmark_ms) {
 	.setColor('#0099ff')
 	.addField("benchmark time:", `${config.benchmark_time}`)
 	.addField("transaction count:", `${transfer_count}`)
-	.addField("average transfer time:", `${average_time_elapsed}`)
+	.addField("TPS:", `${average_time_elapsed * 100}`)
 	.addField("transfer rate:", `${success_rate.toFixed(2)}% (${success_tx}/${success_tx + fail_tx})`)
 
 	webhookClient.send({

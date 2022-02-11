@@ -61,7 +61,7 @@
       tags: 
         - start
     - name: Clear none images
-      shell: docker rmi $(docker images | awk '/^<none>/ { print $3 }')
+      shell: docker images | grep none | awk '{print $3 }' | xargs docker rmi
       ignore_errors: yes
       tags: 
         - start
