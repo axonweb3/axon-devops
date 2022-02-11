@@ -1,5 +1,5 @@
 deploy: 
-	ansible-playbook build.yml --tags build && ansible-playbook deploy.yml --tags deploy,shutdown,start,benchmark
+	ansible-playbook deploy.yml --tags build,deploy,shutdown,start,benchmark
 
 clean: 
 	ansible-playbook deploy.yml --tags shutdown,clean 
