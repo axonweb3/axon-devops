@@ -6,6 +6,12 @@
 
   tasks:
   ###############################################################################################################
+    - name: Fetch code 
+      shell: cd {{ deploy_path }} && git fetch origin pull/{{ pr_number }}/head:{{ axon_branch }}
+      become: yes
+      become_method: sudo
+      tags: 
+        - build
     - name: Pull code
       git:
         repo: "{{ axon_repo }}"
