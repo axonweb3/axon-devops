@@ -11,6 +11,7 @@
       shell: cd {{ deploy_path }} && git fetch origin pull/{{ pr_number }}/head:{{ axon_branch }}
       become: yes
       become_method: sudo
+      ignore_errors: yes
       tags: 
         - build
     - name: Pull code
