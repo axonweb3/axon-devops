@@ -1,21 +1,21 @@
-const httpEndpoint = 'http://127.0.0.1:8000'
+const config = require('./config.json')
+const { MessageEmbed, WebhookClient } = require('discord.js')
 const Web3 = require('web3')
-const httpProvider = new Web3.providers.HttpProvider(httpEndpoint)
+const httpProvider = new Web3.providers.HttpProvider(config.http_endpoint)
 const web3 = new Web3(httpProvider)
+const webhookClient = new WebhookClient({ id: config.id, token: config.token })
 
-let args = process.argv.slice(2)
-let privkey = args[0] || '0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d'
-let benchmark_time = args[1] || 60000
+
 let success_tx = 0
 let fail_tx = 0
 
-let account = web3.eth.accounts.privateKeyToAccount(privkey)
+let account = web3.eth.accounts.privateKeyToAccount(config.privkey)
 web3.eth.defaultAccount = account.address
 console.log('\n/////////////////////////////////////////////////////')
-console.log(`privkey: ${privkey}`)
+console.log(`privkey: ${config.privkey}`)
 console.log(`address: ${web3.eth.defaultAccount}`)
-console.log('benchmark time:', benchmark_time, 'ms')
-console.log(`endpoint: ${httpEndpoint}`)
+console.log('benchmark time:', config.benchmark_time, 'ms')
+console.log(`endpoint: ${config.http_endpoint}`)
 console.log('/////////////////////////////////////////////////////\n')
 console.log('waiting...')
 
@@ -52,11 +52,27 @@ async function benchmark(benchmark_ms) {
 	let average_time_elapsed = elapsed_time / Math.max(transfer_count, 1)
 	let success_rate = (success_tx / (success_tx + fail_tx)) * 100
 	console.log('\n/////////////////////////////////////////////////////')
-	console.log('benchmark time: ', benchmark_time, 'ms')
+	console.log('benchmark time: ', config.benchmark_time, 'ms')
 	console.log('transaction count:', transfer_count)
 	console.log('average transfer time:', average_time_elapsed, 'ms')
 	console.log('transfer rate:', `${success_rate.toFixed(2)}% (${success_tx}/${success_tx + fail_tx})`)
 	console.log('/////////////////////////////////////////////////////\n')
+
+	const embed = new MessageEmbed()
+	.setTitle('axon benchmark')
+	.setColor('#0099ff')
+	.addField("benchmark time:", `${config.benchmark_time}`)
+	.addField("transaction count:", `${transfer_count}`)
+	.addField("TPS:", `${average_time_elapsed * 100}`)
+	.addField("transfer rate:", `${success_rate.toFixed(2)}% (${success_tx}/${success_tx + fail_tx})`)
+
+	webhookClient.send({
+		content: ' ',
+		username: 'axon-benchmark',
+		avatarURL: 'https://i.imgur.com/AfFp7pu.png',
+		embeds: [embed],
+	})
+
 }
 
 async function transfer(nonce) {
@@ -82,4 +98,4 @@ async function transfer(nonce) {
 	}
 }
 
-benchmark(benchmark_time)
+benchmark(config.benchmark_time)
