@@ -26,16 +26,16 @@ overlord_gap = 5
 sync_txs_chunk_size = 5000
 
 [[network.bootstraps]]
-multi_address = "/ip4/172.16.0.11/tcp/8001/p2p/QmXoSkz4zkHHiFZqmDZQ4gFYtJ72uqtp4m6FX373X4VkRq"
+multi_address = "/ip4/172.16.0.11/tcp/8001/p2p/QmNk6bBwkLPuqnsrtxpp819XLZY3ymgjs3p1nKtxBVgqxj"
 
-#[[network.bootstraps]]
-#multi_address = "/ip4/172.16.0.12/tcp/8001/p2p/QmQLufVVmBuHKoYhdDCqUFYVtLYs1quryoaA1mkQYQdWkn"
+[[network.bootstraps]]
+multi_address = "/ip4/172.16.0.12/tcp/8001/p2p/QmaHBJqULbLGDn7Td196goNebH6XMTMMu2sKNNP2DiX9S2"
 
-#[[network.bootstraps]]
-#multi_address = "/ip4/172.16.0.13/tcp/8001/p2p/QmaHBJqULbLGDn7Td196goNebH6XMTMMu2sKNNP2DiX9S2"
+[[network.bootstraps]]
+multi_address = "/ip4/172.16.0.13/tcp/8001/p2p/QmQLufVVmBuHKoYhdDCqUFYVtLYs1quryoaA1mkQYQdWkn"
 
-#[[network.bootstraps]]
-#multi_address = "/ip4/172.16.0.14/tcp/8001/p2p/QmNk6bBwkLPuqnsrtxpp819XLZY3ymgjs3p1nKtxBVgqxj"
+[[network.bootstraps]]
+multi_address = "/ip4/172.16.0.14/tcp/8001/p2p/QmXoSkz4zkHHiFZqmDZQ4gFYtJ72uqtp4m6FX373X4VkRq"
 
 [mempool]
 timeout_gap = 20
