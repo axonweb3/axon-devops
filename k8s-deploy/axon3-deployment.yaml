@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: axon3
+  name: axon3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: axon3
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/axon-net: "true"
+        io.kompose.service: axon3
+    spec:
+      containers:
+        - args:
+            - ./axon
+            - -c=/app/devtools/chain/node_3.toml
+            - -g=/app/devtools/chain/genesis.json
+            - -m=/app/devtools/chain/metadata.json
+          image: zhengjianhui/axon:latest
+          name: axon3
+          resources: {}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /app/devtools
+              name: axon3-claim0
+            - mountPath: /app/logs
+              name: axon3-claim1
+      restartPolicy: Always
+      volumes:
+        - name: axon3-claim0
+          persistentVolumeClaim:
+            claimName: axon3-claim0
+        - name: axon3-claim1
+          persistentVolumeClaim:
+            claimName: axon3-claim1
+status: {}
