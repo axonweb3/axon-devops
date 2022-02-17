@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  creationTimestamp: null
+  labels:
+    type: local
+  name: axon-devtools-volume
+spec:
+  storageClassName: axon-devtools
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 2Gi
+  hostPath:
+    path: "/home/ckb/k8s-deploy/k8s-deploy/devtools"
+    
