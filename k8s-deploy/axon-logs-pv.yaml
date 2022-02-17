@@ -6,7 +6,7 @@ metadata:
     type: local
   name: axon-logs-pv
 spec:
-  storageClassName: ""
+  storageClassName: "axon-logs"
   accessModes:
     - ReadWriteOnce
   capacity:

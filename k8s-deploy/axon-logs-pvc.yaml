@@ -4,7 +4,7 @@ metadata:
   creationTimestamp: null
   name: axon-logs-pvc
 spec:
-  storageClassName: ""
+  storageClassName: "axon-logs"
   accessModes:
     - ReadWriteMany
   resources:

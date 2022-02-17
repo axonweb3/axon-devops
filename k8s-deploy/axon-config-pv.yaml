@@ -6,7 +6,7 @@ metadata:
     type: local
   name: axon-devtools-pv
 spec:
-  storageClassName: ""
+  storageClassName: "axon-devtools"
   accessModes:
     - ReadWriteOnce
   capacity:
