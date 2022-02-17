@@ -4,11 +4,11 @@ metadata:
   creationTimestamp: null
   labels:
     type: local
-  name: axon-devtools-volume
+  name: axon-devtools-pv
 spec:
-  storageClassName: axon-devtools
+  storageClassName: ""
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   capacity:
     storage: 2Gi
   hostPath:

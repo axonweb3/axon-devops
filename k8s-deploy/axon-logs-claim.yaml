@@ -2,11 +2,11 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   creationTimestamp: null
-  name: axon-logs-claim
+  name: axon-logs-pvc
 spec:
-  storageClassName: axon-logs
+  storageClassName: ""
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 2Gi

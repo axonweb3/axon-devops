@@ -4,11 +4,11 @@ metadata:
   creationTimestamp: null
   labels:
     type: local
-  name: axon-logs-volume
+  name: axon-logs-pv
 spec:
-  storageClassName: axon-logs
+  storageClassName: ""
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   capacity:
     storage: 200Mi
   hostPath:
