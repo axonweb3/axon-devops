@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: axon1
+spec:
+  replicas: 1
+    spec:
+      containers:
+        - args:
+            - ./axon
+            - -c=/app/devtools/chain/node_1.toml
+            - -g=/app/devtools/chain/genesis.json
+            - -m=/app/devtools/chain/metadata.json
+          image: zhengjianhui/axon:latest
+          name: axon1
+          resources: {}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /app/devtools
+              name: axon-devtools-claim
+            - mountPath: /app/logs
+              name: axon-logs-claim
+      restartPolicy: Always
+      volumes:
+        - name: axon-devtools-claim
+          persistentVolumeClaim:
+            claimName: axon-devtools-claim
+        - name: axon-logs-claim
+          persistentVolumeClaim:
+            claimName: axon-logs-claim
+status: {}
