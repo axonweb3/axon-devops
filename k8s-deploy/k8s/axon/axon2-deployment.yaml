@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: axon2
+  name: axon2
+  namespace: axon
+spec:
+  ports:
+  - port: 8001
+    protocol: TCP
+    targetPort: 8001
+  selector:
+    app: axon2
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: axon2
+  namespace: axon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: axon2
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        app: axon2
+    spec:
+      containers:
+        - args:
+            - ./axon
+            - -c=/app/devtools/chain/k8s/node_2.toml
+            - -g=/app/devtools/chain/genesis.json
+            - -m=/app/devtools/chain/nodes/metadata.json
+          image: zhengjianhui/axon-k8s:latest
+          ports:
+          - containerPort: 8001
+          name: axon2
+          resources: {}
+          securityContext:
+            privileged: true
+      restartPolicy: Always
+status: {}
