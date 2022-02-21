@@ -7,9 +7,22 @@ metadata:
   namespace: axon
 spec:
   ports:
-  - port: 8001
-    protocol: TCP
+  - name: p2p
+    port: 8001
     targetPort: 8001
+    protocol: TCP
+  - name: rpc
+    port: 8000
+    targetPort: 8000
+    protocol: TCP
+  - name: websocket
+    port: 8010
+    targetPort: 8010
+    protocol: TCP
+  - name: prometheus
+    port: 8100
+    targetPort: 8100
+    protocol: TCP
   selector:
     app: axon1
   type: ClusterIP
@@ -43,7 +56,18 @@ spec:
             - -m=/app/devtools/chain/nodes/metadata.json
           image: zhengjianhui/axon-k8s:latest
           ports:
-          - containerPort: 8001
+          - name: p2p
+            containerPort: 8001
+            protocol: "TCP"
+          - name: rpc
+            containerPort: 8000
+            protocol: "TCP"
+          - name: websocket
+            containerPort: 8010
+            protocol: "TCP"
+          - name: prometheus
+            containerPort: 8100
+            protocol: "TCP"
           name: axon1
           resources: {}
           securityContext:
