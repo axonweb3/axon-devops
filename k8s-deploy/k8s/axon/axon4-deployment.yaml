@@ -58,16 +58,12 @@ spec:
           ports:
           - name: p2p
             containerPort: 8001
-            protocol: "TCP"
           - name: rpc
             containerPort: 8000
-            protocol: "TCP"
           - name: websocket
             containerPort: 8010
-            protocol: "TCP"
           - name: prometheus
             containerPort: 8100
-            protocol: "TCP"
           name: axon4
           resources: {}
           securityContext:
