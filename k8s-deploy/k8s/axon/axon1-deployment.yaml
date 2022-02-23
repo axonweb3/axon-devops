@@ -37,6 +37,7 @@ spec:
   selector:
     matchLabels:
       app: axon1
+      logging: "true"
   strategy:
     type: Recreate
   template:
@@ -47,6 +48,7 @@ spec:
       creationTimestamp: null
       labels:
         app: axon1
+        logging: "true"
     spec:
       containers:
         - args:
