@@ -70,5 +70,7 @@ spec:
           resources: {}
           securityContext:
             privileged: true
+      nodeSelector:
+        disktype: node3
       restartPolicy: Always
 status: {}
