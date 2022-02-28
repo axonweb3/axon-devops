@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: axon3
+  name: axon3
+  namespace: axon
+spec:
+  ports:
+    - name: p2p
+      port: 8001
+      targetPort: 8001
+      protocol: TCP
+    - name: rpc
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+    - name: websocket
+      port: 8010
+      targetPort: 8010
+      protocol: TCP
+    - name: prometheus
+      port: 8100
+      targetPort: 8100
+      protocol: TCP
+  selector:
+    app: axon3
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: axon3
+  namespace: axon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: axon3
+      logging: "true"
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        app: axon3
+        logging: "true"
+    spec:
+      containers:
+        - args:
+            - ./axon
+            - -c=/app/devtools/chain/k8s/node_3.toml
+            - -g=/app/devtools/chain/genesis.json
+            - -m=/app/devtools/chain/nodes/metadata.json
+          image: zhengjianhui/axon-k8s:latest
+          ports:
+          - name: p2p
+            containerPort: 8001
+          - name: rpc
+            containerPort: 8000
+          - name: websocket
+            containerPort: 8010
+          - name: prometheus
+            containerPort: 8100
+          name: axon3
+          resources: {}
+          securityContext:
+            privileged: true
+      nodeSelector:
+        disktype: node3
+      restartPolicy: Always
+status: {}
