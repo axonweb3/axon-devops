@@ -6,35 +6,36 @@ services:
     command:
       - '--path.rootfs=/host'
       - '--collector.tcpstat'
+      - '--web.listen-address=:8101'
     restart: on-failure
     network_mode: 'host'
     pid: 'host'
     volumes:
       - /:/host:ro,rslave
 
-  jaeger-agent:
-    image: jaegertracing/jaeger-agent:1.18.1
-    container_name: muta-jaeger-agent
-    command:
-      - '--reporter.grpc.host-port=${JACGER_COLLECTOR_ADDRESS}'
-    ports:
-      - '14271:14271'
-      - '5775:5775/udp'
-      - '${JACGER_AGENT_PORT}:6831/udp'
-      - '6832:6832/udp'
-      - '5778:5778'
-    restart: on-failure
+  # jaeger-agent:
+  #   image: jaegertracing/jaeger-agent:1.18.1
+  #   container_name: muta-jaeger-agent
+  #   command:
+  #     - '--reporter.grpc.host-port=${JACGER_COLLECTOR_ADDRESS}'
+  #   ports:
+  #     - '14271:14271'
+  #     - '5775:5775/udp'
+  #     - '${JACGER_AGENT_PORT}:6831/udp'
+  #     - '6832:6832/udp'
+  #     - '5778:5778'
+  #   restart: on-failure
 
   promtail:
     image: grafana/promtail:master-9ad98df
     container_name: muta-promtail
     restart: on-failure
     ports:
-      - '9080:9080'
+      - '8102:9080'
     volumes:
       - ./data/promtail/positions:/tmp/promtail/
       - ./config/promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml
-      - ${MUTA_LOG_PATH}:/var/logs
+      - ${AXON_LOG_PATH}:/var/logs
     command: 
       -config.file=/etc/promtail/promtail-config.yaml
 

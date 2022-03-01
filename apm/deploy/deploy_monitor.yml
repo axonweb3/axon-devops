@@ -1,6 +1,7 @@
 ---
-- hosts: localhost
-  # become: yes
-  # become_method: sudo
+- name: Deploy monitor
+  hosts: localhost
+  become: yes
+  become_method: sudo
   roles:
   - monitor

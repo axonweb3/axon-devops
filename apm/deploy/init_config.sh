@@ -1,36 +1,37 @@
 #!/bin/sh 
 
-muta_node_list=`sed -n '/^\[muta_rsync_node/,/^\[prometheus_server/p' hosts | grep -v "^\["`
+axon_node_list=`sed -n '/^\[axon_node/,/^\[prometheus_server/p' hosts | grep -v "^\["`
 
 set_exporter() {
-    jaeger_agents=
-    node_exporters=
-    muta_exporters=
-    promtail_agents=
-    for i in ${muta_node_list};
+    node_exporters=""
+    axon_exporters=""
+    promtail_agents=""
+    for i in ${axon_node_list};
       do
-        node_exporter=\"${i}:9100\"
-        muta_exporter=\"${i}:8000\"
-        jaeger_agent=\"${i}:14271\"
-        promtail_agent=\"${i}:9080\"
-
-        jaeger_agents=${jaeger_agents},${jaeger_agent}
+        node_exporter=\"${i}:8101\"
+        promtail_agent=\"${i}:8102\"
+        axon_exporter=\"${i}:8100\"
+       
         node_exporters=${node_exporters},${node_exporter}
-        muta_exporters=${muta_exporters},${muta_exporter}
         promtail_agents=${promtail_agents},${promtail_agent}
+        axon_exporters=${axon_exporters},${axon_exporter}
 
     done
+     
 
-    jaeger_agents=`echo ${jaeger_agents} | sed 's/^.//1'`
     node_exporters=`echo ${node_exporters} | sed 's/^.//1'`
-    muta_exporters=`echo ${muta_exporters} | sed 's/^.//1'`
+    axon_exporters=`echo ${axon_exporters} | sed 's/^.//1'`
     promtail_agents=`echo ${promtail_agents} | sed 's/^.//1'`
+
+    echo "${node_exporters}"
+    echo "${axon_exporters}"
+    echo "${promtail_agents}"
+
     
     # cp -rp ./roles/prometheus/templates/prometheus.yml.j2 ./roles/prometheus/templates/prometheus.yml_new.j2
-    sed -i '' "s/jaeger_agent_ip:14271/${jaeger_agents}/g" "$1/config/promethues/prometheus.yml"
-    sed -i '' "s/node_exporter_ip:9100/${node_exporters}/g" "$1/config/promethues/prometheus.yml"
-    sed -i '' "s/muta_exporter_ip:8000/${muta_exporters}/g" "$1/config/promethues/prometheus.yml"
-    sed -i '' "s/promtail_agent_ip:9080/${promtail_agents}/g" "$1/config/promethues/prometheus.yml"
+    sed -i "s/node_exporter_ip:9100/${node_exporters}/g" "$1/config/promethues/prometheus.yml"
+    sed -i "s/axon_exporter_ip:8100/${axon_exporters}/g" "$1/config/promethues/prometheus.yml"
+    sed -i "s/promtail_agent_ip:9080/${promtail_agents}/g" "$1/config/promethues/prometheus.yml"
 }
 
 set_exporter $1

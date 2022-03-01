@@ -9,6 +9,7 @@ services:
     ports:
       - 8000:8000
       - 8001:8001
+      - 8100:8100
     volumes:
       - ./devtools:/app/devtools
       - ./logs:/app/logs
