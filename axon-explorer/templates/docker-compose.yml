@@ -1,4 +1,4 @@
-version: '3.6'
+version: "3.6"
 
 services:
   ethereum-lite-explorer:
@@ -7,5 +7,5 @@ services:
     ports:
       - "8190:80"
     environment:
-       APP_NODE_URL: ${ETH_RPC}
+      APP_NODE_URL: ${ETH_RPC}
     restart: on-failure
