@@ -1,7 +1,9 @@
 {
     "http_endpoint": "http://127.0.0.1:8000",
-    "privkey" : "0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d",
+    "private_key" : "0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d",
+    "continuous_benchmark": false,
     "benchmark_time": 60000,
+    "batch_size": 1000,
     "id": "936501604767629344",
     "token": "Fha8Hn6C31VEu3wL5XejIVGocTXiQbJ6HabAC5sLtHHwvqQ63iXj1FmOkH_FVN4mTZwQ"
 }
