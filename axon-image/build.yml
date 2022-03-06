@@ -28,11 +28,9 @@
       ignore_errors: yes
       tags: 
         - build
-        
+
     - name: Push images
       shell: docker push zhengjianhui/axon-k8s:latest
       ignore_errors: yes
       tags: 
         - build
-
-    
