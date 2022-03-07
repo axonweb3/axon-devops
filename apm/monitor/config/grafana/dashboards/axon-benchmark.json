@@ -8,6 +8,12 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
@@ -15,9 +21,10 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 27,
-  "iteration": 1600614138703,
+  "id": 2,
+  "iteration": 1646148648056,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
       "alert": {
@@ -68,7 +75,7 @@
       "description": "rate of committed transactions for each node in this network",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "links": []
         },
         "overrides": []
       },
@@ -96,9 +103,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -108,13 +116,15 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "avg(rate(muta_consensus_committed_tx_total[5m]))",
+          "exemplar": true,
+          "expr": "avg(rate(axon_consensus_committed_tx_total[5m]))",
           "interval": "",
           "legendFormat": "TPS",
           "refId": "A"
         },
         {
-          "expr": "avg(rate(muta_consensus_committed_tx_total[5m]))",
+          "exemplar": true,
+          "expr": "avg(rate(axon_consensus_committed_tx_total[5m]))",
           "hide": true,
           "interval": "",
           "legendFormat": "p2",
@@ -123,13 +133,12 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:620",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "lt",
           "value": 1,
-          "yaxis": "left"
+          "visible": true
         }
       ],
       "timeFrom": null,
@@ -222,7 +231,7 @@
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "links": []
         },
         "overrides": []
       },
@@ -251,9 +260,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -263,14 +273,16 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "avg(histogram_quantile(0.90, sum(rate(muta_consensus_time_cost_seconds_bucket{type=\"exec\"}[5m])) by (le, instance)))",
+          "exemplar": true,
+          "expr": "avg(histogram_quantile(0.90, sum(rate(axon_consensus_time_cost_seconds_bucket{type=\"exec\"}[5m])) by (le, instance)))",
           "hide": false,
           "interval": "",
           "legendFormat": "exec_90",
           "refId": "A"
         },
         {
-          "expr": "avg(histogram_quantile(0.90, sum(rate(muta_consensus_time_cost_seconds_bucket{type=\"exec\"}[5m])) by (le, instance)))",
+          "exemplar": true,
+          "expr": "avg(histogram_quantile(0.90, sum(rate(axon_consensus_time_cost_seconds_bucket{type=\"exec\"}[5m])) by (le, instance)))",
           "hide": true,
           "interval": "",
           "legendFormat": "p2",
@@ -279,13 +291,12 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:4109",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
           "value": 2.4,
-          "yaxis": "left"
+          "visible": true
         }
       ],
       "timeFrom": null,
@@ -381,7 +392,7 @@
       "description": "lower is better, no data when all nodes consensus with round 0.",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "links": []
         },
         "overrides": []
       },
@@ -408,9 +419,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -420,14 +432,16 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "(muta_consensus_round > 0 )",
+          "exemplar": true,
+          "expr": "(axon_consensus_round > 0 )",
           "instant": false,
           "interval": "",
           "legendFormat": "{{instance}}",
           "refId": "A"
         },
         {
-          "expr": "(muta_consensus_round > 0 )",
+          "exemplar": true,
+          "expr": "(axon_consensus_round > 0 )",
           "hide": true,
           "interval": "",
           "legendFormat": "p1",
@@ -436,13 +450,12 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:4214",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "gt",
           "value": 2.9,
-          "yaxis": "left"
+          "visible": true
         }
       ],
       "timeFrom": null,
@@ -536,7 +549,7 @@
       "description": "lower is better",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "links": []
         },
         "overrides": []
       },
@@ -564,9 +577,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -576,14 +590,16 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "avg(histogram_quantile(0.90, sum(rate(muta_consensus_duration_seconds_bucket[5m])) by (le, instance)))",
+          "exemplar": true,
+          "expr": "avg(histogram_quantile(0.90, sum(rate(axon_consensus_duration_seconds_bucket[5m])) by (le, instance)))",
           "hide": false,
           "interval": "",
           "legendFormat": "time_usage(s)",
           "refId": "A"
         },
         {
-          "expr": "avg(histogram_quantile(0.90, sum(rate(muta_consensus_duration_seconds_bucket[5m])) by (le, instance))) / avg(histogram_quantile(0.90, sum(rate(muta_consensus_time_cost_seconds_bucket{type=\"exec\"}[5m])) by (le, instance)))",
+          "exemplar": true,
+          "expr": "avg(histogram_quantile(0.90, sum(rate(axon_consensus_duration_seconds_bucket[5m])) by (le, instance))) / avg(histogram_quantile(0.90, sum(rate(axon_consensus_time_cost_seconds_bucket{type=\"exec\"}[5m])) by (le, instance)))",
           "hide": true,
           "interval": "",
           "legendFormat": "p1",
@@ -592,13 +608,12 @@
       ],
       "thresholds": [
         {
-          "$$hashKey": "object:1151",
           "colorMode": "critical",
           "fill": true,
           "line": true,
           "op": "lt",
           "value": 1.1,
-          "yaxis": "left"
+          "visible": true
         }
       ],
       "timeFrom": null,
@@ -644,138 +659,6 @@
       }
     },
     {
-      "datasource": "Loki",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "align": null
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Time"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 209
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "line {app=\"muta\", event=\"cons000\", filename=\"/opt/muta.log\", hostip=\"47.102.143.134\", job=\"muta-logs\", level=\"WARN\"}"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 1126
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "line {app=\"muta\", event=\"cons000\", filename=\"/opt/muta.log\", hostip=\"47.108.136.220\", job=\"muta-logs\", level=\"WARN\"}"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 1238
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "line {app=\"muta\", event=\"cons000\", filename=\"/opt/muta.log\", hostip=\"39.105.11.48\", job=\"muta-logs\", level=\"WARN\"}"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 1041
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "line {app=\"muta\", event=\"cons000\", filename=\"/opt/muta.log\", hostip=\"47.108.136.220\", job=\"muta-logs\", level=\"WARN\", round=\"5\"}"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 1738
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "id"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 354
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "line {app=\"muta\", event=\"cons000\", filename=\"/opt/muta.log\", hostip=\"47.108.136.220\", job=\"muta-logs\", level=\"WARN\", round=\"7\"}"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 1353
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 24,
-        "x": 0,
-        "y": 16
-      },
-      "id": 68,
-      "options": {
-        "frameIndex": 0,
-        "showHeader": true
-      },
-      "pluginVersion": "7.0.0",
-      "targets": [
-        {
-          "expr": "{round=~\"[3-9]\"}",
-          "refId": "A"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "round",
-      "type": "table"
-    },
-    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -783,7 +666,7 @@
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "links": []
         },
         "overrides": []
       },
@@ -793,7 +676,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 25
+        "y": 16
       },
       "hiddenSeries": false,
       "id": 26,
@@ -810,9 +693,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -822,7 +706,8 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "avg (sum by (instance) (increase(muta_storage_get_cf_seconds[5m]))) / avg(increase(muta_consensus_height[5m]))",
+          "exemplar": true,
+          "expr": "avg (sum by (instance) (increase(axon_storage_get_cf_seconds[5m]))) / avg(increase(axon_consensus_height[5m]))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -877,7 +762,7 @@
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "links": []
         },
         "overrides": []
       },
@@ -887,7 +772,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 25
+        "y": 16
       },
       "hiddenSeries": false,
       "id": 24,
@@ -904,9 +789,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -916,7 +802,8 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "avg (sum by (instance) (increase(muta_storage_put_cf_seconds[5m]))) / avg(increase(muta_consensus_height[5m]))",
+          "exemplar": true,
+          "expr": "avg (sum by (instance) (increase(axon_storage_put_cf_seconds[5m]))) / avg(increase(axon_consensus_height[5m]))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -967,9 +854,6 @@
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": null
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -987,7 +871,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 33
+        "y": 24
       },
       "id": 10,
       "options": {
@@ -996,15 +880,18 @@
           "calcs": [
             "mean"
           ],
+          "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "text": {}
       },
-      "pluginVersion": "7.0.0",
+      "pluginVersion": "8.2.0-33922pre",
       "targets": [
         {
-          "expr": "sort_desc(muta_consensus_height)",
+          "exemplar": true,
+          "expr": "sort_desc(axon_consensus_height)",
           "instant": true,
           "interval": "",
           "legendFormat": "{{instance}}",
@@ -1015,6 +902,331 @@
       "timeShift": null,
       "title": "current_height",
       "type": "gauge"
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                1.1
+              ],
+              "type": "lt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "B",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "30s",
+        "frequency": "1m",
+        "handler": 1,
+        "message": "exec time is greater than consensus time",
+        "name": "consensus_p90 alert",
+        "noDataState": "no_data",
+        "notifications": [
+          {
+            "uid": "notification-telegram"
+          }
+        ]
+      },
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "lower is better",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "hiddenSeries": false,
+      "id": 78,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "avg(histogram_quantile(0.90, sum(rate(axon_consensus_check_block_bucket{type=\"check_block_cost\"}[5m])) by (le, instance)))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "check_block_cost",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "avg(histogram_quantile(0.90, sum(rate(axon_consensus_check_block_bucket{type=\"get_txs_cost\"}[5m])) by (le, instance)))",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "get_txs_cost",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "avg(histogram_quantile(0.90, sum(rate(axon_consensus_check_block_bucket{type=\"write_wal_cost\"}[5m])) by (le, instance)))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "write_wal_cost",
+          "refId": "C"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "lt",
+          "value": 1.1,
+          "visible": true
+        }
+      ],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "check_block_cost_p90",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:4282",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:4283",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "alert": {
+        "alertRuleTags": {
+          "@zhengjianhui": "test"
+        },
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.8
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "B",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "message": "todo",
+        "name": "synced_block alert",
+        "noDataState": "no_data",
+        "notifications": [
+          {
+            "uid": "notification-telegram"
+          }
+        ]
+      },
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "lower is better. Number of blocks generated by the synchronization",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "hiddenSeries": false,
+      "id": 8,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "axon_consensus_sync_block_total ",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "changes(axon_consensus_sync_block_total[10m]) / changes(axon_consensus_height[10m]) ",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "B"
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 0.8,
+          "visible": true
+        }
+      ],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "synced_block",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:617",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:618",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "alert": {
@@ -1087,7 +1299,7 @@
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "links": []
         },
         "overrides": []
       },
@@ -1097,7 +1309,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 33
+        "y": 32
       },
       "hiddenSeries": false,
       "id": 56,
@@ -1114,9 +1326,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1126,13 +1339,15 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "increase(muta_consensus_height{job=\"muta_exporter\"}[1m])",
+          "exemplar": true,
+          "expr": "increase(axon_consensus_height{job=\"axon_exporter\"}[1m])",
           "interval": "",
           "legendFormat": "Liveness",
           "refId": "A"
         },
         {
-          "expr": "up{job=\"muta_exporter\"} == 1",
+          "exemplar": true,
+          "expr": "up{job=\"axon_exporter\"} == 1",
           "hide": true,
           "interval": "",
           "legendFormat": "p0",
@@ -1145,7 +1360,8 @@
           "fill": true,
           "line": true,
           "op": "lt",
-          "value": 0.1
+          "value": 0.1,
+          "visible": true
         }
       ],
       "timeFrom": null,
@@ -1191,279 +1407,9 @@
       }
     },
     {
-      "alert": {
-        "alertRuleTags": {
-          "@zhengjianhui": "test"
-        },
-        "conditions": [
-          {
-            "evaluator": {
-              "params": [
-                0.8
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "and"
-            },
-            "query": {
-              "params": [
-                "B",
-                "5m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "avg"
-            },
-            "type": "query"
-          }
-        ],
-        "executionErrorState": "alerting",
-        "for": "5m",
-        "frequency": "1m",
-        "handler": 1,
-        "message": "todo",
-        "name": "synced_block alert",
-        "noDataState": "no_data",
-        "notifications": [
-          {
-            "uid": "notification-telegram"
-          }
-        ]
-      },
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Prometheus",
-      "description": "lower is better. Number of blocks generated by the synchronization",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "align": null
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 41
-      },
-      "hiddenSeries": false,
-      "id": 8,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
-      "percentage": false,
-      "pluginVersion": "7.0.0",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "muta_consensus_sync_block_total ",
-          "instant": false,
-          "interval": "",
-          "legendFormat": "{{instance}}",
-          "refId": "A"
-        },
-        {
-          "expr": "changes(muta_consensus_sync_block_total[10m]) / changes(muta_consensus_height\r[10m]) ",
-          "hide": true,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "B"
-        }
-      ],
-      "thresholds": [
-        {
-          "colorMode": "critical",
-          "fill": true,
-          "line": true,
-          "op": "gt",
-          "value": 0.8
-        }
-      ],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "synced_block",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:617",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:618",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Prometheus",
-      "description": "Estimate the network message arrival rate in the last five minutes",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 41
-      },
-      "hiddenSeries": false,
-      "id": 4,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
-      "percentage": false,
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "(\r\n  # broadcast_count * (instance_count - 1)\r\n  sum(increase(muta_network_message_total{target=\"all\", direction=\"sent\"}[5m])) * (count(count by (instance) (muta_network_message_total)) - 1)\r\n  # unicast_count\r\n  + sum(increase(muta_network_message_total{target=\"single\", direction=\"sent\"}[5m]))\r\n) \r\n/\r\n# received_count\r\n(sum(increase(muta_network_message_total{direction=\"received\"}[5m])))\n",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "network_message_arrival_rate",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:444",
-          "format": "none",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:445",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "percentage",
@@ -1485,7 +1431,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 49
+        "y": 40
       },
       "id": 18,
       "options": {
@@ -1494,16 +1440,19 @@
           "calcs": [
             "last"
           ],
+          "fields": "",
           "limit": 16000,
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": false
+        "showThresholdMarkers": false,
+        "text": {}
       },
-      "pluginVersion": "7.0.0",
+      "pluginVersion": "8.2.0-33922pre",
       "targets": [
         {
-          "expr": "muta_mempool_tx_count",
+          "exemplar": true,
+          "expr": "axon_mempool_tx_count",
           "instant": true,
           "interval": "",
           "legendFormat": "{{instance}}",
@@ -1516,20 +1465,6 @@
       "type": "gauge"
     },
     {
-      "collapsed": false,
-      "datasource": null,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 59
-      },
-      "id": 74,
-      "panels": [],
-      "title": "Row title",
-      "type": "row"
-    },
-    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -1538,7 +1473,7 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "links": []
         },
         "overrides": []
       },
@@ -1548,10 +1483,10 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 60
+        "y": 50
       },
       "hiddenSeries": false,
-      "id": 20,
+      "id": 80,
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -1567,9 +1502,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1590,20 +1526,23 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(muta_api_request_result_total{type=\"send_transaction\"}[5m]))",
+          "exemplar": true,
+          "expr": "sum(rate(axon_api_request_result_total{type=\"send_transaction\"}[5m]))",
           "interval": "",
           "legendFormat": "Total",
           "refId": "C"
         },
         {
-          "expr": "sum(rate(muta_api_request_result_total{result=\"success\",type=\"send_transaction\"}[5m]))",
+          "exemplar": true,
+          "expr": "sum(rate(axon_api_request_result_total{result=\"success\",type=\"send_transaction\"}[5m]))",
           "instant": false,
           "interval": "",
           "legendFormat": "Success Total",
           "refId": "A"
         },
         {
-          "expr": "rate(muta_api_request_result_total{result=\"success\", type=\"send_transaction\"}[5m])",
+          "exemplar": true,
+          "expr": "rate(axon_api_request_result_total{result=\"success\", type=\"send_transaction\"}[5m])",
           "interval": "",
           "legendFormat": "{{instance}}",
           "refId": "B"
@@ -1653,13 +1592,133 @@
       }
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 58
+      },
+      "hiddenSeries": false,
+      "id": 20,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "$$hashKey": "object:167",
+          "alias": "Total",
+          "yaxis": 2
+        },
+        {
+          "$$hashKey": "object:168",
+          "alias": "Success Total",
+          "yaxis": 2
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "sum(rate(axon_api_request_result_total[5m])) by (type)",
+          "interval": "",
+          "legendFormat": "Total",
+          "refId": "C"
+        },
+        {
+          "exemplar": true,
+          "expr": "sum(rate(axon_api_request_result_total{result=\"success\"}[5m])) by (type)",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Success Total",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "processed_rpc_request",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:187",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:188",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
       "collapsed": false,
       "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 68
+        "y": 66
       },
       "id": 62,
       "panels": [],
@@ -1667,59 +1726,103 @@
       "type": "row"
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
       "datasource": "Prometheus",
+      "description": "Estimate the network message arrival rate in the last five minutes",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
+          "links": []
         },
         "overrides": []
       },
+      "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 69
+        "y": 67
       },
-      "id": 46,
+      "hiddenSeries": false,
+      "id": 4,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
       "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "alertThreshold": true
       },
-      "pluginVersion": "7.0.0",
+      "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
-          "expr": "muta_network_connected_peers",
-          "instant": true,
+          "exemplar": true,
+          "expr": "(\n  # broadcast_count * (instance_count - 1)\n  sum(increase(axon_network_message_total{target=\"all\", direction=\"sent\"}[5m])) * (count(count by (instance) (axon_network_message_total)) - 1)\n  # unicast_count\n  + sum(increase(axon_network_message_total{target=\"single\", direction=\"sent\"}[5m]))\n) \n/\n# received_count\n(sum(increase(axon_network_message_total{direction=\"received\"}[5m])))\n",
           "interval": "",
-          "legendFormat": "{{instance}}",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
+      "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
-      "title": "Connected Peers",
-      "type": "gauge"
+      "title": "network_message_arrival_rate",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:444",
+          "format": "none",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:445",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "aliasColors": {},
@@ -1730,23 +1833,7 @@
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": null
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
+          "links": []
         },
         "overrides": []
       },
@@ -1756,7 +1843,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 69
+        "y": 67
       },
       "hiddenSeries": false,
       "id": 58,
@@ -1775,10 +1862,10 @@
       "linewidth": 1,
       "nullPointMode": "connected",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.0.0",
+      "pluginVersion": "8.2.0-33922pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1788,7 +1875,8 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "max(muta_network_saved_peer_count)",
+          "exemplar": true,
+          "expr": "max(axon_network_saved_peer_count)",
           "instant": false,
           "interval": "",
           "intervalFactor": 1,
@@ -1796,7 +1884,8 @@
           "refId": "A"
         },
         {
-          "expr": "muta_network_connected_peers\r",
+          "exemplar": true,
+          "expr": "axon_network_connected_peers",
           "interval": "",
           "legendFormat": "Connected Peers",
           "refId": "B"
@@ -1847,10 +1936,8 @@
     },
     {
       "datasource": "Prometheus",
-      "description": "The right number should be total number of consensus peers minus 1 (Itself). For example, 9 consensus peers, then the right number should be 8.",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1864,8 +1951,7 @@
                 "value": 80
               }
             ]
-          },
-          "unit": "none"
+          }
         },
         "overrides": []
       },
@@ -1873,24 +1959,27 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 77
+        "y": 75
       },
-      "id": 28,
+      "id": 46,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "last"
+            "lastNotNull"
           ],
+          "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "text": {}
       },
-      "pluginVersion": "7.0.0",
+      "pluginVersion": "8.2.0-33922pre",
       "targets": [
         {
-          "expr": "muta_network_connected_consensus_peers",
+          "exemplar": true,
+          "expr": "axon_network_connected_peers",
           "instant": true,
           "interval": "",
           "legendFormat": "{{instance}}",
@@ -1899,7 +1988,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Connected Consensus Peers (Minus itself)",
+      "title": "Connected Peers",
       "type": "gauge"
     },
     {
@@ -1951,7 +2040,7 @@
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "links": []
         },
         "overrides": []
       },
@@ -1961,7 +2050,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 77
+        "y": 75
       },
       "hiddenSeries": false,
       "id": 60,
@@ -1978,9 +2067,10 @@
       "linewidth": 1,
       "nullPointMode": "connected",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1990,19 +2080,22 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "max(muta_network_tagged_consensus_peers\r)",
+          "exemplar": true,
+          "expr": "max(axon_network_tagged_consensus_peers)",
           "interval": "",
           "legendFormat": "Consensus peers",
           "refId": "A"
         },
         {
-          "expr": "muta_network_connected_consensus_peers\r",
+          "exemplar": true,
+          "expr": "axon_network_connected_consensus_peers",
           "interval": "",
           "legendFormat": "{{instance}}-Connected Consensus Peers (Minus itself)",
           "refId": "B"
         },
         {
-          "expr": "(sum(muta_network_tagged_consensus_peers\r\n) by (instance) - 1)\r\n- sum(muta_network_connected_consensus_peers) by (instance)",
+          "exemplar": true,
+          "expr": "(sum(axon_network_tagged_consensus_peers\n) by (instance) - 1)\n- sum(axon_network_connected_consensus_peers) by (instance)",
           "hide": true,
           "interval": "",
           "legendFormat": "",
@@ -2015,7 +2108,8 @@
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 0.9
+          "value": 0.9,
+          "visible": true
         }
       ],
       "timeFrom": null,
@@ -2060,9 +2154,9 @@
     },
     {
       "datasource": "Prometheus",
+      "description": "The right number should be total number of consensus peers minus 1 (Itself). For example, 9 consensus peers, then the right number should be 8.",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2076,7 +2170,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "none"
         },
         "overrides": []
       },
@@ -2084,33 +2179,36 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 85
+        "y": 83
       },
-      "id": 76,
+      "id": 28,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "mean"
+            "last"
           ],
+          "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "text": {}
       },
-      "pluginVersion": "7.0.0",
+      "pluginVersion": "8.2.0-33922pre",
       "targets": [
         {
-          "expr": "muta_network_saved_peer_count",
+          "exemplar": true,
+          "expr": "axon_network_connected_consensus_peers",
           "instant": true,
           "interval": "",
-          "legendFormat": "Saved peers",
+          "legendFormat": "{{instance}}",
           "refId": "A"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Saved peers",
+      "title": "Connected Consensus Peers (Minus itself)",
       "type": "gauge"
     },
     {
@@ -2118,7 +2216,6 @@
       "description": "Processing identify protocol handshake, etc verify chain id.",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2140,7 +2237,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 85
+        "y": 83
       },
       "id": 32,
       "options": {
@@ -2149,15 +2246,18 @@
           "calcs": [
             "lastNotNull"
           ],
+          "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "text": {}
       },
-      "pluginVersion": "7.0.0",
+      "pluginVersion": "8.2.0-33922pre",
       "targets": [
         {
-          "expr": "muta_network_unidentified_connections",
+          "exemplar": true,
+          "expr": "axon_network_unidentified_connections",
           "instant": true,
           "interval": "",
           "legendFormat": "{{instance}}",
@@ -2173,7 +2273,6 @@
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2195,40 +2294,42 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 93
+        "y": 91
       },
-      "id": 42,
+      "id": 76,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
             "mean"
           ],
+          "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "text": {}
       },
-      "pluginVersion": "7.0.0",
+      "pluginVersion": "8.2.0-33922pre",
       "targets": [
         {
-          "expr": "muta_network_outbound_connecting_peers",
+          "exemplar": true,
+          "expr": "axon_network_saved_peer_count",
           "instant": true,
           "interval": "",
-          "legendFormat": "{{instance}}",
+          "legendFormat": "Saved peers",
           "refId": "A"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Connecting Peers",
+      "title": "Saved peers",
       "type": "gauge"
     },
     {
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2250,7 +2351,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 93
+        "y": 91
       },
       "id": 44,
       "options": {
@@ -2262,13 +2363,17 @@
           "calcs": [
             "lastNotNull"
           ],
+          "fields": "",
           "values": false
-        }
+        },
+        "text": {},
+        "textMode": "auto"
       },
-      "pluginVersion": "7.0.0",
+      "pluginVersion": "8.2.0-33922pre",
       "targets": [
         {
-          "expr": "muta_network_ip_disconnected_count",
+          "exemplar": true,
+          "expr": "axon_network_ip_disconnected_count",
           "instant": true,
           "interval": "",
           "legendFormat": "{{instance}}",
@@ -2282,12 +2387,8 @@
     },
     {
       "datasource": "Prometheus",
-      "description": "Total number of received messages in processing",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            "align": null
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -2309,24 +2410,27 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 101
+        "y": 99
       },
-      "id": 36,
+      "id": 42,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "mean"
           ],
+          "fields": "",
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "text": {}
       },
-      "pluginVersion": "7.0.0",
+      "pluginVersion": "8.2.0-33922pre",
       "targets": [
         {
-          "expr": "muta_network_received_message_in_processing_guage",
+          "exemplar": true,
+          "expr": "axon_network_outbound_connecting_peers",
           "instant": true,
           "interval": "",
           "legendFormat": "{{instance}}",
@@ -2335,7 +2439,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Received messages in processing",
+      "title": "Connecting Peers",
       "type": "gauge"
     },
     {
@@ -2346,7 +2450,7 @@
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "links": []
         },
         "overrides": []
       },
@@ -2356,7 +2460,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 101
+        "y": 99
       },
       "hiddenSeries": false,
       "id": 50,
@@ -2373,9 +2477,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "8.2.0-33922pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -2385,7 +2490,8 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "muta_network_received_ip_message_in_processing_guage{instance=~\"$node\"}",
+          "exemplar": true,
+          "expr": "axon_network_received_ip_message_in_processing_guage{instance=~\"$node\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -2435,6 +2541,64 @@
       }
     },
     {
+      "datasource": "Prometheus",
+      "description": "Total number of received messages in processing",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 107
+      },
+      "id": 36,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "8.2.0-33922pre",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "axon_network_received_message_in_processing_guage",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Received messages in processing",
+      "type": "gauge"
+    },
+    {
       "alert": {
         "alertRuleTags": {},
         "conditions": [
@@ -2478,21 +2642,7 @@
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
+          "links": []
         },
         "overrides": []
       },
@@ -2501,8 +2651,8 @@
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 0,
-        "y": 109
+        "x": 12,
+        "y": 107
       },
       "hiddenSeries": false,
       "id": 40,
@@ -2519,10 +2669,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.0.0",
+      "pluginVersion": "8.2.0-33922pre",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -2532,7 +2682,8 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "avg(histogram_quantile(0.90, sum(rate(muta_network_ping_in_ms_bucket[5m])) by (le, instance)))",
+          "exemplar": true,
+          "expr": "avg(histogram_quantile(0.90, sum(rate(axon_network_ping_in_ms_bucket[5m])) by (le, instance)))",
           "interval": "",
           "legendFormat": "{{instance}}",
           "refId": "A"
@@ -2544,7 +2695,8 @@
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 999
+          "value": 999,
+          "visible": true
         }
       ],
       "timeFrom": null,
@@ -2588,42 +2740,10 @@
         "align": false,
         "alignLevel": null
       }
-    },
-    {
-      "datasource": "Loki",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 117
-      },
-      "id": 52,
-      "options": {
-        "showLabels": false,
-        "showTime": true,
-        "sortOrder": "Descending",
-        "wrapLogMessage": true
-      },
-      "targets": [
-        {
-          "expr": "{level=\"WARN\"} |~ \"give up\"",
-          "refId": "A"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Peer give up warnings",
-      "type": "logs"
     }
   ],
-  "refresh": "30s",
-  "schemaVersion": 25,
+  "refresh": "",
+  "schemaVersion": 31,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -2631,27 +2751,30 @@
       {
         "allValue": null,
         "current": {
-          "selected": true,
-          "text": "120.24.110.154:8000",
-          "value": [
-            "120.24.110.154:8000"
-          ]
+          "isNone": true,
+          "selected": false,
+          "text": "None",
+          "value": ""
         },
         "datasource": "Prometheus",
         "definition": "label_values(muta_consensus_height, instance)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "Instance",
         "multi": true,
         "name": "node",
         "options": [],
-        "query": "label_values(muta_consensus_height, instance)",
+        "query": {
+          "query": "label_values(muta_consensus_height, instance)",
+          "refId": "Prometheus-node-Variable-Query"
+        },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
         "sort": 0,
         "tagValuesQuery": "",
-        "tags": [],
         "tagsQuery": "",
         "type": "query",
         "useTags": false
@@ -2676,7 +2799,7 @@
     ]
   },
   "timezone": "",
-  "title": "muta-benchmark",
+  "title": "axon-benchmark",
   "uid": "muta-benchmark",
-  "version": 139
+  "version": 34
 }
