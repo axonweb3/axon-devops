@@ -1,0 +1,36 @@
+---
+- name: axon service
+  hosts: localhost
+  vars_files:
+    - config.yml
+  tasks:
+    - name: Fetch code 
+      shell: cd {{ deploy_path }} && git fetch origin pull/{{ pr_number }}/head:{{ axon_branch }}
+      become: yes
+      become_method: sudo
+      ignore_errors: yes
+      tags: 
+        - build
+
+    - name: Pull code
+      git:
+        repo: "{{ axon_repo }}"
+        dest: "{{ deploy_path }}"
+        version: "{{ axon_branch }}"
+        force: yes
+      become: yes
+      become_method: sudo
+      tags: 
+        - build
+
+    - name: Build image
+      shell: cd {{ deploy_path }} && docker build -t zhengjianhui/axon-k8s:latest .
+      ignore_errors: yes
+      tags: 
+        - build
+
+    - name: Push images
+      shell: docker push zhengjianhui/axon-k8s:latest
+      ignore_errors: yes
+      tags: 
+        - build
