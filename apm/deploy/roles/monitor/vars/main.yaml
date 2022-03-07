@@ -1,3 +1,1 @@
-monitor_dir: /Users/zjh/Desktop/monitor
-prometheus_port: 9090
-grafana_port: 3000
+monitor_dir: /home/ckb/axon-monitor
