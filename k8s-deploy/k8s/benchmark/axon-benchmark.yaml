@@ -18,7 +18,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: axon-bechmark
+  name: axon-benchmark
   namespace: axon-benchmark
 spec:
   replicas: 1
@@ -37,9 +37,9 @@ spec:
         app: axon-benchmark
     spec:
       containers:
-      - name: axon-bechmark
+      - name: axon-benchmark
         image: zhengjianhui/axon-benchmark:latest
-        command: ["/bin/sh", "-c","node index.js $protocol://$service_ip:$service_port/ true 3000 1000"]
+        command: ["/bin/sh", "-c","node index.js $protocol://$service_ip:$service_port/ $continues_benchmark $benchmark_time $batch_size $id $token"]
         ports:
         - containerPort: 8098
         securityContext:
