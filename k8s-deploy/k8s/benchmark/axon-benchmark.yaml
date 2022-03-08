@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: axon-benchmark
+  name: axon-benchmark
+  namespace: axon-benchmark
+spec:
+  ports:
+    - name: axon-benchmark
+      port: 8098
+      targetPort: 8098
+      protocol: TCP
+  selector:
+    app: axon-benchmark
+  type: ClusterIP		  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: axon-benchmark
+  namespace: axon-benchmark
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: axon-benchmark
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        app: axon-benchmark
+    spec:
+      containers:
+      - name: axon-benchmark
+        image: zhengjianhui/axon-benchmark:latest
+        command: ["/bin/sh", "-c","node index.js $protocol://$service_ip:$service_port/ $continues_benchmark $benchmark_time $batch_size $id $token"]
+        ports:
+        - containerPort: 8098
+        securityContext:
+          privileged: true
+        envFrom:
+        - configMapRef:
+            name: axon-config
+      restartPolicy: Always
+status: {}

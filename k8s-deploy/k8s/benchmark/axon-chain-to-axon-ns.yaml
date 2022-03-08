@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: axon-chain
+  namespace: axon-benchmark
+spec:
+  type: ExternalName
+  externalName: axon-chain.axon.svc.cluster.local
+  ports:
+  - port: 8000
