@@ -1,0 +1,167 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: Workflow
+metadata:
+  name: axon-chaos
+  namespace: axon
+spec:
+  entry: entry
+  templates:
+    - name: entry
+      templateType: Serial
+      deadline: 1h
+      children:
+        - axon-chaos
+    - name: test-pod
+      templateType: Serial
+      deadline: 10m
+      children:
+        - test-pod-failure
+        - test-pod-kill
+    - name: test-pod-failure
+      templateType: PodChaos
+      deadline: 5m
+      podChaos:
+        selector:
+          namespaces:
+            - axon
+        mode: one
+        action: pod-failure
+    - name: test-pod-kill
+      templateType: PodChaos
+      deadline: 5m
+      podChaos:
+        selector:
+          namespaces:
+            - axon
+        mode: one
+        action: pod-kill
+    - name: test-network
+      templateType: Serial
+      deadline: 25m
+      children:
+        - test-network-partition
+        - test-network-delay
+        - test-network-loss
+        - test-network-duplicate
+        - test-network-corrupt
+    - name: test-network-partition
+      templateType: NetworkChaos
+      deadline: 5m
+      networkChaos:
+        selector:
+          namespaces:
+            - axon
+        mode: one
+        action: partition
+        direction: both
+        target:
+          selector:
+            namespaces:
+              - axon
+          mode: one
+    - name: test-network-delay
+      templateType: NetworkChaos
+      deadline: 5m
+      networkChaos:
+        selector:
+          namespaces:
+            - axon
+        mode: one
+        action: delay
+        delay:
+          latency: 1s
+          jitter: 2s
+          correlation: '30'
+        direction: both
+        target:
+          selector:
+            namespaces:
+              - axon
+          mode: one
+    - name: test-network-loss
+      templateType: NetworkChaos
+      deadline: 5m
+      networkChaos:
+        selector:
+          namespaces:
+            - axon
+        mode: one
+        action: loss
+        loss:
+          loss: '30'
+          correlation: '30'
+        direction: both
+        target:
+          selector:
+            namespaces:
+              - axon
+          mode: one
+    - name: test-network-duplicate
+      templateType: NetworkChaos
+      deadline: 5m
+      networkChaos:
+        selector:
+          namespaces:
+            - axon
+        mode: one
+        action: duplicate
+        duplicate:
+          duplicate: '30'
+          correlation: '30'
+        direction: both
+        target:
+          selector:
+            namespaces:
+              - axon
+          mode: one
+    - name: test-network-corrupt
+      templateType: NetworkChaos
+      deadline: 5m
+      networkChaos:
+        selector:
+          namespaces:
+            - axon
+        mode: one
+        action: corrupt
+        corrupt:
+          corrupt: '30'
+          correlation: '30'
+        direction: both
+        target:
+          selector:
+            namespaces:
+              - axon
+          mode: one
+    - name: test-clock
+      templateType: TimeChaos
+      deadline: 5m
+      timeChaos:
+        selector:
+          namespaces:
+            - axon
+        mode: one
+        timeOffset: 5s
+    - name: test-system-benchmark
+      templateType: StressChaos
+      deadline: 5m
+      stressChaos:
+        selector:
+          namespaces:
+            - axon
+        mode: one
+        stressors:
+          cpu:
+            workers: 4
+            load: 90
+          memory:
+            workers: 4
+            size: '22'
+    - name: axon-chaos
+      templateType: Serial
+      deadline: 1h
+      children:
+        - test-pod
+        - test-network
+        - test-clock
+        - test-system-benchmark
+        
