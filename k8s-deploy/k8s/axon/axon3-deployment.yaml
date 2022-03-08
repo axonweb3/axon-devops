@@ -36,6 +36,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      svc: axon-test
       app: axon3
       logging: "true"
   strategy:
@@ -47,6 +48,7 @@ spec:
         kompose.version: 1.26.1 (HEAD)
       creationTimestamp: null
       labels:
+        svc: axon-test
         app: axon3
         logging: "true"
     spec:
