@@ -129,5 +129,7 @@
     - name: Start axon
       shell: cd {{ deploy_path }} && echo "nohup /home/ckb/.cargo/bin/flamegraph -o a.svg {{ deploy_path }}/axon -c={{ deploy_path }}/config.toml -g={{ deploy_path }}/genesis.json -m={{ deploy_path }}/metadata.json &" > run.sh && sh run.sh
       when: enable_profile == 'true'
+      become: yes
+      become_method: sudo
       tags: 
         - start
