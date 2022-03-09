@@ -11,3 +11,8 @@ services:
       - ./logs:/var/log/nginx
     ports: 
       - 8500:8500  
+<<<<<<< HEAD
+=======
+
+      
+>>>>>>> ae21896 (feat(nginx): axon nginx)
