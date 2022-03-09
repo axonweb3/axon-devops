@@ -26,7 +26,7 @@
       tags: 
         - shutdown
     - name: Shutdown 
-      shell: "kill -9 {{ process_exists.stdout }}"
+      shell: "kill {{ process_exists.stdout }}"
       when: process_exists.stdout != ""
       tags: 
         - shutdown
@@ -103,14 +103,33 @@
         - deploy
         - config   
 
+    - name: Replace enable_profile_debug
+      replace:
+        path: "{{ deploy_path }}/config.toml"
+        regexp: '#enable_profile_debug'
+        replace: "{{ enable_profile_debug }}"
+      tags:
+        - deploy
+        - config  
+
 ###############################################################################################################
-    - name: chmon axon
+    - name: chmod axon
       shell: "chmod 777 -R {{ deploy_path }}"
       become: yes
       become_method: sudo
       tags: 
         - start
+
     - name: Start axon
       shell: cd {{ deploy_path }} && echo "nohup {{ deploy_path }}/axon -c={{ deploy_path }}/config.toml -g={{ deploy_path }}/genesis.json -m={{ deploy_path }}/metadata.json &" > run.sh && sh run.sh
+      when: enable_profile == 'false'
+      tags: 
+        - start
+
+    - name: Start axon
+      shell: cd {{ deploy_path }} && echo "nohup /home/ckb/.cargo/bin/flamegraph -o a.svg {{ deploy_path }}/axon -c={{ deploy_path }}/config.toml -g={{ deploy_path }}/genesis.json -m={{ deploy_path }}/metadata.json &" > run.sh && sh run.sh
+      when: enable_profile == 'true'
+      become: yes
+      become_method: sudo
       tags: 
         - start
