@@ -6,12 +6,14 @@ data_path = "./devtools/chain/data"
 
 asset_contract_address = "0xc2fd48d60ae16b3fe6e333a9a13763691970d9373d4fab7cc323d7ba06fa9986"
 metadata_contract_address = "0xc34393e6a797d2b4e2aabbc7b9dc8bde1db42410d304b5e78c2ff843134e15e0"
+crosschain_contract_address = "0xda6db70ce66da4c6433bb447b484fd480e598621638f380f404697cd9f58b0f8"
 
 [rpc]
 http_listening_address = "0.0.0.0:8000"
 ws_listening_address = "0.0.0.0:8010"
 maxconn = 25000
-max_payload_size = 1048576
+max_payload_size = 10485760
+client_version = "0.1.0"
 # enable_dump_profile = false
 # [graphql.tls]
 # private_key_file_path = "key.pem"
@@ -55,9 +57,10 @@ metrics = true
 max_open_files = 64
 
 # [apm]
-# service_name = "muta"
-# tracing_address = "127.0.0.1:6831"
-# tracing_batch_size = 50
+#service_name = "axon"
+#tracing_address = "0.0.0.1:6831"
+#tracing_batch_size = 50
+#prometheus_listening_address = "0.0.0.0:8200"
 
 [cross_client]
 axon_udt_hash = "0xccca1b5cdede63c5cce826947dc4165e8bd0731c6e88636f3c47e8bc6a58ef03"
