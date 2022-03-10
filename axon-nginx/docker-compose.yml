@@ -11,5 +11,3 @@ services:
       - ./logs:/var/log/nginx
     ports: 
       - 8500:8500  
-
-      
