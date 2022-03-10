@@ -33,4 +33,3 @@ function init_config() {
     let runner = new Runner(config)
     await runner.run()
 })()
-

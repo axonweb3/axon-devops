@@ -87,4 +87,3 @@ class Benchmark {
 }
 
 module.exports = Benchmark
-
