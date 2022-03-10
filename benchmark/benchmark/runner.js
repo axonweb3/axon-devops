@@ -28,6 +28,9 @@ class Runner {
         this.log_benchmark_config_info()
         await this.start()
         await this.exec()
+        if(this.config.continuous_benchmark) {
+            return
+        }
         await this.end()
         this.log_benchmark_res()
         await this.send_discord()
