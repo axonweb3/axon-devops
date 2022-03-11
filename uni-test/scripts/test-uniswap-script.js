@@ -12,11 +12,11 @@ async function main() {
   const account1 = accounts[0];
   const account2 = accounts[1];
 
-  // get  facatory constract objcet
+  // get  facatory contract objcet
   const facatory = await hre.ethers.getContractFactory("UniswapV2Factory");
-  // get  weth constract objcet
+  // get  weth contract objcet
   const weth = await hre.ethers.getContractFactory("WETH9");
-  // get  UniswapV2Router02 constract objcet
+  // get  UniswapV2Router02 contract objcet
   const router02 = await hre.ethers.getContractFactory("UniswapV2Router02");
   // get one Token ERC20  that name is TT
   const erc201 = await hre.ethers.getContractFactory("TRAMS");
@@ -25,17 +25,17 @@ async function main() {
   // get one Token ERC20  tha name is  TSY
   const erc203 = await hre.ethers.getContractFactory("TRAMS");
 
-  // publish the factory constract
+  // publish the factory contract
   const facatoryDe = await facatory.deploy(account1.address);
   facatoryDe.deployed();
   console.log("facatory address is ", facatoryDe.address);
 
-  // publish the weth constract
+  // publish the weth contract
   const wethDe = await weth.deploy();
   wethDe.deployed();
   console.log("weth address is ", wethDe.address);
 
-  // publish constract UniswapV2Router02
+  // publish contract UniswapV2Router02
   const router02De = await router02.deploy(
     facatoryDe.address,
     wethDe.address,

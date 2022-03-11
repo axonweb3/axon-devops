@@ -40,7 +40,6 @@ export default function createDeployContractStep({
 
       let contract: Contract
       let contract_address: string
-      let constract_tx_hash: string
       try {
 
         const options = { timeout: 1000 * 30 }

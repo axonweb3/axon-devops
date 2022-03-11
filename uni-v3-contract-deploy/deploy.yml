@@ -68,17 +68,17 @@
     - name: npm add web3
       shell: "cd {{ deploy_path }} && sudo yarn add web3"
 
-    - name: delete the constract state.json
+    - name: delete the contract state.json
       shell: rm -rf {{ deploy_path }}/state.json
       become: yes
       become_method: sudo
 
-    - name: deploy uniswap v3 constracts.
+    - name: deploy uniswap v3 contracts.
       shell: "cd {{ deploy_path }} && yarn start -pk {{ hex_private_key }} -j {{ node_address }} -w9 {{ WETH }} -v2  {{ UniswapV2Factory }} -o  {{ hex_pub_address }} -s  ./state.json -ncl AT -c 0"
       become: yes
       become_method: sudo
 
-    - name: delete and create the constract_address.yaml
+    - name: delete and create the contract_address.yaml
       shell: "rm -rf contract_address.yaml && touch contract_address.yaml"
       become: yes
       become_method: sudo

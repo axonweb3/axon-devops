@@ -1,5 +1,5 @@
 # use hardhat tool  to test and compile solidity contract
-#### axon uniswap constract case: suggest vscode open this project.
+#### axon uniswap contract case: suggest vscode open this project.
 ```shell
 $ cd ~
 $ git clone https://github.com/nervosnetwork/axon-devops.git
@@ -16,7 +16,7 @@ $ npx hardhat node
 $ npx hardhat compile
 ```
 #
-## test uniswap constracts
+## test uniswap contracts
 ```shell
 $ npx hardhat run scripts/test-uniswap-script.js
 ```

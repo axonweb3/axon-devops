@@ -11,17 +11,17 @@ async function main() {
   const WETH = await hre.ethers.getContractFactory("WETH9");
   const Router02 = await hre.ethers.getContractFactory("UniswapV2Router02");
 
-  // publish the factory constract
+  // publish the factory contract
   const facatoryDe = await Facatory.deploy(account1.address);
   facatoryDe.deployed();
   console.log("facatory address is ", facatoryDe.address);
 
-  // publish the weth constract
+  // publish the weth contract
   const wethDe = await WETH.deploy();
   wethDe.deployed();
   console.log("weth address is ", account1.address);
 
-  // publish UniswapV2Router02 constract
+  // publish UniswapV2Router02 contract
   const router02De = await Router02.deploy(facatoryDe.address, wethDe.address);
   router02De.deployed();
   console.log("UniswapV2Router02 address is ", router02De.address);
