@@ -3,3 +3,6 @@
 .DS_Store
 apm/agent/.env
 node_modules
+dist
+build
+contract_address.yaml
