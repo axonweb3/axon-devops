@@ -6,13 +6,12 @@
   vars_files:
     - config.yml
   tasks:
-  ###############################################################################################################
+    ###############################################################################################################
     - name: yarn install
       shell: yarn install
       become: yes
       become_method: sudo
-    - name: deploy uniswap constracts.
+    - name: deploy uniswap contracts.
       shell: node deploy.js
       become: yes
-      become_method: sudo      
-
+      become_method: sudo
