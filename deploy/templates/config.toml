@@ -4,6 +4,8 @@ privkey = "#private_key"
 # db config
 data_path = "./devtools/chain/data"
 
+epoch_len = 100_000_000
+
 asset_contract_address = "0xc2fd48d60ae16b3fe6e333a9a13763691970d9373d4fab7cc323d7ba06fa9986"
 metadata_contract_address = "0xc34393e6a797d2b4e2aabbc7b9dc8bde1db42410d304b5e78c2ff843134e15e0"
 crosschain_contract_address = "0xda6db70ce66da4c6433bb447b484fd480e598621638f380f404697cd9f58b0f8"
@@ -26,7 +28,6 @@ rpc_timeout = 10
 [consensus]
 overlord_gap = 5
 sync_txs_chunk_size = 5000
-
 
 [[network.bootstraps]]
 multi_address = "/ip4/#bootstraps/tcp/8001/p2p/QmNk6bBwkLPuqnsrtxpp819XLZY3ymgjs3p1nKtxBVgqxj"
@@ -59,6 +60,7 @@ max_open_files = 64
 # service_name = "muta"
 # tracing_address = "127.0.0.1:6831"
 # tracing_batch_size = 50
+# prometheus_listening_address = "0.0.0.0:8200"
 
 [cross_client]
 axon_udt_hash = "0xccca1b5cdede63c5cce826947dc4165e8bd0731c6e88636f3c47e8bc6a58ef03"
