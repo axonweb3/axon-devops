@@ -57,8 +57,14 @@ spec:
             - ./axon
             - -c=/app/devtools/chain/k8s/node_4.toml
             - -g=/app/devtools/chain/genesis.json
-            - -m=/app/devtools/chain/nodes/metadata.json
           image: zhengjianhui/axon-k8s:latest
+          volumeMounts:
+          - name: config-node4
+            mountPath: /app/devtools/chain/k8s/node_4.toml
+            subPath: node_4.toml
+          - name: config-genesis
+            mountPath: /app/devtools/chain/genesis.json
+            subPath: genesis.json
           ports:
           - name: p2p
             containerPort: 8001
@@ -74,5 +80,12 @@ spec:
             privileged: true
       nodeSelector:
         disktype: node4
+      volumes:
+        - name: config-node4
+          configMap:
+            name: node4-toml
+        - name: config-genesis
+          configMap:
+            name: genesis
       restartPolicy: Always
 status: {}
