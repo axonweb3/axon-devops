@@ -31,7 +31,7 @@ class Command {
 
         try {
             apply_chaos_res =
-                exec('kubectl apply -f /home/ckb/axon-devops/axon-chaos/axon-chaso.yaml')
+                exec('kubectl apply -f /home/ckb/axon-devops/axon-chaos/axon-chaos.yaml')
         } catch (e) {
             apply_chaos_res = e
         }
@@ -47,7 +47,7 @@ class Command {
         let kill_chaos_res, kill_benchmark_res, kill_axon_res
         try {
             kill_chaos_res =
-                exec('kubectl delete -f /home/ckb/axon-devops/axon-chaos/axon-chaso.yaml')
+                exec('kubectl delete -f /home/ckb/axon-devops/axon-chaos/axon-chaos.yaml')
         } catch (e) {
             kill_chaos_res = e
         }
