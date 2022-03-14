@@ -46,10 +46,19 @@
         - config
 
 ###############################################################################################################
-    - name: Copy the axon configuration file
+    - name: Copy config.toml
       copy:
         src: ./templates/config.toml
         dest: "{{ deploy_path }}/devtools/chain/config.toml"
+        mode: 0755
+      tags: 
+        - deploy
+        - config
+
+    - name: Copy genesis.json
+      copy:
+        src: ./templates/genesis.json
+        dest: "{{ deploy_path }}/devtools/chain/genesis.json"
         mode: 0755
       tags: 
         - deploy
