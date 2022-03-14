@@ -1,2 +1,5 @@
 #!/bin/sh
-kubectl delete -f /home/ckb/axon-devops/axon-chaos
+kubectl delete -f ./axon-chaos.yaml
+sleep 120
+kubectl apply -f ./axon-chaos.yaml
+
