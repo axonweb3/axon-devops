@@ -21,8 +21,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
-  "iteration": 1646148648056,
+  "iteration": 1647090966635,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -1527,14 +1526,14 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum(rate(axon_api_request_result_total{type=\"send_transaction\"}[5m]))",
+          "expr": "sum(rate(axon_api_request_result_total{type=\"eth_sendRawTransaction\"}[5m]))",
           "interval": "",
           "legendFormat": "Total",
           "refId": "C"
         },
         {
           "exemplar": true,
-          "expr": "sum(rate(axon_api_request_result_total{result=\"success\",type=\"send_transaction\"}[5m]))",
+          "expr": "sum(rate(axon_api_request_result_total{result=\"success\",type=\"eth_sendRawTransaction\"}[5m]))",
           "instant": false,
           "interval": "",
           "legendFormat": "Success Total",
@@ -1542,7 +1541,7 @@
         },
         {
           "exemplar": true,
-          "expr": "rate(axon_api_request_result_total{result=\"success\", type=\"send_transaction\"}[5m])",
+          "expr": "rate(axon_api_request_result_total{result=\"success\", type=\"eth_sendRawTransaction\"}[5m])",
           "interval": "",
           "legendFormat": "{{instance}}",
           "refId": "B"
@@ -2213,7 +2212,6 @@
     },
     {
       "datasource": "Prometheus",
-      "description": "Processing identify protocol handshake, etc verify chain id.",
       "fieldConfig": {
         "defaults": {
           "mappings": [],
@@ -2239,8 +2237,11 @@
         "x": 12,
         "y": 83
       },
-      "id": 32,
+      "id": 44,
       "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
@@ -2249,15 +2250,14 @@
           "fields": "",
           "values": false
         },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "text": {}
+        "text": {},
+        "textMode": "auto"
       },
       "pluginVersion": "8.2.0-33922pre",
       "targets": [
         {
           "exemplar": true,
-          "expr": "axon_network_unidentified_connections",
+          "expr": "axon_network_peer_id_disconnected_count",
           "instant": true,
           "interval": "",
           "legendFormat": "{{instance}}",
@@ -2266,8 +2266,8 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Unidentified Connections",
-      "type": "gauge"
+      "title": "Disconnected count(To other peers)",
+      "type": "stat"
     },
     {
       "datasource": "Prometheus",
@@ -2327,122 +2327,6 @@
       "type": "gauge"
     },
     {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 91
-      },
-      "id": 44,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "text": {},
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.2.0-33922pre",
-      "targets": [
-        {
-          "exemplar": true,
-          "expr": "axon_network_ip_disconnected_count",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "{{instance}}",
-          "refId": "A"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Disconnected count(To other peers)",
-      "type": "stat"
-    },
-    {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 99
-      },
-      "id": 42,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "text": {}
-      },
-      "pluginVersion": "8.2.0-33922pre",
-      "targets": [
-        {
-          "exemplar": true,
-          "expr": "axon_network_outbound_connecting_peers",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "{{instance}}",
-          "refId": "A"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Connecting Peers",
-      "type": "gauge"
-    },
-    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -2460,7 +2344,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 99
+        "y": 91
       },
       "hiddenSeries": false,
       "id": 50,
@@ -2491,7 +2375,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "axon_network_received_ip_message_in_processing_guage{instance=~\"$node\"}",
+          "expr": "axon_network_received_peer_id_message_in_processing_guage",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -2501,7 +2385,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Received messages in processing by ip",
+      "title": "Received messages in processing by peer_id",
       "tooltip": {
         "shared": true,
         "sort": 2,
@@ -2566,7 +2450,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 107
+        "y": 99
       },
       "id": 36,
       "options": {
@@ -2652,7 +2536,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 107
+        "y": 99
       },
       "hiddenSeries": false,
       "id": 40,
@@ -2740,9 +2624,124 @@
         "align": false,
         "alignLevel": null
       }
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 107
+      },
+      "id": 42,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "8.2.0-33922pre",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "axon_network_outbound_connecting_peers",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Connecting Peers",
+      "type": "gauge"
+    },
+    {
+      "datasource": "Prometheus",
+      "description": "Processing identify protocol handshake, etc verify chain id.",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 107
+      },
+      "id": 32,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "8.2.0-33922pre",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "axon_network_unidentified_connections",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Unidentified Connections",
+      "type": "gauge"
     }
   ],
-  "refresh": "",
+  "refresh": "10s",
   "schemaVersion": 31,
   "style": "dark",
   "tags": [],
@@ -2801,5 +2800,5 @@
   "timezone": "",
   "title": "axon-benchmark",
   "uid": "muta-benchmark",
-  "version": 34
+  "version": 1
 }
