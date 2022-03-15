@@ -10,8 +10,13 @@ async function run(chaos_url) {
     cmd.kill_chaos_integration()
     await sleep(120000)
     cmd.apply_chaos_integration()
-    await cmd.wait_chaos_integration_res()
-    cmd.kill_chaos_integration()
+    const res = await cmd.wait_chaos_integration_res()
+    if(res) {
+        cmd.kill_chaos_integration()
+    } else {
+        console.log("chaos has been cancelled ！！！！！！！！！！！！！！！！！")
+    }
+
 }
 
 

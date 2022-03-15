@@ -5,11 +5,13 @@ class WaitChaosRes {
 
     constructor(url) {
         this.url = url
-        this.events = [];
+        this.events = []
+        this.uid = ""
     }
 
     async wait() {
         let workflow = await this.get_workflow();
+        this.uid = workflow.uid
         console.log(
             "############################################### chaos start ###############################################")
         while (workflow.status == "running") {
@@ -17,6 +19,9 @@ class WaitChaosRes {
             this.change_events(events)
             await sleep(5000)
             workflow = await this.get_workflow();
+            if(this.uid != workflow.uid) {
+                return false
+            }
         }
 
         const tasks = await this.get_tasks_by_uid(workflow.uid)
@@ -24,6 +29,8 @@ class WaitChaosRes {
 
         console.log(
             "############################################### chaos end ###############################################")
+
+        return true
     }
 
     async get_tasks_by_uid(uid) {

@@ -1,4 +1,5 @@
-const WaitChaosRes = require('./wait_chaos_res');
+const WaitChaosRes = require('./wait_chaos_res')
+const child_process = require('child_process')
 
 class Command {
 
@@ -7,12 +8,12 @@ class Command {
     }
 
     async wait_chaos_integration_res() {
-        const res = new WaitChaosRes(this.chaos_url)
-        await res.wait()
+        const waitChaosRes = new WaitChaosRes(this.chaos_url)
+        return await waitChaosRes.wait()
     }
 
     apply_chaos_integration() {
-        const exec = require('child_process').execSync
+        const exec = child_process.execSync
 
         let apply_chaos_res, apply_benchmark_res, apply_axon_res
         try {
@@ -42,7 +43,7 @@ class Command {
     }
 
     kill_chaos_integration() {
-        const exec = require('child_process').execSync
+        const exec = child_process.execSync
 
         let kill_chaos_res, kill_benchmark_res, kill_axon_res
         try {
