@@ -2,45 +2,44 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: axon4
-  name: axon4
+    app: axon3
+  name: axon3
   namespace: axon
 spec:
   ports:
-  - name: p2p
-    port: 8001
-    targetPort: 8001
-    protocol: TCP
-  - name: rpc
-    port: 8000
-    targetPort: 8000
-    protocol: TCP
-  - name: websocket
-    port: 8010
-    targetPort: 8010
-    protocol: TCP
-  - name: prometheus
-    port: 8100
-    targetPort: 8100
-    protocol: TCP
+    - name: p2p
+      port: 8001
+      targetPort: 8001
+      protocol: TCP
+    - name: rpc
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+    - name: websocket
+      port: 8010
+      targetPort: 8010
+      protocol: TCP
+    - name: prometheus
+      port: 8100
+      targetPort: 8100
+      protocol: TCP
   selector:
-    app: axon4
+    app: axon3
   type: ClusterIP
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: axon4
+  name: axon3
   namespace: axon
 spec:
   replicas: 1
+  serviceName: "axon3"
   selector:
     matchLabels:
       svc: axon-test
-      app: axon4
+      app: axon3
       logging: "true"
-  strategy:
-    type: Recreate
   template:
     metadata:
       annotations:
@@ -49,22 +48,25 @@ spec:
       creationTimestamp: null
       labels:
         svc: axon-test
-        app: axon4
+        app: axon3
         logging: "true"
     spec:
       containers:
         - args:
             - ./axon
-            - -c=/app/devtools/chain/k8s/node_4.toml
+            - -c=/app/devtools/chain/k8s/node_3.toml
             - -g=/app/devtools/chain/genesis.json
           image: zhengjianhui/axon-k8s:latest
           volumeMounts:
-          - name: config-node4
-            mountPath: /app/devtools/chain/k8s/node_4.toml
-            subPath: node_4.toml
+          - name: config-node3
+            mountPath: /app/devtools/chain/k8s/node_3.toml
+            subPath: node_3.toml
           - name: config-genesis
             mountPath: /app/devtools/chain/genesis.json
             subPath: genesis.json
+          - name: data3
+            mountPath: /app/devtools/chain/data3
+            subPath: data3
           ports:
           - name: p2p
             containerPort: 8001
@@ -74,18 +76,26 @@ spec:
             containerPort: 8010
           - name: prometheus
             containerPort: 8100
-          name: axon4
+          name: axon3
           resources: {}
           securityContext:
             privileged: true
       nodeSelector:
-        disktype: node4
+        disktype: node3
       volumes:
-        - name: config-node4
+        - name: config-node3
           configMap:
-            name: node4-toml
+            name: node3-toml
         - name: config-genesis
           configMap:
             name: genesis
       restartPolicy: Always
-status: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: data3
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: gp2
+      resources:
+        requests:
+          storage: 100Gi
