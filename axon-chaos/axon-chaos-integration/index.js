@@ -1,9 +1,10 @@
 const Command = require('./src/command');
 const sleep = require('./src/sleep');
+const config = require('./config.json')
 
 
 let args = process.argv.slice(2)
-let chaos_url = args[0] || 'https://localhost:8080'
+let chaos_url = args[0] || config.chaos_url
 
 async function run(chaos_url) {
     const cmd = new Command(chaos_url)
