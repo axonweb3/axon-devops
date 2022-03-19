@@ -53,23 +53,8 @@ class Command {
             kill_chaos_res = e
         }
 
-        try {
-            kill_benchmark_res =
-                exec(
-                    'kubectl delete -f /home/ckb/axon-devops/k8s-deploy/k8s/benchmark/axon-benchmark.yaml')
-        } catch (e) {
-            kill_benchmark_res = e
-        }
-
-        try {
-            kill_axon_res = exec('kubectl delete -f /home/ckb/axon-devops/k8s-deploy/k8s/axon')
-        } catch (e) {
-            kill_axon_res = e
-        }
-
         console.log(`kill chaos res: ${kill_chaos_res.toString()}`);
-        console.log(`kill benchmark res: ${kill_benchmark_res.toString()}`);
-        console.log(`kill axon res: ${kill_axon_res.toString()}`);
+    
     }
 }
 
