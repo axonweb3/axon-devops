@@ -24,5 +24,5 @@ datasources:
 - name: jaeger
   type: jaeger
   access: proxy
-  url: http://jaeger-query:8202
+  url: http://jaeger-query:16686
   basicAuth: false
