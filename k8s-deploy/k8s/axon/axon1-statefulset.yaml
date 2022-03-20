@@ -28,7 +28,7 @@ spec:
   type: ClusterIP
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: axon1
   namespace: axon
@@ -39,8 +39,7 @@ spec:
       svc: axon-test
       app: axon1
       logging: "true"
-  strategy:
-    type: Recreate
+  serviceName: "axon1"
   template:
     metadata:
       annotations:
@@ -65,6 +64,9 @@ spec:
           - name: config-genesis
             mountPath: /app/devtools/chain/genesis.json
             subPath: genesis.json
+          - name: data1
+            mountPath: /app/devtools/chain/data1
+            subPath: data1
           ports:
           - name: p2p
             containerPort: 8001
@@ -88,4 +90,12 @@ spec:
           configMap:
             name: genesis
       restartPolicy: Always
-status: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: data1
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: gp2
+      resources:
+        requests:
+          storage: 100Gi
