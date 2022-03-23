@@ -1,0 +1,113 @@
+---
+- name: uni contract
+  hosts: localhost
+  become: yes
+  become_method: sudo
+  vars_files:
+    - config.yml
+    - ../uni-v2-contract-deploy/contract_Uni_V2_Address.yaml
+  tasks:
+    ###############################################################################################################
+    - name: rm uni-interface
+      shell: "rm -rf {{ deploy_path }}"
+      become: yes
+      become_method: sudo
+      tags:
+        - up
+
+    - name: mkdir {{ deploy_path }}
+      shell: "mkdir -p {{ deploy_path }}"
+      become: yes
+      become_method: sudo
+      tags:
+        - up
+
+    - name: Pull code
+      git:
+        repo: "git://github.com/DavidChild/uniswap_v2.git"
+        dest: "{{ deploy_path }}"
+        force: yes
+      become: yes
+      become_method: sudo
+      tags:
+        - up
+
+    - name: docker-compose
+      shell: "cp ./templates/docker-compose.yml {{ deploy_path }}"
+      become: yes
+      become_method: sudo
+      tags:
+        - up
+
+    - name: uni-interface shutdown
+      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yml down"
+      tags:
+        - up
+
+    - name: yarn install
+      shell: "cd {{ deploy_path }} && sudo yarn install"
+      tags:
+        - up
+
+    ###############################################################################################################
+    - name: Replace ROUTER_ADDRESS to UniswapV2Router02
+      shell: sed -i "s/0x12fE4028b3799420D1C17a09D10EB72b976ec729/{{ UniswapV2Router02 }}/g" "{{ deploy_path }}/src/constants/index.ts"
+      tags:
+        - up
+
+    - name: Replace `FACTORY_ADDRESS` in the axonuniswapsdk.cjs.development.js with `UniswapV2Factory`
+      shell: sed -i "s/0xc4A3C40808d63e1eE18f7739F239dfA5Bc92bFCd/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/axonuniswapsdk/dist/axonuniswapsdk.cjs.development.js"
+      tags:
+        - up
+
+    - name: Replace `WEHT_ADDRESS` in the axonuniswapsdk.cjs.development.js with `WETH`
+      shell: sed -i "s/0xb484fd480E598621638F380F404697Cd9f58B0F8/{{ WETH }}/g" "{{ deploy_path }}/node_modules/axonuniswapsdk/dist/axonuniswapsdk.cjs.development.js"
+      tags:
+        - up
+
+    - name: Replace `INIT_CODE_HASH` in the axonuniswapsdk.cjs.development.js with `${INIT_CODE_HASH}`
+      shell: sed -i "s/0xfe5c25035eb1580fcbc8496a5d5423870718fac54c9d582b43039dbce6afc72f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/axonuniswapsdk/dist/axonuniswapsdk.cjs.development.js"
+      tags:
+        - up
+
+    - name: Replace MuiltiCall_ADDRESS to MuiltiCall
+      shell: sed -i "s/0x77787c7473CCd42B815d974f11BcbB1792635082/{{ Multicall }}/g" "{{ deploy_path }}/src/constants/multicall/index.ts"
+      tags:
+        - up
+
+    - name: Replace  Uniswap start port
+      shell: sed -i "s/react-scripts start/PORT={{ PORT }} react-scripts start/g" "{{ deploy_path }}/package.json"
+      tags:
+        - up
+
+    ###########################################################################################################
+    - name: yarn build
+      shell: "cd {{ deploy_path }} && yarn build"
+      become_method: sudo
+      tags:
+        - up
+
+    - name: uni-interface docker config
+      copy:
+        src: ./templates/docker-compose.yml
+        dest: "{{ deploy_path }}/docker-compose.yml"
+        mode: 0755
+      tags:
+        - up
+
+    - name: uni-interface deploy
+      shell: "cd {{ deploy_path }} && docker-compose up -d"
+      tags:
+        - up
+    ###########################################################################################################
+    - name: uni-interface down
+      shell: "cd {{ deploy_path }} && docker-compose down"
+      tags:
+        - down
+
+    - name: clean up uni-interface
+      shell: "rm -rf {{ deploy_path }}"
+      become: yes
+      become_method: sudo
+      tags:
+        - down

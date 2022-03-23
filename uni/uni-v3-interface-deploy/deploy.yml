@@ -1,0 +1,255 @@
+---
+- name: uni contract
+  hosts: localhost
+  become: yes
+  become_method: sudo
+  vars_files:
+    - config.yml
+    - ../uni-v2-contract-deploy/contract_Uni_V2_Address.yaml
+    - ../uni-v3-contract-deploy/contract_Uni_V3_Address.yaml
+  tasks:
+    ###############################################################################################################
+    - name: rm uni-interface_v3
+      shell: "rm -rf {{ deploy_path }}"
+      become: yes
+      become_method: sudo
+      tags:
+        - up
+
+    - name: mkdir {{ deploy_path }}
+      shell: "mkdir -p {{ deploy_path }}"
+      become: yes
+      become_method: sudo
+      tags:
+        - up
+
+    - name: Pull code
+      git:
+        repo: "git://github.com/Uniswap/interface.git"
+        dest: "{{ deploy_path }}"
+        version: "37e085763c2214a0d3b83bb366aaf73633870206"
+        force: yes
+      become: yes
+      become_method: sudo
+      tags:
+        - up
+
+    - name: docker-compose
+      shell: "cp ./templates/docker-compose.yml {{ deploy_path }}"
+      become: yes
+      become_method: sudo
+      tags:
+        - up
+
+    - name: uni-interface shutdown
+      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yml down"
+      tags:
+        - up
+
+    - name: yarn install
+      shell: "cd {{ deploy_path }} && sudo yarn install"
+      tags:
+        - up
+
+    ###############################################################################################################
+    - name: Replace tokens templete
+      shell: sed -i "s/0xb00d616B820C39619Ee29e5144D0226Cf8B5c15A/{{ WETH }}/g" "./code_files/tokens.ts"
+      tags:
+        - up
+
+    - name: cp  src/constants/tokens.ts
+      shell: "cp ./code_files/tokens.ts {{ deploy_path }}/src/constants/tokens.ts"
+      become: yes
+      become_method: sudo
+      tags:
+        - up
+
+    - name: Replace multicall
+      shell: sed -i "s/0x1F98415757620B543A52E61c46B32eB19261F984/{{ multicall2Address }}/g" "{{ deploy_path }}/src/constants/addresses.ts"
+      tags:
+        - up
+
+    - name: Replace multicall
+      shell: sed -i "s/0x1F98415757620B543A52E61c46B32eB19261F984/{{ multicall2Address }}/g" "{{ deploy_path }}/src/constants/addresses.ts"
+      tags:
+        - up
+
+    - name: Replace  v2router
+      shell: sed -i "s/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D/{{ UniswapV2Router02 }}/g" "{{ deploy_path }}/src/constants/addresses.ts"
+      tags:
+        - up
+    - name: Replace `v2roter` in hook.ts
+      shell: sed -i "s/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D/{{ UniswapV2Router02 }}/g" "{{ deploy_path }}/src/state/swap/hooks.tsx"
+      tags:
+        - up
+
+    - name: Replace quoter
+      shell: sed -i "s/0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6/{{ quoterV2Address }}/g" "{{ deploy_path }}/src/constants/addresses.ts"
+      tags:
+        - up
+
+    - name: Replace nonfungibleTokenPositionManagerAddress
+      shell: sed -i "s/0xC36442b4a4522E871399CD717aBDD847Ab11FE88/{{ nonfungibleTokenPositionManagerAddress }}/g" "{{ deploy_path }}/src/constants/addresses.ts"
+      tags:
+        - up
+
+    - name: Replace swaprouter
+      shell: sed -i "s/0xE592427A0AEce92De3Edee1F18E0157C05861564/{{ swapRouter02 }}/g" "{{ deploy_path }}/src/constants/addresses.ts"
+      tags:
+        - up
+
+    - name: Replace v3MigratorAddress
+      shell: sed -i "s/0xA5644E29708357803b5A882D272c41cC0dF92B34/{{ v3MigratorAddress }}/g" "{{ deploy_path }}/src/constants/addresses.ts"
+      tags:
+        - up
+
+    - name: Replace `v2factory` --sdk v2
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/constants.d.ts"
+      tags:
+        - up
+
+    - name: Replace `v2factory` in hook.ts
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/src/state/swap/hooks.tsx"
+      tags:
+        - up
+
+    - name: Replace `InitCodeHash` --sdk v2
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ InitCodeHash }}/g" "{{ deploy_path }}//node_modules/@uniswap/v2-sdk/dist/constants.d.ts"
+      tags:
+        - up
+
+    - name: Replace `v2factory` in v2-sdk.cjs.development.js
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js"
+      tags:
+        - up
+
+    - name: Replace `InitCodeHash` --v2-sdk.cjs.development.js
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js"
+      tags:
+        - up
+
+    - name: Replace `v2factory` in v2-sdk.cjs.development.js.map
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js.map"
+      tags:
+        - up
+
+    - name: Replace `InitCodeHash` --v2-sdk.cjs.development.js.map
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js.map"
+      tags:
+        - up
+
+    - name: Replace `v2factory` in v2-sdk.cjs.production.min.js
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.production.min.js"
+      tags:
+        - up
+
+    - name: Replace `InitCodeHash` --v2-sdk.cjs.production.min.js
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.production.min.js"
+      tags:
+        - up
+
+    - name: Replace `v2factory` in v2-sdk.cjs.production.min.js
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.production.min.js"
+      tags:
+        - up
+
+    - name: Replace `InitCodeHash` --v2-sdk.cjs.production.min.js
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.production.min.js"
+      tags:
+        - up
+
+    - name: Replace `v2factory` in v2-sdk.cjs.production.min.js.map
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.production.min.js.map"
+      tags:
+        - up
+
+    - name: Replace `InitCodeHash` --v2-sdk.cjs.production.min.js.map
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.production.min.js.map"
+      tags:
+        - up
+
+    - name: Replace `v2factory` in v2-sdk.esm.js
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js"
+      tags:
+        - up
+
+    - name: Replace `InitCodeHash` --v2-sdk.esm.js
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js"
+      tags:
+        - up
+
+    - name: Replace `v2factory` in v2-sdk.esm.js.map
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js.map"
+      tags:
+        - up
+
+    - name: Replace `InitCodeHash` --v2-sdk.esm.js.map
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js.map"
+      tags:
+        - up
+
+    - name: Replace `v3factory` --sdk v3
+      shell: sed -i "s/0x1F98431c8aD98523631AE4a59f267346ea31F984/{{ v3CoreFactoryAddress }}/g" "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/constants.d.ts"
+      tags:
+        - up
+
+    - name: Replace `v3factory` --v3-sdk.cjs.development.js
+      shell: sed -i "s/0x1F98431c8aD98523631AE4a59f267346ea31F984/{{ v3CoreFactoryAddress }}/g" "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/v3-sdk.cjs.development.js"
+      tags:
+        - up
+
+    - name: Replace `v3factory` --v3-sdk.cjs.development.js.map
+      shell: sed -i "s/0x1F98431c8aD98523631AE4a59f267346ea31F984/{{ v3CoreFactoryAddress }}/g" "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/v3-sdk.cjs.development.js.map"
+      tags:
+        - up
+
+    - name: Replace `v3factory` --v3-sdk.cjs.production.min.js
+      shell: sed -i "s/0x1F98431c8aD98523631AE4a59f267346ea31F984/{{ v3CoreFactoryAddress }}/g" "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/v3-sdk.cjs.production.min.js"
+      tags:
+        - up
+
+    - name: Replace `v3factory` --v3-sdk.cjs.production.min.js.map
+      shell: sed -i "s/0x1F98431c8aD98523631AE4a59f267346ea31F984/{{ v3CoreFactoryAddress }}/g" "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/v3-sdk.cjs.production.min.js.map"
+      tags:
+        - up
+
+    - name: Replace `v3factory` --v3-sdk.esm.js
+      shell: sed -i "s/0x1F98431c8aD98523631AE4a59f267346ea31F984/{{ v3CoreFactoryAddress }}/g" "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/v3-sdk.esm.js"
+      tags:
+        - up
+
+    - name: Replace `v3factory` --v3-sdk.esm.js.map
+      shell: sed -i "s/0x1F98431c8aD98523631AE4a59f267346ea31F984/{{ v3CoreFactoryAddress }}/g" "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/v3-sdk.esm.js.map"
+      tags:
+        - up
+    ###########################################################################################################
+    - name: yarn build
+      shell: "cd {{ deploy_path }} && yarn build"
+      become_method: sudo
+      tags:
+        - up
+
+    - name: uni-interface docker config
+      copy:
+        src: ./templates/docker-compose.yml
+        dest: "{{ deploy_path }}/docker-compose.yml"
+        mode: 0755
+      tags:
+        - up
+
+    - name: uni-interface deploy
+      shell: "cd {{ deploy_path }} && docker-compose up -d"
+      tags:
+        - up
+    ###########################################################################################################
+    - name: uni-interface down
+      shell: "cd {{ deploy_path }} && docker-compose down"
+      tags:
+        - down
+
+    - name: clean up uni-interface
+      shell: "rm -rf {{ deploy_path }}"
+      become: yes
+      become_method: sudo
+      tags:
+        - down

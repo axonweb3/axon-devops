@@ -1,0 +1,334 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/zjh/Documents/cryptape/axon-devops/uni/uni-v2-contract-deploy/contracts/ERC20.sol": {
+      "lastModificationDate": 1648951719731,
+      "contentHash": "d368b290281f47eaa25f2450707ae26d",
+      "sourceName": "contracts/ERC20.sol",
+      "solcConfig": {
+        "version": "0.6.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        ">=0.6.2",
+        "0.6.2",
+        "^0.6.2",
+        "0.6.2",
+        "0.6.2",
+        "0.6.2",
+        "0.6.2",
+        "0.6.2",
+        "0.6.2"
+      ],
+      "artifacts": [
+        "Address",
+        "Context",
+        "ERC20",
+        "ERC20Burnable",
+        "IERC20",
+        "Ownable",
+        "ReentrancyGuard",
+        "SafeMath",
+        "TRAMS"
+      ]
+    },
+    "/Users/zjh/Documents/cryptape/axon-devops/uni/uni-v2-contract-deploy/node_modules/hardhat/console.sol": {
+      "lastModificationDate": 1648812901309,
+      "contentHash": "cc4777addd464ea56fa35b1c45df0591",
+      "sourceName": "hardhat/console.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.22 <0.9.0"
+      ],
+      "artifacts": [
+        "console"
+      ]
+    },
+    "/Users/zjh/Documents/cryptape/axon-devops/uni/uni-v2-contract-deploy/contracts/MultilCall.sol": {
+      "lastModificationDate": 1648951719732,
+      "contentHash": "1741b4c5ac6a637b8e4edf9741e3a5f1",
+      "sourceName": "contracts/MultilCall.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        ">=0.5.0"
+      ],
+      "artifacts": [
+        "Multicall"
+      ]
+    },
+    "/Users/zjh/Documents/cryptape/axon-devops/uni/uni-v2-contract-deploy/contracts/Greeter.sol": {
+      "lastModificationDate": 1648951719731,
+      "contentHash": "c81675fb9a5bb3127a49f93718e14576",
+      "sourceName": "contracts/Greeter.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Greeter"
+      ]
+    },
+    "/Users/zjh/Documents/cryptape/axon-devops/uni/uni-v2-contract-deploy/contracts/Migrations.sol": {
+      "lastModificationDate": 1648951719732,
+      "contentHash": "50b3b1dc92806dc8f604fc8c5c65518f",
+      "sourceName": "contracts/Migrations.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.22 <0.9.0"
+      ],
+      "artifacts": [
+        "Migrations"
+      ]
+    },
+    "/Users/zjh/Documents/cryptape/axon-devops/uni/uni-v2-contract-deploy/contracts/Weth.sol": {
+      "lastModificationDate": 1648951719732,
+      "contentHash": "67a96896909eabfda004c310b96d40ca",
+      "sourceName": "contracts/Weth.sol",
+      "solcConfig": {
+        "version": "0.4.26",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.4.18"
+      ],
+      "artifacts": [
+        "WETH9"
+      ]
+    },
+    "/Users/zjh/Documents/cryptape/axon-devops/uni/uni-v2-contract-deploy/contracts/UniswapV2Router02.sol": {
+      "lastModificationDate": 1648951719732,
+      "contentHash": "7ea130b02fe8288f87d229a6c765e2ed",
+      "sourceName": "contracts/UniswapV2Router02.sol",
+      "solcConfig": {
+        "version": "0.6.6",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "=0.6.6"
+      ],
+      "artifacts": [
+        "IERC20",
+        "IUniswapV2Factory",
+        "IUniswapV2Pair",
+        "IUniswapV2Router01",
+        "IUniswapV2Router02",
+        "IWETH",
+        "SafeMath",
+        "TransferHelper",
+        "UniswapV2Library",
+        "UniswapV2Router02"
+      ]
+    },
+    "/Users/zjh/Documents/cryptape/axon-devops/uni/uni-v2-contract-deploy/contracts/Factory.sol": {
+      "lastModificationDate": 1648951719731,
+      "contentHash": "0bd7b20b3d73f6346c4b706fdfb68b2a",
+      "sourceName": "contracts/Factory.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "=0.5.16"
+      ],
+      "artifacts": [
+        "IERC20",
+        "IUniswapV2Callee",
+        "IUniswapV2ERC20",
+        "IUniswapV2Factory",
+        "IUniswapV2Pair",
+        "Math",
+        "SafeMath",
+        "UQ112x112",
+        "UniswapV2ERC20",
+        "UniswapV2Factory",
+        "UniswapV2Pair"
+      ]
+    }
+  }
+}

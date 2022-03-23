@@ -1,0 +1,17 @@
+---
+- name: uni contract
+  hosts: localhost
+  become: yes
+  become_method: sudo
+  vars_files:
+    - config.yml
+  tasks:
+    ###############################################################################################################
+    - name: yarn install
+      shell: yarn install
+      become: yes
+      become_method: sudo
+    - name: deploy uniswap contracts.
+      shell: node deploy.js
+      become: yes
+      become_method: sudo
