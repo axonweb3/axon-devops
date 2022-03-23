@@ -6,6 +6,7 @@ datasources:
   access: proxy
   url: http://prometheus:9090
   basicAuth: false
+
 - name: Loki
   type: loki
   access: proxy
@@ -19,8 +20,9 @@ datasources:
   access: proxy
   url: http://muta-loki:3100/loki
   basicAuth: false
-# - name: jaeger
-#   type: jaeger
-#   access: proxy
-#   url: http://jaeger-query:16686
-#   basicAuth: false
+
+- name: jaeger
+  type: jaeger
+  access: proxy
+  url: http://jaeger-query:16686
+  basicAuth: false
