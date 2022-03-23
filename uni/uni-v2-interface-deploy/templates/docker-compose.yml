@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  uni-interface:
+    image: nginx:latest
+    container_name: uni-interface
+    volumes:
+      - ./build:/usr/share/nginx/html
+    ports:
+      - "8513:80"
+    restart: on-failure
+    networks:
+      - uni-net
+networks:
+  uni-net:
