@@ -6,3 +6,5 @@ node_modules
 dist
 build
 contract_address.yaml
+contract_Uni_V2_Address.yaml
+contract_Uni_V3_Address.yaml
