@@ -56,11 +56,13 @@ metrics = true
 [rocksdb]
 max_open_files = 64
 
-[apm]
+[jaeger]
 service_name = "axon"
 tracing_address = "127.0.0.1:6831"
 tracing_batch_size = 50
-prometheus_listening_address = "0.0.0.0:8100"
+
+[prometheus]
+listening_address = "0.0.0.0:8100"
 
 [cross_client]
 axon_udt_hash = "0xccca1b5cdede63c5cce826947dc4165e8bd0731c6e88636f3c47e8bc6a58ef03"
