@@ -52,7 +52,8 @@ spec:
         logging: "true"
     spec:
       containers:
-        - args:
+        - name: axon4
+          args:
             - ./axon
             - -c=/app/devtools/chain/k8s/node_4.toml
             - -g=/app/devtools/chain/genesis.json
@@ -76,7 +77,14 @@ spec:
             containerPort: 8010
           - name: prometheus
             containerPort: 8100
-          name: axon4
+        - name: jaeger-agent-new
+          image: jaegertracing/jaeger-agent:1.32
+          env:
+          - name: JACGER_COLLECTOR_ADDRESS
+            value: jaeger-collector:14250
+          - name: JACGER_AGENT_PORT
+            value: "6831"
+          args: ['--reporter.grpc.host-port=$(JACGER_COLLECTOR_ADDRESS)']
           resources: {}
           securityContext:
             privileged: true
