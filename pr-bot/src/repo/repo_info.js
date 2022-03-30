@@ -18,6 +18,7 @@ class RepoInfo {
 
         return res;
     }
+
 }
 
 module.exports = RepoInfo;

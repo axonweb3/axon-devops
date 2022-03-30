@@ -1,12 +1,12 @@
 const { MessageEmbed, WebhookClient } = require('discord.js');
 
 class DiscordWebhook {
+
     constructor(config) {
         this.discord = new WebhookClient({ id: config.id, token: config.token });
     }
 
     async send_pr_infos(pr_infos) {
-
         for (const index in pr_infos) {
             const info = pr_infos[index];
             const embed = new MessageEmbed()
@@ -26,7 +26,7 @@ class DiscordWebhook {
 
 
     }
-}
 
+}
 
 module.exports = DiscordWebhook;
