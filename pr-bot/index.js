@@ -20,6 +20,6 @@ const config = require('./config.json');
             console.log(e);
         }
 
-    }, config.time_interval_for_notification * 60 * 1000);
+    }, config.time_interval_for_notification * 60 * 60 * 1000);
 
 })();

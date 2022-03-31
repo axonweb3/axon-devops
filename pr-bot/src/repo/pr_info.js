@@ -9,7 +9,7 @@ class PrIfnfo {
 
         this.title = pr_info.title;
         this.owner = pr_info.user.login;
-        this.reviewers = requested_reviewers.length === 0 ? 'Please add reviewer' : requested_reviewers.join(", ");
+        this.reviewers = requested_reviewers.length === 0 ? 'Please add reviewer' : requested_reviewers.join(', ');
         this.link = pr_info._links.html.href;
     }
 

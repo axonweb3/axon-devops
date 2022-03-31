@@ -1,6 +1,7 @@
 module.exports = {
     root: true,
     env: {
+        es6: true,
         node: true
     },
     extends: [
@@ -11,6 +12,12 @@ module.exports = {
     rules: {
         "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
         "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
+        "no-unused-vars": 2,
+        "no-use-before-define": 2,
+        "linebreak-style": [2, "unix"],
+        "quotes": ["error", "single"],
+        "semi": ["error", "always"],
+        "curly": ["error", "all"],
         "no-dupe-keys": "error",
         "no-duplicate-case": "error",
         "no-empty": ["error", {"allowEmptyCatch": true}],
@@ -21,7 +28,7 @@ module.exports = {
     },
     parserOptions: {
         parser: "@typescript-eslint/parser",
-        ecmaVersion: 2017
+        ecmaVersion: 2018
     }
 }
 

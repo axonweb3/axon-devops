@@ -1,5 +1,5 @@
-const fetch = require('node-fetch')
-const PrIfnfo = require('./pr_info')
+const fetch = require('node-fetch');
+const PrIfnfo = require('./pr_info');
 
 class RepoInfo {
 

@@ -6,30 +6,24 @@
   "dependencies": {
     "discord.js": "^13.6.0",
     "node-fetch": "^2.6.7",
-    "piscina": "^3.2.0",
     "pm2": "^5.2.0"
   },
   "devDependencies": {
-    "eslint": "^5.16.0",
-    "eslint-formatter-pretty": "^4.0.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-prettier": "^3.3.1"
+    "eslint": "^8.12.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-formatter-pretty": "^4.1.0",
+    "eslint-plugin-compat": "^4.0.2",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-promise": "^6.0.0",
+    "husky": "^7.0.0",
+    "lint-staged": "^12.3.7",
+    "prettier": "^2.6.1"
   },
   "scripts": {
     "lint": "eslint --format=pretty -c .eslintrc.js src --ext ts,js",
     "start": "pm2 start index.js",
-    "stop": "pm2 stop index.js"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "src/**": [
-      "prettier --config .prettierrc --write",
-      "eslint --fix",
-      "git add"
-    ]
+    "stop": "pm2 stop index.js",
+    "prepare": "husky install"
   }
 }

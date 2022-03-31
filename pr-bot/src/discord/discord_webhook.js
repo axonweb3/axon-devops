@@ -12,8 +12,8 @@ class DiscordWebhook {
             const embed = new MessageEmbed()
                 .setTitle(info.title)
                 .setColor('#0099ff')
-                .addField("reviewers: ", `${info.reviewers}`)
-                .addField("owner: ", info.owner)
+                .addField('reviewers: ', `${info.reviewers}`)
+                .addField('owner: ', info.owner)
                 .setURL(info.link);
 
             await this.discord.send({
