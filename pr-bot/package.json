@@ -1,0 +1,33 @@
+{
+  "name": "pr-boot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^13.6.0",
+    "node-fetch": "^2.6.7",
+    "pm2": "^5.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.12.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-formatter-pretty": "^4.1.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "lint-staged": "^12.3.7",
+    "prettier": "^2.6.1"
+  },
+  "scripts": {
+    "lint": "eslint --format=pretty -c .eslintrc.js src --ext ts,js --fix",
+    "start": "pm2 start index.js",
+    "stop": "pm2 stop index.js"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --format=pretty -c .eslintrc.js src --ext ts,js --fix",
+      "prettier --ignore-path .eslintignore --single-quote --write",
+      "git add"
+    ]
+  }
+}
