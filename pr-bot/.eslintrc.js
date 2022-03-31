@@ -8,8 +8,9 @@ module.exports = {
         'plugin:import/errors',
         'plugin:import/warnings',
         'plugin:import/typescript',
+        "plugin:promise/recommended",
     ],
-    plugins: ['prettier', 'import'],
+    plugins: ['prettier', 'import', 'promise'],
     rules: {
         'prettier/prettier': 'error',
         'no-unused-vars': 'off',
