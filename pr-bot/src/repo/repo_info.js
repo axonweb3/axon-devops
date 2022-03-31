@@ -1,24 +1,22 @@
-const fetch = require('node-fetch');
-const PrIfnfo = require('./pr_info');
+const fetch = require('node-fetch')
+const PrIfnfo = require('./pr_info')
 
 class RepoInfo {
+	constructor(owner, repo) {
+		this.repo_url = `https://api.github.com/repos/${owner}/${repo}/pulls`
+	}
 
-    constructor(owner, repo) {
-        this.repo_url = `https://api.github.com/repos/${owner}/${repo}/pulls`;
-    }
+	async getPrInfos() {
+		const response = await fetch(this.repo_url)
+		const prInfos = await response.json()
 
-    async get_pr_info() {
-        const response = await fetch(this.repo_url);
-        const pr_infos = await response.json();
+		const res = []
+		for (const index in prInfos) {
+			res.push(new PrIfnfo(prInfos[index]))
+		}
 
-        const res = [];
-        for (const index in pr_infos) {
-            res.push(new PrIfnfo(pr_infos[index]));
-        }
-
-        return res;
-    }
-
+		return res
+	}
 }
 
-module.exports = RepoInfo;
+module.exports = RepoInfo

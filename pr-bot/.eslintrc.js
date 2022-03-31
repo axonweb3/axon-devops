@@ -9,26 +9,15 @@ module.exports = {
         'plugin:import/warnings',
         'plugin:import/typescript',
     ],
+    plugins: ['prettier', 'import'],
     rules: {
-        "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
-        "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
-        "no-unused-vars": 2,
-        "no-use-before-define": 2,
-        "linebreak-style": [2, "unix"],
-        "quotes": ["error", "single"],
-        "semi": ["error", "always"],
-        "curly": ["error", "all"],
-        "no-dupe-keys": "error",
-        "no-duplicate-case": "error",
-        "no-empty": ["error", {"allowEmptyCatch": true}],
-        "no-ex-assign": "error",
-        "no-extra-boolean-cast": "error",
-        "no-extra-semi": "error",
-        "curly": "error"
+        'prettier/prettier': 'error',
+        'no-unused-vars': 'off',
+        'import/order': ['warn', { alphabetize: { order: 'asc' } }],
     },
     parserOptions: {
         parser: "@typescript-eslint/parser",
-        ecmaVersion: 2018
+        ecmaVersion: 2022
     }
 }
 

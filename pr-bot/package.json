@@ -15,15 +15,21 @@
     "eslint-formatter-pretty": "^4.1.0",
     "eslint-plugin-compat": "^4.0.2",
     "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^6.0.0",
-    "husky": "^7.0.0",
     "lint-staged": "^12.3.7",
     "prettier": "^2.6.1"
   },
   "scripts": {
-    "lint": "eslint --format=pretty -c .eslintrc.js src --ext ts,js",
+    "lint": "eslint --format=pretty -c .eslintrc.js src --ext ts,js --fix",
     "start": "pm2 start index.js",
-    "stop": "pm2 stop index.js",
-    "prepare": "husky install"
+    "stop": "pm2 stop index.js"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --format=pretty -c .eslintrc.js src --ext ts,js --fix",
+      "prettier --ignore-path .eslintignore --single-quote --write",
+      "git add"
+    ]
   }
 }
