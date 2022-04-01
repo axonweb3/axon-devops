@@ -3,7 +3,7 @@ const hre = require("hardhat");
 
 async function main() {
   const account1 = await hre.ethers.getSigner(
-    "0x35E70C3F5A794A77Efc2Ec5bA964BFfcC7Fd2C0a",
+    "0x35E70C3F5A794A77Efc2Ec5bA964BFfcC7Fd2C0a"
   );
 
   console.log("signer address is :", account1.address);
