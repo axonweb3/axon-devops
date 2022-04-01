@@ -1,36 +1,23 @@
 module.exports = {
+  root: true,
   env: {
+    es6: true,
     node: true,
-    es2022: true,
-    jest: true,
-    browser: true,
   },
-  globals: {
-    browser: "writable",
-    metamask: "writable",
-    page: "writable",
-  },
-  extends: ["eslint:recommended", "airbnb-base", "plugin:sonarjs/recommended"],
-  plugins: ["sonarjs"],
-  parserOptions: {
-    sourceType: "module",
-  },
+  extends: [
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:promise/recommended",
+  ],
+  plugins: ["prettier", "import", "promise"],
   rules: {
-    indent: [
-      "error",
-      2,
-    ],
-    "linebreak-style": [
-      "error",
-      "unix",
-    ],
-    quotes: [
-      "error",
-      "double",
-    ],
-    semi: [
-      "error",
-      "always",
-    ],
+    "prettier/prettier": "error",
+    "no-unused-vars": "off",
+    "import/order": ["warn", { alphabetize: { order: "asc" } }],
+  },
+  parserOptions: {
+    parser: "@typescript-eslint/parser",
+    ecmaVersion: 2022,
   },
 };
