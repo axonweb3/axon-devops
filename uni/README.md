@@ -1,50 +1,61 @@
-# use hardhat tool  to test and compile solidity contract
-#### axon uniswap contract case: suggest vscode open this project.
-```shell
-$ cd ~
-$ git clone https://github.com/nervosnetwork/axon-devops.git
-$ cd axon-devops/uni-test
-$ npm install
-```
-## start a hardhat evm node
-```shell
-$ npx hardhat node
-```
-#
-## compile all contracts
-```shell
-$ npx hardhat compile
-```
-#
-## test uniswap contracts
-```shell
-$ npx hardhat run scripts/test-uniswap-script.js
-```
-#
+# deploy Uniswap v2
 
-## publish contracts to axon
-```shell
-$ cd ../uni-contract-deploy
-$ npm install
-```
-modify deployed network node address setting in the config.yml as following  image shown.
+Requires ansible nodejs yarn to be installed 
 
-![1642397938(1)](https://user-images.githubusercontent.com/18735238/149713785-7f2c2898-74d6-4334-a599-27afda81637f.jpg)
-
+## deploy contract 
+### step 1
 ```shell
-$ node templates/deploy.js
+$ cd axon-devops/uni/uni-v2-contract-deploy
 ```
 
-# deploy uni interface
+### step 2
 ```shell
-$ cd uni-interface-deploy && make deploy 
+$ yarn install
 ```
 
-## metamask network
-name: GÖRLI
-chain id: 5
+
+### step 3
+
+```shell
+$ vim scripts/config.json
+```
+
+Editor config.json
+
+```json
+{
+    "node_address": "http://127.0.0.1:8000", // # Axon node address
+    "hex_private_key": "0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d" // Your private key
+}
+```
 
 
+### step 4
 
-## Reference
-[Reference Links](https://segmentfault.com/a/1190000040401731)
+```shell
+$ yarn deploy
+```
+
+## deploy interface
+### step 1
+```shell
+$ cd axon-devops/uni/uni-v2-interface-deploy
+```
+
+### step 2
+```shell
+$ vim config.yml
+```
+Editor config.yml
+
+```yml
+deploy_path: "/home/axon/uni-v2"              # deploy path
+listen_on_port: 8190                          # listen on port
+```
+
+
+### step 3
+
+```shell
+$ make deploy
+```
