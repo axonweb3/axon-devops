@@ -24,7 +24,7 @@ Editor config.json
 
 ```json
 {
-    "node_address": "http://127.0.0.1:8000", // # Axon node address
+    "node_address": "http://127.0.0.1:8000", // Axon node address
     "hex_private_key": "0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d" // Your private key
 }
 ```
