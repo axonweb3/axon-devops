@@ -14,7 +14,6 @@ const options = { timeout: 1000 * 30 };
 const web3 = new Web3(new Web3.providers.HttpProvider(endpoint, options));
 const account = web3.eth.accounts.privateKeyToAccount(hexPrivateKey);
 
-
 async function sendTransaction(web3, _chainId, account, data, nonce) {
   const tx = {
     type: 2,
