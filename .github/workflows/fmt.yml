@@ -1,0 +1,46 @@
+name: Code Format
+concurrency:
+  group: Code Format-${{ github.ref }}
+  cancel-in-progress: true
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  Prologue:
+    name: prologue
+    runs-on: ubuntu-20.04
+    outputs:
+      job_skip: ${{ steps.prologue.outputs.job_skip }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: prologue
+      id: prologue
+      uses: ./.github/actions/ci_prologue
+      with:
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
+        PR_COMMONS_BODY: "${{ github.event.pull_request.body }}"
+        GITHUB_WORKFLOW: ${{ github.workflow }}
+
+  Format:
+    needs: prologue
+    runs-on: ubuntu-latest
+    if: needs.prologue.outputs.job_skip == 'run'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          components: rustfmt
+          toolchain: nightly
+
+      - name: check-fmt
+        run: make check-fmt
+      
+      - name: install-cargo-sort
+        run: cargo install cargo-sort
+
+      - name: check-sort
+        run: make check-sort
