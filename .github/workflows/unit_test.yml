@@ -49,4 +49,4 @@ jobs:
       #   run: cargo install moleculec --locked --version "0.6.0"
 
       - name: CI
-        run: cargo test --all
+        run: cd axon-cli && cargo test --all
