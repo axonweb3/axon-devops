@@ -9,7 +9,7 @@ on:
   pull_request:
 
 jobs:
-  prologue:
+  Prologue:
     name: prologue
     runs-on: ubuntu-20.04
     outputs:
@@ -23,6 +23,7 @@ jobs:
         GITHUB_EVENT_NAME: ${{ github.event_name }}
         PR_COMMONS_BODY: "${{ github.event.pull_request.body }}"
         GITHUB_WORKFLOW: ${{ github.workflow }}
+
   Clippy:
     needs: prologue
     runs-on: ubuntu-latest
