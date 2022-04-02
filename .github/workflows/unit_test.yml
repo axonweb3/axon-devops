@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.prologue.outputs.job_skip == 'run'
     steps:
-      # - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       # - uses: lyricwulf/abc@v1
       #   with: 
       #     linux: m4
@@ -49,4 +49,4 @@ jobs:
       #   run: cargo install moleculec --locked --version "0.6.0"
 
       - name: CI
-        run: cd ${{ github.workspace }}/axon-cli && cargo test --all
+        run: make test
