@@ -41,6 +41,14 @@
       tags:
         - up
 
+    - name: Replace listen_on_port
+      replace:
+        path: "{{ deploy_path }}/docker-compose.yml"
+        regexp: 'listen_on_port'
+        replace: "{{ listen_on_port }}"
+      tags:
+        - up
+
     - name: uni-interface shutdown
       shell: "docker-compose -f {{ deploy_path }}/docker-compose.yml down"
       tags:

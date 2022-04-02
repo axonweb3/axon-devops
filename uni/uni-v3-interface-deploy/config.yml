@@ -1,2 +1,2 @@
-deploy_path: "/workspace/uniswapinterface_v3/"
-PORT: 8645
+deploy_path: "./axon/uni-v3"
+listen_on_port: 8645
