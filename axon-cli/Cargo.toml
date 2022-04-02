@@ -8,3 +8,4 @@ license = "MIT"
 
 [dependencies]
 clap = { version = "3.1", features = ["cargo", "yaml"] }
+rustyline = { version = "9.1", features = ["case_insensitive_history_search"] }
