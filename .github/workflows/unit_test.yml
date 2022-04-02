@@ -36,7 +36,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          components: rustfmt, clippy
+          toolchain: 1.59
 
       - uses: Swatinem/rust-cache@v1
       
