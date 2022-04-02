@@ -1,0 +1,43 @@
+name: Cargo Clippy
+concurrency:
+  group: Cargo Clippy-${{ github.ref }}
+  cancel-in-progress: true
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  Prologue:
+    name: prologue
+    runs-on: ubuntu-20.04
+    outputs:
+      job_skip: ${{ steps.prologue.outputs.job_skip }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: prologue
+      id: prologue
+      uses: ./.github/actions/ci_prologue
+      with:
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
+        PR_COMMONS_BODY: "${{ github.event.pull_request.body }}"
+        GITHUB_WORKFLOW: ${{ github.workflow }}
+
+  Clippy:
+    needs: prologue
+    runs-on: ubuntu-latest
+    if: needs.prologue.outputs.job_skip == 'run'
+    steps:
+      - uses: lyricwulf/abc@v1
+        with: 
+          linux: m4
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          components: clippy
+
+      - name: cargo-clippy
+        run: make clippy && git diff --exit-code Cargo.lock
+
