@@ -3,8 +3,8 @@ name = "axon-cli"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 clap = { version = "3.1", features = ["cargo", "yaml"] }
+rustyline = { version = "9.1", features = ["case_insensitive_history_search"] }
