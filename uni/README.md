@@ -79,7 +79,7 @@ Editor config.yml
 deploy_path: "./axon/uni-v3"                  # deploy path
 listen_on_port: 8199                          # listen on port
 ```
-### step 1
+### step 3
 ```shell
 $ make deploy
 ```
