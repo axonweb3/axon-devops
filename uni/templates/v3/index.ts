@@ -8,21 +8,21 @@ import deploy from './src/deploy'
 import { MigrationState } from './src/migrations'
 import { asciiStringToBytes32 } from './src/util/asciiStringToBytes32'
 import { version } from './package.json'
-import { syncBuiltinESMExports } from 'module'
-const Web3 = require('web3')
+import Web3Client from "./src/util/web3-utils";
+
 program
-  .requiredOption('-pk, --private-key <string>', 'Private key used to deploy all contracts')
-  .requiredOption('-j, --json-rpc <url>', 'JSON RPC URL where the program should be deployed')
-  .requiredOption('-w9, --weth9-address <address>', 'Address of the WETH9 contract on this chain')
-  .requiredOption('-ncl, --native-currency-label <string>', 'Native currency label, e.g. ETH')
+  .requiredOption('-pk, --private-key <string>', 'The private key used to deploy all contracts')
+  .requiredOption('-j, --json-rpc <url>', 'The JSON RPC URL where the program should be deployed')
+  .requiredOption('-s, --state <path>', 'Path to the JSON file containing the migrations state')
+  .requiredOption('-w9, --weth9-address <address>', 'The address of the WETH9 contract to use')
+  .requiredOption('-ncl, --native-currency-label <string>', 'The label of the native currency, e.g. ETH')
+  .requiredOption('-v2, --v2-core-factory-address <address>', 'The V2 core factory address used in the swap router')
   .requiredOption(
     '-o, --owner-address <address>',
-    'Contract address that will own the deployed artifacts after the script runs'
+    'The address of the contract that will own the deployed artifacts after the migration runs'
   )
-  .option('-s, --state <path>', 'Path to the JSON file containing the migrations state (optional)', './state.json')
-  .option('-v2, --v2-core-factory-address <address>', 'The V2 core factory address used in the swap router (optional)')
-  .option('-g, --gas-price <number>', 'The gas price to pay in GWEI for each transaction (optional)')
-  .option('-c, --confirmations <number>', 'How many confirmations to wait for after each transaction (optional)', '2')
+  .option('-g, --gas-price <number>', 'The gas price to pay in GWEI for each transaction')
+  .option('-c, --confirmations <number>', 'How many confirmations to wait for after each transaction', '2')
 
 program.name('npx @uniswap/deploy-v3').version(version).parse(process.argv)
 
@@ -32,19 +32,8 @@ if (!/^0x[a-zA-Z0-9]{64}$/.test(program.privateKey)) {
 }
 
 let url: URL
-let privateKey: string
 try {
   url = new URL(program.jsonRpc)
-  privateKey = program.privateKey;
-} catch (error) {
-  console.error('Invalid JSON privateKey ', (error as Error).message)
-  process.exit(1)
-}
-
-let jsonRpc: string
-try {
-  url = new URL(program.jsonRpc)
-  jsonRpc = program.jsonRpc;
 } catch (error) {
   console.error('Invalid JSON RPC URL', (error as Error).message)
   process.exit(1)
@@ -103,6 +92,7 @@ try {
 }
 
 const wallet = new Wallet(program.privateKey, new JsonRpcProvider({ url: url.href }))
+export const web3Client = new Web3Client(program.jsonRpc, program.privateKey)
 
 let state: MigrationState
 if (fs.existsSync(program.state)) {
@@ -121,13 +111,6 @@ const onStateChange = async (newState: MigrationState): Promise<void> => {
   fs.writeFileSync(program.state, JSON.stringify(newState))
   finalState = newState
 }
-function sleep() {
-  var start = (new Date()).getTime();
-  while ((new Date()).getTime() - start < 5000) {
-    // 使用  continue 实现；
-    continue;
-  }
-}
 
 async function run() {
   let step = 1
@@ -141,24 +124,10 @@ async function run() {
     weth9Address,
     initialState: state,
     onStateChange,
-    jsonRpc,
-    privateKey
   })
 
-  const options = { timeout: 1000 * 30 }
-  const web3 = new Web3(new Web3.providers.HttpProvider(jsonRpc, options))
   for await (const result of generator) {
-
-
-    // sleep();
-    // var receipt = await web3.eth.getTransactionReceipt(result[0].hash);
-
-    // console.log(result[0].hash);
-    // if (receipt != null) {
-    //   result[0].address = receipt.contractAddress;
-    // }
     console.log(`Step ${step++} complete`, result)
-
     results.push(result)
 
     // wait 15 minutes for any transactions sent in the step

@@ -1,0 +1,407 @@
+---
+################################################ deploy v3 contract ###############################################################
+- import_playbook: deploy_v2.yml
+- name: uni deploy v3 contract
+  hosts: localhost
+  # become: yes
+  # become_method: sudo
+  vars_files:
+    - config.yml
+    - uni-v2-contract-deploy/contract_Uni_V2_Address.yaml
+  tasks:
+    - name: delete the {{ v3_contract_deploy_path }}
+      shell: "rm -rf {{ v3_contract_deploy_path }}"
+      ignore_errors: yes
+      tags:
+        - v3-contract
+
+    - name: Pull code
+      git:
+        repo: "https://github.com/Uniswap/deploy-v3.git"
+        dest: "{{ v3_contract_deploy_path }}"
+        version: "v1.0.0"
+        force: yes
+      # become: yes
+      # become_method: sudo
+      tags:
+        - v3-contract
+
+    - name: replace createDeployContractStep
+      shell: "cp templates/v3/createDeployContractStep.ts {{ v3_contract_deploy_path }}/src/steps/meta/createDeployContractStep.ts"
+      tags:
+        - v3-contract
+
+    - name: replace createDeployLibraryStep
+      shell: "cp templates/v3/createDeployLibraryStep.ts {{ v3_contract_deploy_path }}/src/steps/meta/createDeployLibraryStep.ts"
+      tags:
+        - v3-contract
+
+    - name: add web3-utils.ts
+      shell: "cp templates/v3/web3-utils.ts {{ v3_contract_deploy_path }}/src/util/web3-utils.ts"
+      tags:
+        - v3-contract
+
+    - name: replace index.ts
+      shell: "cp templates/v3/index.ts {{ v3_contract_deploy_path }}/index.ts"
+      tags:
+        - v3-contract
+
+    - name: yarn install
+      shell: "cd {{ v3_contract_deploy_path }} && yarn install"
+      tags:
+        - v3-contract
+
+    - name: yarn add web3
+      shell: "cd {{ v3_contract_deploy_path }} && yarn add web3"
+      tags:
+        - v3-contract      
+
+    - name: deploy uniswap v3 contracts
+      shell: "cd {{ v3_contract_deploy_path }} && yarn start -pk {{ hex_private_key }} -j {{ node_address }} -w9 {{ WETH }} -v2  {{ UniswapV2Factory }} -o  {{ hex_pub_address }} -s  './state.json' -ncl AT -c 0"
+      tags:
+        - v3-contract
+
+    - name: delete and create the contract_Uni_V3_Address.yaml
+      shell: "rm -rf contract_Uni_V3_Address.yaml && touch contract_Uni_V3_Address.yaml"
+      ignore_errors: yes
+      tags:
+        - v3-contract
+
+    - name: copy the state.json file
+      shell: "cp {{ v3_contract_deploy_path }}/state.json contract_Uni_V3_Address.yaml"
+      tags:
+        - v3-contract
+
+################################################ deploy v3 interface ###############################################################
+- name: uni contract
+  hosts: localhost
+  # become: yes
+  # become_method: sudo
+  vars_files:
+    - config.yml
+    - uni-v2-contract-deploy/contract_Uni_V2_Address.yaml
+    - contract_Uni_V3_Address.yaml
+  tasks:
+    ###############################################################################################################
+    - name: uni-interface shutdown
+      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yml down"
+      ignore_errors: yes
+      tags:
+        - stop
+
+    - name: rm uni-interface-v3
+      shell: "rm -rf {{ deploy_path }}"
+      ignore_errors: yes
+      tags:
+        - v3-interface
+
+    - name: Pull code
+      git:
+        repo: "https://github.com/Uniswap/interface.git"
+        dest: "{{ deploy_path }}"
+        version: "v4.25.0"
+        force: yes
+      tags:
+        - v3-interface
+
+    - name: cp docker-compose
+      copy:
+        src: ./templates/v3/docker-compose.yml
+        dest: "{{ deploy_path }}/docker-compose.yml"
+        mode: 0755
+      tags:
+        - v3-interface
+
+    - name: Replace listening_port
+      replace:
+        path: "{{ deploy_path }}/docker-compose.yml"
+        regexp: "listening_port"
+        replace: "{{ listening_port }}"
+      tags:
+        - v3-interface
+
+    - name: yarn install
+      shell: "cd {{ deploy_path }} && yarn install"
+      tags:
+        - v3-interface
+
+    ###############################################################################################################
+    - name: cp src/constants/tokens.ts
+      shell: "cp ./templates/v3/tokens.ts {{ deploy_path }}/src/constants/tokens.ts"
+      tags:
+        - v3-interface
+
+    - name: Replace tokens templete
+      replace:
+        path: "{{ deploy_path }}/src/constants/tokens.ts"
+        regexp: "0xb00d616B820C39619Ee29e5144D0226Cf8B5c15A"
+        replace: "{{ WETH }}"
+      tags:
+        - v3-interface
+
+    - name: Replace multicall
+      replace:
+        path: "{{ deploy_path }}/src/constants/addresses.ts"
+        regexp: "0x1F98415757620B543A52E61c46B32eB19261F984"
+        replace: "{{ multicall2Address }}"
+      tags:
+        - v3-interface
+
+    - name: Replace multicall
+      replace:
+        path: "{{ deploy_path }}/src/constants/addresses.ts"
+        regexp: "0x1F98415757620B543A52E61c46B32eB19261F984"
+        replace: "{{ multicall2Address }}"
+      tags:
+        - v3-interface
+
+    - name: Replace v2router
+      replace:
+        path: "{{ deploy_path }}/src/constants/addresses.ts"
+        regexp: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+        replace: "{{ UniswapV2Router02 }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v2roter` in hook.ts
+      replace:
+        path: "{{ deploy_path }}/src/state/swap/hooks.tsx"
+        regexp: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+        replace: "{{ UniswapV2Router02 }}"
+      tags:
+        - v3-interface
+
+    - name: Replace quoter
+      replace:
+        path: "{{ deploy_path }}/src/constants/addresses.ts"
+        regexp: "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6"
+        replace: "{{ quoterV2Address }}"
+      tags:
+        - v3-interface
+
+    - name: Replace nonfungibleTokenPositionManagerAddress
+      replace:
+        path: "{{ deploy_path }}/src/constants/addresses.ts"
+        regexp: "0xC36442b4a4522E871399CD717aBDD847Ab11FE88"
+        replace: "{{ nonfungibleTokenPositionManagerAddress }}"
+      tags:
+        - v3-interface
+
+    - name: Replace swaprouter
+      replace:
+        path: "{{ deploy_path }}/src/constants/addresses.ts"
+        regexp: "0xE592427A0AEce92De3Edee1F18E0157C05861564"
+        replace: "{{ swapRouter02 }}"
+      tags:
+        - v3-interface
+
+    - name: Replace v3MigratorAddress
+      replace:
+        path: "{{ deploy_path }}/src/constants/addresses.ts"
+        regexp: "0xA5644E29708357803b5A882D272c41cC0dF92B34"
+        replace: "{{ v3MigratorAddress }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v2factory` --sdk v2
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/constants.d.ts"
+        regexp: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        replace: "{{ UniswapV2Factory }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v2factory` in hook.ts
+      replace:
+        path: "{{ deploy_path }}/src/state/swap/hooks.tsx"
+        regexp: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        replace: "{{ UniswapV2Factory }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `InitCodeHash` --sdk v2
+      replace:
+        path: "{{ deploy_path }}//node_modules/@uniswap/v2-sdk/dist/constants.d.ts"
+        regexp: "0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f"
+        replace: "{{ InitCodeHash }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v2factory` in v2-sdk.cjs.development.js
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js"
+        regexp: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        replace: "{{ UniswapV2Factory }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `InitCodeHash` --v2-sdk.cjs.development.js
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js"
+        regexp: "0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f"
+        replace: "{{ InitCodeHash }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v2factory` in v2-sdk.cjs.development.js.map
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js.map"
+        regexp: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        replace: "{{ UniswapV2Factory }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `InitCodeHash` --v2-sdk.cjs.development.js.map
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.development.js.map"
+        regexp: "0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f"
+        replace: "{{ InitCodeHash }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v2factory` in v2-sdk.cjs.production.min.js
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.production.min.js"
+        regexp: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        replace: "{{ UniswapV2Factory }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `InitCodeHash` --v2-sdk.cjs.production.min.js
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.production.min.js"
+        regexp: "0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f"
+        replace: "{{ InitCodeHash }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v2factory` in v2-sdk.cjs.production.min.js
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.production.min.js"
+        regexp: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        replace: "{{ UniswapV2Factory }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `InitCodeHash` --v2-sdk.cjs.production.min.js
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.production.min.js"
+        regexp: "0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f"
+        replace: "{{ InitCodeHash }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v2factory` in v2-sdk.cjs.production.min.js.map
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.production.min.js.map"
+        regexp: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        replace: "{{ UniswapV2Factory }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `InitCodeHash` --v2-sdk.cjs.production.min.js.map
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.cjs.production.min.js.map"
+        regexp: "0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f"
+        replace: "{{ InitCodeHash }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v2factory` in v2-sdk.esm.js
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js"
+        regexp: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        replace: "{{ UniswapV2Factory }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `InitCodeHash` --v2-sdk.esm.js
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js"
+        regexp: "0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f"
+        replace: "{{ InitCodeHash }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v2factory` in v2-sdk.esm.js.map
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js.map"
+        regexp: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        replace: "{{ UniswapV2Factory }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `InitCodeHash` --v2-sdk.esm.js.map
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v2-sdk/dist/v2-sdk.esm.js.map"
+        regexp: "0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f"
+        replace: "{{ InitCodeHash }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v3factory` --sdk v3
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/constants.d.ts"
+        regexp: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+        replace: "{{ v3CoreFactoryAddress }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v3factory` --v3-sdk.cjs.development.js
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/v3-sdk.cjs.development.js"
+        regexp: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+        replace: "{{ v3CoreFactoryAddress }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v3factory` --v3-sdk.cjs.development.js.map
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/v3-sdk.cjs.development.js.map"
+        regexp: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+        replace: "{{ v3CoreFactoryAddress }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v3factory` --v3-sdk.cjs.production.min.js
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/v3-sdk.cjs.production.min.js"
+        regexp: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+        replace: "{{ v3CoreFactoryAddress }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v3factory` --v3-sdk.cjs.production.min.js.map
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/v3-sdk.cjs.production.min.js.map"
+        regexp: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+        replace: "{{ v3CoreFactoryAddress }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v3factory` --v3-sdk.esm.js
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/v3-sdk.esm.js"
+        regexp: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+        replace: "{{ v3CoreFactoryAddress }}"
+      tags:
+        - v3-interface
+
+    - name: Replace `v3factory` --v3-sdk.esm.js.map
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/v3-sdk/dist/v3-sdk.esm.js.map"
+        regexp: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+        replace: "{{ v3CoreFactoryAddress }}"
+      tags:
+        - v3-interface
+    ###########################################################################################################
+    - name: yarn build
+      shell: "cd {{ deploy_path }} && yarn build"
+      tags:
+        - v3-interface
+
+    - name: uni-interface deploy
+      shell: "cd {{ deploy_path }} && docker-compose up -d"
+      tags:
+        - start
+

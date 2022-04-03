@@ -20,7 +20,7 @@ hex_pub_address: "0x8ab0cf264df99d83525e9e11c7e4db01558ae1b1"                   
 listening_port: "8300"                                                                  # listening port
 ```
 
-## v2 make command
+## make command
 
 ### v2-deploy
 `v2-deploy` clears the data and starts the uni-interface
@@ -40,3 +40,20 @@ Stop uni-interface
 $ make v2-stop
 ```
 
+### v3-deploy
+`v3-deploy` clears the data and starts the uni-interface
+```shell
+$ make v3-deploy
+```
+
+### v3-start
+Start uni-interface 
+```shell
+$ make v3-start
+```
+
+### v3-stop
+Stop uni-interface 
+```shell
+$ make v3-stop
+```

@@ -1,8 +1,8 @@
 import { Contract, ContractInterface, ContractFactory } from '@ethersproject/contracts'
 import { MigrationConfig, MigrationState, MigrationStep } from '../../migrations'
 import linkLibraries from '../../util/linkLibraries'
-import sleep from './sleep'
-const Web3 = require('web3')
+import {web3Client} from "../../../index";
+
 type ConstructorArgs = (string | number | string[] | number[])[]
 
 export default function createDeployContractStep({
@@ -26,6 +26,7 @@ export default function createDeployContractStep({
   } else if (computeLibraries && (!linkReferences || Object.keys(linkReferences).length === 0)) {
     throw new Error('Compute libraries passed but no link references')
   }
+
   return async (state, config) => {
     if (state[key] === undefined) {
       const constructorArgs: ConstructorArgs = computeArguments ? computeArguments(state, config) : []
@@ -39,36 +40,24 @@ export default function createDeployContractStep({
       )
 
       let contract: Contract
-      let contract_address: string
+      let receipt
       try {
-
-        const options = { timeout: 1000 * 30 }
-        const web3 = new Web3(new Web3.providers.HttpProvider(config.jsonRpc, options))
-        const account = web3.eth.accounts.privateKeyToAccount(config.privateKey)
-        contract = await factory.deploy(...constructorArgs, { gasPrice: config.gasPrice, gasLimit: 6721975 })
-        console.log("tx hash is ", contract.deployTransaction.hash);
-        sleep(10000);
-        var receipt = await web3.eth.getTransactionReceipt(contract.deployTransaction.hash);
-
-        if (receipt != null) {
-          contract_address = receipt.contractAddress;
-
-        } else {
-          console.log("receipt is null:", contract.deployTransaction.hash);
-          contract_address = contract.address
-        }
-
+        const nonce = await web3Client.getNonce();
+        contract = await factory.deploy(...constructorArgs, { gasPrice: config.gasPrice, gasLimit: 22222222, nonce: nonce })
+        receipt = await web3Client.getReceipt(contract.deployTransaction.hash);
       } catch (error) {
         console.error(`Failed to deploy ${contractName}`)
         throw error
       }
 
-      state[key] = contract_address;
+
+
+      state[key] = receipt.contractAddress
 
       return [
         {
           message: `Contract ${contractName} deployed`,
-          address: contract_address,
+          address: receipt.contractAddress,
           hash: contract.deployTransaction.hash,
         },
       ]
