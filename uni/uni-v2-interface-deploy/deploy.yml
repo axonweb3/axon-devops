@@ -33,10 +33,11 @@
       tags:
         - up
 
-    - name: docker-compose
-      shell: "cp ./templates/docker-compose.yml {{ deploy_path }}"
-      become: yes
-      become_method: sudo
+    - name: uni-interface docker config
+      copy:
+        src: ./templates/docker-compose.yml
+        dest: "{{ deploy_path }}/docker-compose.yml"
+        mode: 0755
       tags:
         - up
 
@@ -59,43 +60,58 @@
         - up
 
     ###############################################################################################################
+    - name: Replace REACT_APP_CHAIN_ID  in .env
+      shell: sed -i "s/1/5/g" "{{ deploy_path }}/.env"
+      tags:
+        - up
+
     - name: Replace ROUTER_ADDRESS to UniswapV2Router02
-      replace:
-        path: "{{ deploy_path }}/src/constants/index.ts"
-        regexp: '0xc4A3C40808d63e1eE18f7739F239dfA5Bc92bFCd'
-        replace: "{{ UniswapV2Router02 }}"
+      shell: sed -i "s/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D/{{ UniswapV2Router02 }}/g" "{{ deploy_path }}/src/constants/index.ts"
       tags:
         - up
 
-    - name: Replace `FACTORY_ADDRESS` in the axonuniswapsdk.cjs.development.js with `UniswapV2Factory`
-      replace:
-        path: "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
-        regexp: '0xb484fd480E598621638F380F404697Cd9f58B0F8'
-        replace: "{{ UniswapV2Factory }}"
+    - name: Replace ROUTER_ADDRESS to UniswapV2Router02
+      shell: sed -i "s/0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D/{{ UniswapV2Router02 }}/g" "{{ deploy_path }}/src/state/swap/hooks.ts"
       tags:
         - up
 
-    - name: Replace `WEHT_ADDRESS` in the axonuniswapsdk.cjs.development.js with `WETH`
-      replace:
-        path: "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
-        regexp: '0xb9dc8Bde1DB42410D304b5e78c2ff843134E15e0'
-        replace: "{{ WETH }}"
+    - name: Replace `FACTORY_ADDRESS` in the sdk.cjs.development.js with `UniswapV2Factory`
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+      tags:
+        - up 
+
+    - name: Replace `FACTORY_ADDRESS` in the hooks.ts
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/src/state/swap/hooks.ts"
+      tags:
+        - up 
+
+    - name: Replace `FACTORY_ADDRESS` in the sdk.esm.js with `UniswapV2Factory`
+      shell: sed -i "s/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f/{{ UniswapV2Factory }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
       tags:
         - up
 
-    - name: Replace `INIT_CODE_HASH` in the axonuniswapsdk.cjs.development.js with `${INIT_CODE_HASH}`
-      replace:
-        path: "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
-        regexp: '0xfe5c25035eb1580fcbc8496a5d5423870718fac54c9d582b43039dbce6afc72f'
-        replace: "{{ InitCodeHash }}"
+    - name: Replace `WEHT_ADDRESS` in the sdk.cjs.development.js with `WETH`
+      shell: sed -i "s/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/{{ WETH }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+      tags:
+        - up
+
+    - name: Replace `WEHT_ADDRESS` in the sdk.esm.js with `WETH`
+      shell: sed -i "s/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/{{ WETH }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
+      tags:
+        - up
+
+    - name: Replace `INIT_CODE_HASH` in the sdk.cjs.development.js with `${INIT_CODE_HASH}`
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+      tags:
+        - up
+    
+    - name: Replace `INIT_CODE_HASH` in the sdk.esm.js with `${INIT_CODE_HASH}`
+      shell: sed -i "s/0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f/{{ InitCodeHash }}/g" "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
       tags:
         - up
 
     - name: Replace MuiltiCall_ADDRESS to MuiltiCall
-      replace:
-        path: "{{ deploy_path }}/src/constants/multicall/index.ts"
-        regexp: '0x77dCa2C955b15e9dE4dbBCf1246B4B85b651e50e'
-        replace: "{{ Multicall }}"
+      shell: sed -i "s/0x77dCa2C955b15e9dE4dbBCf1246B4B85b651e50e/{{ Multicall }}/g" "{{ deploy_path }}/src/constants/multicall/index.ts"
       tags:
         - up
 
@@ -104,14 +120,6 @@
       shell: "cd {{ deploy_path }} && yarn build"
       # become: yes
       # become_method: sudo
-      tags:
-        - up
-
-    - name: uni-interface docker config
-      copy:
-        src: ./templates/docker-compose.yml
-        dest: "{{ deploy_path }}/docker-compose.yml"
-        mode: 0755
       tags:
         - up
 
