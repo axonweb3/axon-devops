@@ -7,7 +7,7 @@ services:
     volumes:
       - ./build:/usr/share/nginx/html
     ports:
-      - "listen_on_port:80"
+      - "listening_port:80"
     restart: on-failure
     networks:
       - uni-net
