@@ -3,8 +3,8 @@
 - import_playbook: deploy_v2.yml
 - name: uni deploy v3 contract
   hosts: localhost
-  # become: yes
-  # become_method: sudo
+  become: yes
+  become_method: sudo
   vars_files:
     - config.yml
     - uni-v2-contract-deploy/contract_Uni_V2_Address.yaml
@@ -21,8 +21,8 @@
         dest: "{{ v3_contract_deploy_path }}"
         version: "v1.0.0"
         force: yes
-      # become: yes
-      # become_method: sudo
+      become: yes
+      become_method: sudo
       tags:
         - v3-contract
 
@@ -75,8 +75,8 @@
 ################################################ deploy v3 interface ###############################################################
 - name: uni contract
   hosts: localhost
-  # become: yes
-  # become_method: sudo
+  become: yes
+  become_method: sudo
   vars_files:
     - config.yml
     - uni-v2-contract-deploy/contract_Uni_V2_Address.yaml

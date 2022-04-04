@@ -4,8 +4,8 @@
   hosts: localhost
   vars_files:
     - config.yml
-  # become: yes
-  # become_method: sudo
+  become: yes
+  become_method: sudo
   tasks:
     - name: copy config
       copy:
@@ -52,8 +52,8 @@
   vars_files:
     - config.yml
     - uni-v2-contract-deploy/contract_Uni_V2_Address.yaml
-  # become: yes
-  # become_method: sudo
+  become: yes
+  become_method: sudo
   tasks:
     - name: uni-interface down
       shell: "cd {{ deploy_path }} && docker-compose down"
