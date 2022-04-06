@@ -1,0 +1,203 @@
+---
+################################################ deploy v2 contract ###############################################################
+- name: uni v2 contract
+  hosts: localhost
+  vars_files:
+    - config.yml
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: copy config
+      copy:
+        src: ./templates/v2/config.json
+        dest: ./uni-v2-contract-deploy/scripts/config.json
+        mode: 0755
+      tags:
+        - v2-contract
+
+    - name: replace node_address
+      replace:
+        path: ./uni-v2-contract-deploy/scripts/config.json
+        regexp: "#node_address"
+        replace: "{{ node_address }}"
+      tags:
+        - v2-contract
+
+    - name: replace hex_private_key
+      replace:
+        path: ./uni-v2-contract-deploy/scripts/config.json
+        regexp: "#hex_private_key"
+        replace: "{{ hex_private_key }}"
+      tags:
+        - v2-contract
+
+    - name: yarn install
+      shell: cd uni-v2-contract-deploy && yarn install
+      tags:
+        - v2-contract
+
+    - name: compile v2 contracts
+      shell: cd uni-v2-contract-deploy && yarn compile
+      tags:
+        - v2-contract
+
+    - name: deploy uniswap contracts
+      shell: cd uni-v2-contract-deploy && yarn deploy
+      tags:
+        - v2-contract
+
+################################################ deploy v2 interface ###############################################################
+- name: uni v2 interface
+  hosts: localhost
+  vars_files:
+    - config.yml
+    - uni-v2-contract-deploy/contract_Uni_V2_Address.yaml
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: uni-interface down
+      shell: "cd {{ deploy_path }} && docker-compose down"
+      ignore_errors: yes
+      tags:
+        - stop
+
+    - name: rm uni-interface
+      shell: "rm -rf {{ deploy_path }}"
+      tags:
+        - v2-interface
+
+    - name: pull code
+      git:
+        repo: "https://github.com/Uniswap/uniswap-interface.git"
+        dest: "{{ deploy_path }}"
+        version: "v2.6.5"
+        force: yes
+      become: yes
+      become_method: sudo
+      tags:
+        - v2-interface
+
+    - name: uni-interface docker config
+      copy:
+        src: ./templates/v2/docker-compose.yml
+        dest: "{{ deploy_path }}/docker-compose.yml"
+        mode: 0755
+      tags:
+        - v2-interface
+
+    - name: Replace listen_on_port
+      replace:
+        path: "{{ deploy_path }}/docker-compose.yml"
+        regexp: "listening_port"
+        replace: "{{ listening_port }}"
+      tags:
+        - v2-interface
+
+    - name: uni-interface shutdown
+      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yml down"
+      tags:
+        - v2-interface
+
+    - name: yarn install
+      shell: "cd {{ deploy_path }} && yarn install"
+      tags:
+        - v2-interface
+
+    ###############################################################################################################
+    - name: Replace REACT_APP_CHAIN_ID in .env
+      replace:
+        path: "{{ deploy_path }}/.env"
+        regexp: "1"
+        replace: "5"
+      tags:
+        - v2-interface
+
+    - name: Replace ROUTER_ADDRESS to UniswapV2Router02
+      replace:
+        path: "{{ deploy_path }}/src/constants/index.ts"
+        regexp: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+        replace: "{{ UniswapV2Router02 }}"
+      tags:
+        - v2-interface
+
+    - name: Replace ROUTER_ADDRESS to UniswapV2Router02
+      replace:
+        path: "{{ deploy_path }}/src/state/swap/hooks.ts"
+        regexp: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+        replace: "{{ UniswapV2Router02 }}"
+      tags:
+        - v2-interface
+
+    - name: Replace `FACTORY_ADDRESS` in the sdk.cjs.development.js with `UniswapV2Factory`
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+        regexp: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        replace: "{{ UniswapV2Factory }}"
+      tags:
+        - v2-interface
+
+    - name: Replace `FACTORY_ADDRESS` in the hooks.ts
+      replace:
+        path: "{{ deploy_path }}/src/state/swap/hooks.ts"
+        regexp: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        replace: "{{ UniswapV2Factory }}"
+      tags:
+        - v2-interface
+
+    - name: Replace `FACTORY_ADDRESS` in the sdk.esm.js with `UniswapV2Factory`
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
+        regexp: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        replace: "{{ UniswapV2Factory }}"
+      tags:
+        - v2-interface
+
+    - name: Replace `WEHT_ADDRESS` in the sdk.cjs.development.js with `WETH`
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+        regexp: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6"
+        replace: "{{ WETH }}"
+      tags:
+        - v2-interface
+
+    - name: Replace `WEHT_ADDRESS` in the sdk.esm.js with `WETH`
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
+        regexp: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6"
+        replace: "{{ WETH }}"
+      tags:
+        - v2-interface
+
+    - name: Replace `INIT_CODE_HASH` in the sdk.cjs.development.js with `${INIT_CODE_HASH}`
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.cjs.development.js"
+        regexp: "0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f"
+        replace: "{{ InitCodeHash }}"
+      tags:
+        - v2-interface
+
+    - name: Replace `INIT_CODE_HASH` in the sdk.esm.js with `${INIT_CODE_HASH}`
+      replace:
+        path: "{{ deploy_path }}/node_modules/@uniswap/sdk/dist/sdk.esm.js"
+        regexp: "0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f"
+        replace: "{{ InitCodeHash }}"
+      tags:
+        - v2-interface
+
+    - name: Replace MuiltiCall_ADDRESS to MuiltiCall
+      replace:
+        path: "{{ deploy_path }}/src/constants/multicall/index.ts"
+        regexp: "0x77dCa2C955b15e9dE4dbBCf1246B4B85b651e50e"
+        replace: "{{ Multicall }}"
+      tags:
+        - v2-interface
+
+    - name: yarn build
+      shell: "cd {{ deploy_path }} && yarn build"
+      tags:
+        - v2-interface
+
+    - name: uni-interface start
+      shell: "cd {{ deploy_path }} && docker-compose up -d"
+      tags:
+        - start
