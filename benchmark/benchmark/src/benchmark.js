@@ -1,4 +1,5 @@
 const Web3 = require('web3')
+const { WaitableBatchRequest } = require('./utils');
 
 class Benchmark {
     constructor(info) {
@@ -45,23 +46,18 @@ class Benchmark {
     }
 
     async end() {
-        this.benchmark_info.end_block_number = await this.web3.eth.getBlockNumber()
-        for (let i = this.benchmark_info.start_block_number; i <= this.benchmark_info.end_block_number; i++) {
-            let block = await this.web3.eth.getBlock(i)
-            this.benchmark_info.transfer_count += block.transactions.length
-        }
+        this.benchmark_info.transfer_count = this.benchmark_info.success_tx + this.benchmark_info.fail_tx;
     }
 
     async send_txs() {
         while (this.config.continuous_benchmark || this.config.benchmark_time > this.benchmark_info.total_time) {
-            let txs = await this.gen_batch_transactions();
-            await txs.execute()
+            await this.send_batch_transactions();
             this.benchmark_info.total_time = (performance.now() - this.benchmark_info.start_time)
         }
     }
 
-    async gen_batch_transactions() {
-        let txs = new this.web3.BatchRequest();
+    async send_batch_transactions() {
+        let txs = new WaitableBatchRequest(this.web3);
         for (let i = 0; i < this.config.batch_size; i++) {
             this.benchmark_info.nonce += 1
             let tx = {
@@ -78,10 +74,11 @@ class Benchmark {
             txs.add(this.web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
                 if (err) this.benchmark_info.fail_tx += 1
                 else this.benchmark_info.success_tx += 1
-            }))
+            }), signed_tx.transactionHash);
         }
 
-        return txs
+        await txs.execute()
+        await txs.waitFinished();
     }
 
 }

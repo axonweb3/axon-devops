@@ -1,4 +1,5 @@
 const Web3 = require('web3')
+const { WaitableBatchRequest } = require('./utils');
 
 class AccountFactory {
     async get_accounts(config) {
@@ -10,7 +11,7 @@ class AccountFactory {
         let nonce = await web3.eth.getTransactionCount(account.address)
 
         let accounts = []
-        let batch_request = new web3.BatchRequest();
+        let batch_request = new WaitableBatchRequest(web3);
         for (let i = 0; i < config.thread_num; i++) {
             let benchmark_account = web3.eth.accounts.create()
 
@@ -29,20 +30,14 @@ class AccountFactory {
             batch_request.add(web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
                 if (err) console.log(err)
                 else accounts.push(benchmark_account)
-            }))
+            }), signed_tx.transactionHash);
         }
 
         await batch_request.execute()
-
-        await this.sleep(5000)
+        await batch_request.waitFinished();
+        await batch_request.waitConfirmed();
 
         return accounts
-    }
-
-    async sleep(ms) {
-        return new Promise((resolve) => {
-            setTimeout(resolve, ms)
-        })
     }
 }
 
