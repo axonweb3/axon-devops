@@ -5,11 +5,6 @@ const Web3 = require('web3')
 const AccountFactory = require('./account_factory')
 const { waitForTransaction } = require('./utils')
 
-const BENCHMARK_CASES = [
-    "./benchmark",
-    "./contract_benchmark",
-];
-
 class Runner {
 
     constructor(config) {
@@ -61,20 +56,25 @@ class Runner {
     }
 
     async run() {
+        let tasks = [];
         this.log_benchmark_config_info()
         await this.prepare()
-        for (let i in BENCHMARK_CASES) {
-            let benchmarkCase = BENCHMARK_CASES[i];
+        for (let i in this.config.benchmark_cases) {
+            let benchmarkCase = this.config.benchmark_cases[i];
             console.log(`benchmark case ${i}: ${benchmarkCase}`);
             await this.start()
-            await this.exec(benchmarkCase)
+            tasks.push(this.exec(benchmarkCase));
             if(this.config.continuous_benchmark) {
                 continue;
+            } else {
+                await Promise.all(tasks);
+                tasks = [];
             }
             await this.end()
             this.log_benchmark_res()
             await this.send_discord()
         }
+        await Promise.all(tasks);
     }
 
     async prepare() {
