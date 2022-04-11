@@ -1,4 +1,4 @@
-# Deploy Uniswap v2
+# Deploy Uniswap
 Requires ansible、nodejs、yarn、docker、docker-compose to be installed 
 ## Configuration of the deployment
 
