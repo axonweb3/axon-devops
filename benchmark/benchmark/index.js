@@ -26,6 +26,10 @@ function init_config() {
         if (args[5] != undefined) {
             config.token = args[5]
         }
+
+        if (args[6] != undefined) {
+            config.benchmark_cases = JSON.parse(args[6])
+        }
     }
 }
 (async () => {

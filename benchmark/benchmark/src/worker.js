@@ -1,6 +1,6 @@
-const Benchmark = require('./benchmark')
-
 module.exports = (async (info) => {
-    let benchmark = new Benchmark(info)
-    return await benchmark.exec().catch((err) => console.log(err))
+    const BenchmarkCase = require(info.benchmarkCase);
+
+    let benchmarkCase = new BenchmarkCase(info);
+    return await benchmarkCase.exec().catch((err) => console.log(err));
 });
