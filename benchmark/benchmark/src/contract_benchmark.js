@@ -1,5 +1,6 @@
 const Web3 = require('web3')
 const { WaitableBatchRequest } = require('./utils');
+const ERC20JSON = require('./ERC20.json');
 
 class Benchmark {
     constructor(info) {
@@ -29,6 +30,7 @@ class Benchmark {
         this.account = this.web3.eth.accounts.privateKeyToAccount(private_key)
         this.web3.eth.defaultAccount = this.account.address
 
+        this.contract = new this.web3.eth.Contract(ERC20JSON.abi, info.contracts["ERC20"]);
     }
 
     async exec() {
@@ -61,14 +63,11 @@ class Benchmark {
         for (let i = 0; i < this.config.batch_size; i++) {
             this.benchmark_info.nonce += 1
             let tx = {
-                "to": '0x5cf83df52a32165a7f392168ac009b168c9e8915',
-                "type": 2,
-                "value": 1,
-                "maxPriorityFeePerGas": 3,
-                "maxFeePerGas": 3,
-                "gasLimit": 21000,
+                "from": this.account.address,
+                "to": this.contract.options.address,
+                "gasLimit": 200000,
                 "nonce": this.benchmark_info.nonce,
-                "chainId": 5
+                "data": this.contract.methods.transfer('0x5cf83df52a32165a7f392168ac009b168c9e8915', 0).encodeABI(),
             }
             let signed_tx = await this.account.signTransaction(tx)
             txs.add(this.web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {

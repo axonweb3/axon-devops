@@ -3,6 +3,7 @@ const Piscina = require('piscina');
 const { MessageEmbed, WebhookClient } = require('discord.js')
 const Web3 = require('web3')
 const AccountFactory = require('./account_factory')
+const { waitForTransaction } = require('./utils')
 
 class Runner {
 
@@ -22,22 +23,67 @@ class Runner {
             total_time: 0,
             res: [],
         }
+
+        this.account = this.web3.eth.accounts.wallet.add(this.config.private_key);
+        this.contracts = {};
+    }
+
+    async sendDeploymentContract(contract, contractJson) {
+        return new Promise(async (resolve) => {
+            const instance = await contract
+                .deploy({
+                    data: contractJson.bytecode,
+                    arguments: ["Name", "Symbol"],
+                })
+                .send({
+                    from: this.account.address,
+                    nonce: (await this.web3.eth.getTransactionCount(this.account.address)) + 1,
+                    gas: 2000000,
+                });
+            resolve(instance);
+        });
+    }
+
+    async deployContract(jsonPath, name) {
+        console.log("\ndeploying contract: ", name);
+        const contractJson = require(jsonPath);
+
+        const contract = new this.web3.eth.Contract(contractJson.abi);
+        const instance = await this.sendDeploymentContract(contract, contractJson);
+
+        this.contracts[name] = instance.options.address;
+        console.log(`contract ${name} deployed to ${instance.options.address}`);
     }
 
     async run() {
+        let tasks = [];
         this.log_benchmark_config_info()
-        await this.start()
-        await this.exec()
-        if(this.config.continuous_benchmark) {
-            return
+        await this.prepare()
+        for (let i in this.config.benchmark_cases) {
+            let benchmarkCase = this.config.benchmark_cases[i];
+            console.log(`benchmark case ${i}: ${benchmarkCase}`);
+            await this.start()
+            tasks.push(this.exec(benchmarkCase));
+            if(this.config.continuous_benchmark) {
+                continue;
+            } else {
+                await Promise.all(tasks);
+                tasks = [];
+            }
+            await this.end()
+            this.log_benchmark_res()
+            await this.send_discord()
         }
-        await this.end()
-        this.log_benchmark_res()
-        await this.send_discord()
-
+        await Promise.all(tasks);
     }
 
-    async exec() {
+    async prepare() {
+        console.log('preparing...');
+        await this.deployContract("./ERC20.json", "ERC20");
+        console.log('\nprepared');
+    }
+
+    async exec(benchmarkCase) {
         let accountFactory = new AccountFactory()
         let accounts = await accountFactory.get_accounts(this.config)
 
@@ -47,7 +93,7 @@ class Runner {
 
         let tasks = []
         for (const index in accounts) {
-            tasks.push(piscina.run({config: {...this.config}, private_key: accounts[index].privateKey}))
+            tasks.push(piscina.run({benchmarkCase, contracts: this.contracts, config: {...this.config}, private_key: accounts[index].privateKey}))
         }
 
         const res = await Promise.all(tasks)
@@ -63,10 +109,7 @@ class Runner {
     async end() {
         this.benchmark_info.end_time = performance.now()
         this.benchmark_info.end_block_number = await this.web3.eth.getBlockNumber()
-        for (let i = this.benchmark_info.start_block_number; i <= this.benchmark_info.end_block_number; i++) {
-            let block = await this.web3.eth.getBlock(i)
-            this.benchmark_info.transfer_count += block.transactions.length
-        }
+        this.benchmark_info.transfer_count = this.benchmark_info.res.reduce((total, res) => res.transfer_count)
         this.benchmark_info.success_transfer_count = this.benchmark_info.res.reduce((total, res) => res.success_tx)
         this.benchmark_info.fail_transfer_count = this.benchmark_info.res.reduce((total, res) => res.fail_tx)
         this.benchmark_info.total_time = this.benchmark_info.end_time - this.benchmark_info.start_time
