@@ -9,11 +9,19 @@ impl Cli {
         let matches = Command::new("axon_cli")
             .version(crate_version!())
             .arg(
-                Arg::new("network_mode")
-                    .short('m')
-                    .long("mode")
-                    .help("Axon network mode, at most 4 nodes can be started automatically")
-                    .required(false)
+                Arg::new("docker-compose-path")
+                    .short('d')
+                    .long("compose-path")
+                    .help("absolute path of docker-compose.yml")
+                    .required(true)
+                    .takes_value(true),
+            )
+            .arg(
+                Arg::new("chain-data-path")
+                    .short('c')
+                    .long("chain-data")
+                    .help("absolute path of chain data")
+                    .required(true)
                     .takes_value(true),
             )
             .get_matches();

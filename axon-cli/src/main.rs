@@ -2,19 +2,19 @@ mod cli;
 pub use cli::Cli;
 
 mod interactive;
-pub use interactive::interactive;
+pub use interactive::Interative;
 
 fn main() {
     let matches = Cli::init().matches;
-    if matches.is_present("network_mode") {
-        let mode = matches.value_of("network_mode").unwrap();
-        println!("hahahhahahahahhh {}", mode);
-    }
+    let c_path = matches.value_of("docker-compose-path").unwrap();
+    println!("compose path: {}", c_path);
+    let d_path = matches.value_of("chain-data-path").unwrap();
+    println!("chain data path: {}", d_path);
 
     let _result = match matches.subcommand() {
         // ("run",_) => println!("run"),
         _ => {
-            interactive();
+            Interative::interactive(c_path, d_path);
         }
     };
 }
