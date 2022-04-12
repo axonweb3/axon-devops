@@ -13,7 +13,7 @@ impl Cli {
                     .short('m')
                     .long("mode")
                     .help("Axon network mode, at most 4 nodes can be started automatically")
-                    .required(true)
+                    .required(false)
                     .takes_value(true),
             )
             .get_matches();
