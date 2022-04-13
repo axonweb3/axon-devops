@@ -1,3 +1,4 @@
 - [Deploy UniSwap](./uni/README.md)
 - [Deploy nginx](./axon-nginx/README.md)
 - [Deploy Benchmark](./benchmark/README.md)
+- [Deploy pr-bot](./pr-bot/README.md)
