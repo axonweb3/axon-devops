@@ -12,6 +12,9 @@ class RepoInfo {
 
 		const res = []
 		for (const index in prInfos) {
+			if (prInfos[index].draft == true) {
+				continue
+			}
 			res.push(new PrIfnfo(prInfos[index]))
 		}
 
