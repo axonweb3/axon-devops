@@ -14,7 +14,7 @@ fn main() {
     let _result = match matches.subcommand() {
         // ("run",_) => println!("run"),
         _ => {
-            Interative::interactive(c_path, d_path);
+            Interative::start(c_path, d_path);
         }
     };
 }
