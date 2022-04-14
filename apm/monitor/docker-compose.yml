@@ -53,13 +53,11 @@ services:
 
   # ================================= Jaeger  ================================= 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
     container_name: elasticsearch
     ports:
       - "9200:9200"
       - "9300:9300"
-    expose:
-      - "9200"
     restart: on-failure
     environment:
       - cluster.name=jaeger-cluster
@@ -128,39 +126,7 @@ services:
       - ./data/nginx:/var/log/nginx
     command: -config.file=/etc/loki/loki-local-config.yaml
     networks:
-      - muta-monitor   
-# ================================= kibana  ================================= 
-  kibana:
-    build:
-      context: ./config/kibana/
-      args:
-        ELK_VERSION: 7.13.1
-    container_name: elk-kibana
-    volumes:
-      - type: bind
-        source: ./config/kibana/kibana.yml
-        target: /usr/share/config/kibana/kibana.yml
-        read_only: true
-    ports:
-      - "8560:5601"
-    networks:
-      - muta-monitor
-    depends_on:
-      - elasticsearch
-# ================================= fluentd  ================================= 
-  fluentd:
-    build: ./config/fluentd
-    volumes:
-      - ./config/fluentd/conf:/config/fluentd/etc
-    links:
-      - "elasticsearch"
-    restart: on-failure
-    container_name: fluentd
-    ports:
-      - "24224:24224"
-      - "24224:24224/udp"
-    networks:
-     - muta-monitor
+      - muta-monitor    
 
 networks:
   muta-monitor:
