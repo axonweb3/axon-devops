@@ -10,16 +10,16 @@ impl Cli {
             .version(crate_version!())
             .arg(
                 Arg::new("docker-compose-path")
-                    .short('d')
-                    .long("compose-path")
+                    .short('c')
+                    .long("compose")
                     .help("absolute path of docker-compose.yml")
                     .required(true)
                     .takes_value(true),
             )
             .arg(
                 Arg::new("chain-data-path")
-                    .short('c')
-                    .long("chain-data")
+                    .short('d')
+                    .long("data")
                     .help("absolute path of chain data")
                     .required(true)
                     .takes_value(true),
@@ -27,10 +27,5 @@ impl Cli {
             .get_matches();
 
         Cli { matches }
-    }
-
-    pub fn start(&self) {
-        let mode = self.matches.value_of("network_mode").unwrap();
-        println!("hahahhahahahahhh    {}", mode);
     }
 }

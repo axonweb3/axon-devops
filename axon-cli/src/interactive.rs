@@ -17,11 +17,11 @@ impl Interative {
                     rl.add_history_entry(line.as_str());
                     println!("Line: {}", line);
                     if line == "start" {
-                        let s1 = String::from("--file=");
-                        let cli_path = s1 + c_path;
-                        print!("docker compose file: {}", cli_path);
+                        let compose_para_1 = String::from("--file=");
+                        let compose_para = compose_para_1 + c_path;
+                        print!("docker compose file: {}", compose_para);
                         let output = Command::new("docker-compose")
-                            .arg(cli_path)
+                            .arg(compose_para)
                             .arg("up")
                             .arg("-d")
                             .output()
