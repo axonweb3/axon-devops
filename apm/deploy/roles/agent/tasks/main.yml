@@ -52,10 +52,26 @@
   tags: 
     - config
 
-- name: sed promtail
-  shell: sed -i 's/LOKI_ADDRESS/{{ monitor_address }}/' "{{ monitor_agent_dir }}/config/promtail/promtail-config.yaml"
+- name: Replace LOKI_ADDRESS
+  replace:
+    path: "{{ monitor_agent_dir }}/config/promtail/promtail-config.yaml"
+    regexp: "LOKI_ADDRESS"
+    replace: "{{ monitor_address }}"
+  tags:
+      - config
+
+- name: chown filebeat
+  shell: sudo chown root "{{ monitor_agent_dir }}/config/filebeat/filebeat.yml"
   tags: 
     - config
+
+- name: Replace es_address
+  replace:
+    path: "{{ monitor_agent_dir }}/config/filebeat/filebeat.yml"
+    regexp: "ES_ADDRESS"
+    replace: "{{ es_address }}"
+  tags:
+      - config
 
 - name: start 
   shell: "cd {{ monitor_agent_dir }} && docker-compose up -d"

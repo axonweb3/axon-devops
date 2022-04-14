@@ -2,3 +2,4 @@
 monitor_agent_dir: /home/ckb/axon-apm-agent
 log_path: \/home\/ckb\/axon-docker\/logs
 monitor_address: xxx.xxx.xxx.xxx
+es_address: xxx.xxx.xxx.xxx
