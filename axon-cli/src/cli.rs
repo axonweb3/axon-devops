@@ -1,7 +1,7 @@
 use clap::{crate_version, Arg, ArgMatches, Command};
 
 pub struct Cli {
-    pub matches: ArgMatches,
+    matches: ArgMatches,
 }
 
 impl Cli {
@@ -27,5 +27,9 @@ impl Cli {
             .get_matches();
 
         Cli { matches }
+    }
+
+    pub fn get_matches(self) -> ArgMatches {
+        self.matches
     }
 }

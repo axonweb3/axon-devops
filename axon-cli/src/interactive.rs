@@ -1,9 +1,13 @@
-use clap::crate_version;
-use rustyline::error::ReadlineError;
-use rustyline::Editor;
-use std::process::Command;
+use std::path::Path;
 
-pub struct Interative {}
+use clap::crate_version;
+use rustyline::{error::ReadlineError, Editor};
+use std::process;
+
+#[derive(Default)]
+pub struct Interative;
+
+const HISTORY_FILE: &str = "history.txt";
 
 impl Interative {
     pub fn build_interactive() -> clap::Command<'static> {
@@ -15,9 +19,9 @@ impl Interative {
             .subcommand(clap::Command::new("delete").about("Delete chain data"))
     }
 
-    pub fn start(c_path: &str, d_path: &str) {
+    pub fn start<P: AsRef<Path>>(c_path: P, d_path: P) {
         let mut rl = Editor::<()>::new();
-        if rl.load_history("history.txt").is_err() {
+        if rl.load_history(HISTORY_FILE).is_err() {
             println!("No previous history.");
         }
 
@@ -27,17 +31,15 @@ impl Interative {
             match readline {
                 Ok(line) => {
                     rl.add_history_entry(line.as_str());
-                    // println!("Command: {}", line);
                     let args = vec!["interactive", &line];
                     let app_m = parser.clone().try_get_matches_from(args);
                     match app_m {
                         Ok(matches) => match matches.subcommand() {
                             Some(("start", _)) => {
-                                println!("start");
                                 let compose_para_1 = String::from("--file=");
-                                let compose_para = compose_para_1 + c_path;
-                                print!("docker compose file: {}", compose_para);
-                                let _output = Command::new("docker-compose")
+                                let compose_para =
+                                    compose_para_1 + c_path.as_ref().to_str().unwrap();
+                                let _output = process::Command::new("docker-compose")
                                     .arg(compose_para)
                                     .arg("up")
                                     .arg("-d")
@@ -45,7 +47,7 @@ impl Interative {
                                     .expect("start local docker nodes exception!!!");
                             }
                             Some(("stop", _)) => {
-                                let _output = Command::new("docker")
+                                let _output = process::Command::new("docker")
                                     .arg("stop")
                                     .arg("axon1")
                                     .arg("axon2")
@@ -55,7 +57,7 @@ impl Interative {
                                     .expect("stop containers exception!!!");
                             }
                             Some(("rm", _)) => {
-                                let _output = Command::new("docker")
+                                let _output = process::Command::new("docker")
                                     .arg("rm")
                                     .arg("axon1")
                                     .arg("axon2")
@@ -65,10 +67,9 @@ impl Interative {
                                     .expect("rm containers exception!!!");
                             }
                             Some(("delete", _)) => {
-                                println!("chain data path: {}", d_path);
-                                let _output = Command::new("rm")
+                                let _output = process::Command::new("rm")
                                     .arg("-rf")
-                                    .arg(d_path)
+                                    .arg(d_path.as_ref().to_str().unwrap())
                                     .output()
                                     .expect("delete chain data exception!!!");
                             }
@@ -93,6 +94,6 @@ impl Interative {
                 }
             }
         }
-        rl.save_history("history.txt").unwrap();
+        rl.save_history(HISTORY_FILE).unwrap();
     }
 }
