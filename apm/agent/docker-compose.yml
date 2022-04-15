@@ -1,4 +1,4 @@
-version: '3'
+version: '3.3'
 services:
   node-exporter:
     image: quay.io/prometheus/node-exporter:v0.18.1
@@ -39,4 +39,22 @@ services:
       - ${AXON_LOG_PATH}:/var/logs
     command: 
       -config.file=/etc/promtail/promtail-config.yaml
+
+  filebeat:
+      image: "docker.elastic.co/beats/filebeat:7.2.0"
+      user: root
+      volumes:
+          - /var/run/docker.sock:/host_docker/docker.sock
+          - /var/lib/docker:/host_docker/var/lib/docker
+          - ./config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+          - ${AXON_LOG_PATH}:/usr/share/filebeat/logs
+
+      command: ["--strict.perms=false"]
+      ulimits:
+        memlock:
+          soft: -1
+          hard: -1
+      stdin_open: true
+volumes:
+    elasticsearch_data:
 

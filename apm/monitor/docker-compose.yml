@@ -1,4 +1,4 @@
-version: "3"
+version: "3.2"
 
 services:
 
@@ -33,7 +33,7 @@ services:
     
   # ================================= Prometheus ================================= 
   prometheus:
-    image: prom/prometheus:v2.20.1
+    image: prom/prometheus:v2.32.1
     container_name: muta-prometheus
     hostname: prometheus
     restart: on-failure
