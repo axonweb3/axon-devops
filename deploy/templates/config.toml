@@ -80,3 +80,6 @@ checkpoint_type_hash = "0xbc3b9e93e517482862e5928419b624b90e2824988c8f3f0e056bcc
 [profile.release]
 overflow-checks = true
 debug = #enable_profile_debug
+
+[ckb_crypto_primitive]
+ed25519_type_hash = "0xdfeba1e90541d536fa913d9e8a390d69ff37c0721b0a0883ce581c5060f8f9b4"
