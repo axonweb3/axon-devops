@@ -2,7 +2,7 @@ version: '3.3'
 services:
   node-exporter:
     image: quay.io/prometheus/node-exporter:v0.18.1
-    container_name: muta-node-exporter
+    container_name: a x o n-node-exporter
     command:
       - '--path.rootfs=/host'
       - '--collector.tcpstat'
@@ -29,7 +29,7 @@ services:
 
   promtail:
     image: grafana/promtail:master-9ad98df
-    container_name: muta-promtail
+    container_name: axon-promtail
     restart: on-failure
     ports:
       - '8102:9080'
