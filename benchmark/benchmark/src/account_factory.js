@@ -1,5 +1,6 @@
 const Web3 = require('web3')
 const { WaitableBatchRequest } = require('./utils');
+const logger = require('./logger')
 
 class AccountFactory {
     async get_accounts(config) {
@@ -28,7 +29,7 @@ class AccountFactory {
             }
             let signed_tx = await account.signTransaction(tx)
             batch_request.add(web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
-                if (err) console.log(err)
+                if (err) logger.error("create account tx err: ", err)
                 else accounts.push(benchmark_account)
             }), signed_tx.transactionHash);
         }
