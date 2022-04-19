@@ -2,7 +2,7 @@ version: '3.3'
 services:
   node-exporter:
     image: quay.io/prometheus/node-exporter:v0.18.1
-    container_name: a x o n-node-exporter
+    container_name: axon-node-exporter
     command:
       - '--path.rootfs=/host'
       - '--collector.tcpstat'
