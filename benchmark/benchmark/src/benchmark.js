@@ -1,5 +1,6 @@
 const Web3 = require('web3')
 const { WaitableBatchRequest } = require('./utils');
+const logger = require('./logger')
 
 class Benchmark {
     constructor(info) {
@@ -72,7 +73,10 @@ class Benchmark {
             }
             let signed_tx = await this.account.signTransaction(tx)
             txs.add(this.web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
-                if (err) this.benchmark_info.fail_tx += 1
+                if (err) {
+                    this.benchmark_info.fail_tx += 1
+                    logger.error("send tx err: ", err)
+                }
                 else this.benchmark_info.success_tx += 1
             }), signed_tx.transactionHash);
         }
