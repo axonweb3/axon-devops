@@ -3,7 +3,8 @@ const Piscina = require('piscina');
 const { MessageEmbed, WebhookClient } = require('discord.js')
 const Web3 = require('web3')
 const AccountFactory = require('./account_factory')
-const { waitForTransaction } = require('./utils')
+const logger = require('./logger')
+
 
 class Runner {
 
@@ -45,14 +46,19 @@ class Runner {
     }
 
     async deployContract(jsonPath, name) {
-        console.log("\ndeploying contract: ", name);
-        const contractJson = require(jsonPath);
+        try {
+            console.log("\ndeploying contract: ", name);
+            const contractJson = require(jsonPath);
 
-        const contract = new this.web3.eth.Contract(contractJson.abi);
-        const instance = await this.sendDeploymentContract(contract, contractJson);
+            const contract = new this.web3.eth.Contract(contractJson.abi);
+            const instance = await this.sendDeploymentContract(contract, contractJson);
 
-        this.contracts[name] = instance.options.address;
-        console.log(`contract ${name} deployed to ${instance.options.address}`);
+            this.contracts[name] = instance.options.address;
+            console.log(`contract ${name} deployed to ${instance.options.address}`);
+        } catch (e) {
+            logger.error("deploy contract err: ", e)
+            throw e
+        }
     }
 
     async run() {
