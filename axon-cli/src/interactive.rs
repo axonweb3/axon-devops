@@ -1,15 +1,16 @@
 use std::path::Path;
+use std::process;
 
 use clap::crate_version;
 use rustyline::{error::ReadlineError, Editor};
-use std::process;
 
+use crate::mydocker;
 #[derive(Default)]
-pub struct Interative;
+pub struct Interactive;
 
 const HISTORY_FILE: &str = "history.txt";
 
-impl Interative {
+impl Interactive {
     pub fn build_interactive() -> clap::Command<'static> {
         clap::Command::new("interactive")
             .version(crate_version!())
@@ -17,15 +18,16 @@ impl Interative {
             .subcommand(clap::Command::new("stop").about("Stop four axon container nodes"))
             .subcommand(clap::Command::new("rm").about("Remove four axon containers"))
             .subcommand(clap::Command::new("delete").about("Delete chain data"))
+            .subcommand(clap::Command::new("list").about("List docker images"))
     }
 
-    pub fn start<P: AsRef<Path>>(c_path: P, d_path: P) {
+    pub fn start<P: AsRef<Path>>(m_path: P, d_path: P) {
         let mut rl = Editor::<()>::new();
         if rl.load_history(HISTORY_FILE).is_err() {
             println!("No previous history.");
         }
 
-        let parser = crate::Interative::build_interactive();
+        let parser = crate::Interactive::build_interactive();
         loop {
             let readline = rl.readline(">> ");
             match readline {
@@ -36,15 +38,27 @@ impl Interative {
                     match app_m {
                         Ok(matches) => match matches.subcommand() {
                             Some(("start", _)) => {
-                                let compose_para_1 = String::from("--file=");
-                                let compose_para =
-                                    compose_para_1 + c_path.as_ref().to_str().unwrap();
-                                let _output = process::Command::new("docker-compose")
-                                    .arg(compose_para)
-                                    .arg("up")
-                                    .arg("-d")
-                                    .output()
-                                    .expect("start local docker nodes exception!!!");
+                                mydocker::Api::create_network("axon-net");
+                                mydocker::Api::start_container(
+                                    "axon1",
+                                    "node_1.toml",
+                                    m_path.as_ref().to_str().unwrap(),
+                                );
+                                mydocker::Api::start_container(
+                                    "axon2",
+                                    "node_2.toml",
+                                    m_path.as_ref().to_str().unwrap(),
+                                );
+                                mydocker::Api::start_container(
+                                    "axon3",
+                                    "node_3.toml",
+                                    m_path.as_ref().to_str().unwrap(),
+                                );
+                                mydocker::Api::start_container(
+                                    "axon4",
+                                    "node_4.toml",
+                                    m_path.as_ref().to_str().unwrap(),
+                                );
                             }
                             Some(("stop", _)) => {
                                 let _output = process::Command::new("docker")
@@ -73,6 +87,9 @@ impl Interative {
                                     .output()
                                     .expect("delete chain data exception!!!");
                             }
+                            // Some(("list", _)) => {
+
+                            // }
                             _ => {}
                         },
                         Err(err) => {

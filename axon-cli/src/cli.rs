@@ -9,10 +9,10 @@ impl Cli {
         let matches = Command::new("axon_cli")
             .version(crate_version!())
             .arg(
-                Arg::new("docker-compose-path")
-                    .short('c')
-                    .long("compose")
-                    .help("absolute path of docker-compose.yml")
+                Arg::new("mount-path")
+                    .short('m')
+                    .long("mount")
+                    .help("absolute mount path of docker container")
                     .required(true)
                     .takes_value(true),
             )

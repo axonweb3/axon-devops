@@ -6,10 +6,11 @@
     cargon build --release
 
 3. run axon-cli with correct parameters. For example,
-../target/debug/axon-cli --compose=/home/wenyuan/git/axon-devops/axon-cli/docker-compose.yml --data=/home/wenyuan/git/axon-devops/axon-cli/devtools/chain
-   You have to config docker-compose.yml and chain data path explicitly.
+../target/debug/axon-cli --mount=/home/wenyuan/git/axon-devops/axon-cli/devtools --data=/home/wenyuan/git/axon-devops/axon-cli/devtools/chain
+   You have to config mount path and chain data path explicitly.
 
 4. after axon-cli gets run. You have 4 commands to exeute.
+Before the start of docker containers, you have to enable tcp port for docker(0.0.0.0:2375 in this case).
 1). start, you can start 4 docker axon nodes.
 2). stop, stop the 4 docker nodes just started.
 3). rm, remove the 4 docker containers just created.
