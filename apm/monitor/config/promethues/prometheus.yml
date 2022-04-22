@@ -14,7 +14,7 @@ alerting:
 
 # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:
-  - "muta-network-rules.yml"
+  - "axon-network-rules.yml"
 
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
@@ -26,7 +26,7 @@ scrape_configs:
 
   # - job_name: 'jaeger'
   #   static_configs:
-  #   - targets: ['muta-jaeger-collector:14269','muta-jaeger-query:16687']
+  #   - targets: ['axon-jaeger-collector:14269','axon-jaeger-query:16687']
 
   # - job_name: 'jaeger_agent'
   #   static_configs:
