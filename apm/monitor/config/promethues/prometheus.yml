@@ -40,10 +40,3 @@ scrape_configs:
     static_configs:
     - targets: [axon_exporter_ip:8100]
 
-  - job_name: 'loki'
-    static_configs:
-    - targets: ['loki:3100']
-
-  - job_name: 'promtail_agent'
-    static_configs:
-    - targets: [promtail_agent_ip:9080]
