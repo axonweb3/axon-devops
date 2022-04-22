@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  axon1:
+    container_name: axon1
+    # build: .
+    image: axon:v1
+    restart: always
+    privileged: true
+    # ports:
+    #   - 8432:5432
+    volumes:
+      - ./devtools:/app/devtools
+    networks:
+      - axon-net
+    command: ./axon -c=/app/devtools/config/node_1.toml -g=/app/devtools/config/genesis_four_nodes.json
+
+  axon2:
+    container_name: axon2
+    image: axon:v1
+    restart: always
+    privileged: true
+    volumes:
+      - ./devtools:/app/devtools
+    networks:
+      - axon-net
+    command: ./axon -c=/app/devtools/config/node_2.toml -g=/app/devtools/config/genesis_four_nodes.json
+
+  axon3:
+    container_name: axon3
+    image: axon:v1
+    restart: always
+    privileged: true
+    volumes:
+      - ./devtools:/app/devtools
+    networks:
+      - axon-net
+    command: ./axon -c=/app/devtools/config/node_3.toml -g=/app/devtools/config/genesis_four_nodes.json
+
+  axon4:
+    container_name: axon4
+    image: axon:v1
+    restart: always
+    privileged: true
+    volumes:
+      - ./devtools:/app/devtools
+    networks:
+      - axon-net
+    command: ./axon -c=/app/devtools/config/node_4.toml -g=/app/devtools/config/genesis_four_nodes.json
+
+networks:
+  axon-net:
