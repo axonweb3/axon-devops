@@ -3966,8 +3966,8 @@
         "for": "5m",
         "frequency": "1m",
         "handler": 1,
-        "message": "Muta node is down",
-        "name": "muta status alert",
+        "message": "Axon node is down",
+        "name": "axon status alert",
         "noDataState": "ok",
         "notifications": [
           {

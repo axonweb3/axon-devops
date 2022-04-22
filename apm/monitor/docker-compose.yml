@@ -5,7 +5,7 @@ services:
   # ================================= Grafana  ================================= 
   grafana:
     image: grafana/grafana:master
-    container_name: muta-granafa
+    container_name: axon-granafa
     restart: on-failure
     ports:
       - "8600:3000"
@@ -20,21 +20,21 @@ services:
       GF_RENDERING_CALLBACK_URL: http://grafana:3000/
       GF_LOG_FILTERS: rendering:debug
     networks:
-      - muta-monitor  
+      - axon-monitor  
 
   # link https://github.com/grafana/grafana-image-renderer/blob/master/docs/remote_rendering_using_docker.md    
   renderer:
     image:  grafana/grafana-image-renderer:2.0.0
-    container_name: muta-grafana-image-renderer
+    container_name: axon-grafana-image-renderer
     ports:
       - 8081
     networks:
-      - muta-monitor 
+      - axon-monitor 
     
   # ================================= Prometheus ================================= 
   prometheus:
     image: prom/prometheus:v2.32.1
-    container_name: muta-prometheus
+    container_name: axon-prometheus
     hostname: prometheus
     restart: on-failure
     volumes:
@@ -49,7 +49,7 @@ services:
       - --web.console.templates=/usr/share/prometheus/consoles
       - --web.enable-lifecycle
     networks:
-      - muta-monitor   
+      - axon-monitor   
 
   # ================================= Jaeger  ================================= 
   elasticsearch:
@@ -69,7 +69,7 @@ services:
     volumes:
       - ./data/es:/usr/share/elasticsearch/data
     networks:
-      - muta-monitor   
+      - axon-monitor   
 
   jaeger-collector:
     image: jaegertracing/jaeger-collector:1.32
@@ -91,7 +91,7 @@ services:
     depends_on:
       - elasticsearch
     networks:
-      - muta-monitor   
+      - axon-monitor   
 
   jaeger-query:
     image: jaegertracing/jaeger-query:1.32
@@ -112,12 +112,12 @@ services:
     depends_on:
       - jaeger-collector  
     networks:
-      - muta-monitor
+      - axon-monitor
 
   # ================================= Loki  ================================= 
   loki:
     image: grafana/loki:1.5.0
-    container_name: muta-loki
+    container_name: axon-loki
     restart: on-failure
     ports:
       - "8103:3100"
@@ -126,8 +126,8 @@ services:
       - ./data/nginx:/var/log/nginx
     command: -config.file=/etc/loki/loki-local-config.yaml
     networks:
-      - muta-monitor    
+      - axon-monitor    
 
 networks:
-  muta-monitor:
+  axon-monitor:
     driver: bridge 
