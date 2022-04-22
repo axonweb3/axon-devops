@@ -39,13 +39,18 @@ spec:
       containers:
       - name: axon-benchmark
         image: zhengjianhui/axon-benchmark:latest
-        command: ["/bin/sh", "-c","node index.js $protocol://$service_ip:$service_port/ $continues_benchmark $benchmark_time $batch_size $id $token"]
+        volumeMounts:
+        - name: config-benchmark
+          mountPath: /benchmark/config.json
+          subPath: config.json
+        command: ["/bin/sh", "-c","node index.js"]
         ports:
         - containerPort: 8098
         securityContext:
           privileged: true
-        envFrom:
-        - configMapRef:
-            name: axon-config
+      volumes:
+        - name: config-benchmark
+          configMap:
+            name: config-benchmark
       restartPolicy: Always
 status: {}
