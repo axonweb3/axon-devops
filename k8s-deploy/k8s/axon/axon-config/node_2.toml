@@ -67,7 +67,7 @@ max_open_files = 64
 
 [jaeger]
 service_name = "axon"
-tracing_address = "jaeger-agent:6831"
+tracing_address = "127.0.0.1:6831"
 tracing_batch_size = 50
 
 [prometheus]
