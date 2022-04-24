@@ -24,6 +24,14 @@ impl Cli {
                     .required(true)
                     .takes_value(true),
             )
+            .arg(
+                Arg::new("benchmark-data-path")
+                    .short('b')
+                    .long("bench")
+                    .help("absolute path of benchmark data")
+                    .required(true)
+                    .takes_value(true),
+            )
             .get_matches();
 
         Cli { matches }

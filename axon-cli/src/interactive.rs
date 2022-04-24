@@ -1,28 +1,32 @@
-use std::path::Path;
 use std::process;
 
-use clap::crate_version;
+use clap::{crate_version, Command};
 use rustyline::{error::ReadlineError, Editor};
 
-use crate::mydocker;
-#[derive(Default)]
-pub struct Interactive;
+use crate::docker;
 
 const HISTORY_FILE: &str = "history.txt";
 
+#[derive(Default)]
+pub struct Interactive {
+    pub mount_path: String,
+    pub data_path:  String,
+    pub bench_path: String,
+}
+
 impl Interactive {
-    pub fn build_interactive() -> clap::Command<'static> {
-        clap::Command::new("interactive")
+    pub fn build_interactive() -> Command<'static> {
+        Command::new("interactive")
             .version(crate_version!())
-            .subcommand(clap::Command::new("start").about("Start four axon nodes"))
-            .subcommand(clap::Command::new("stop").about("Stop four axon container nodes"))
-            .subcommand(clap::Command::new("rm").about("Remove four axon containers"))
-            .subcommand(clap::Command::new("del").about("Delete chain data"))
-            .subcommand(clap::Command::new("benchmark").about("Start benchmark"))
-            .subcommand(clap::Command::new("list").about("List docker images"))
+            .subcommand(Command::new("start").about("Start four axon nodes"))
+            .subcommand(Command::new("stop").about("Stop four axon container nodes"))
+            .subcommand(Command::new("rm").about("Remove four axon containers"))
+            .subcommand(Command::new("del").about("Delete chain data"))
+            .subcommand(Command::new("bm").about("Start benchmark"))
+            .subcommand(Command::new("list").about("List docker images"))
     }
 
-    pub fn start<P: AsRef<Path>>(m_path: P, d_path: P) {
+    pub async fn start(&self) {
         let mut rl = Editor::<()>::new();
         if rl.load_history(HISTORY_FILE).is_err() {
             println!("No previous history.");
@@ -39,7 +43,7 @@ impl Interactive {
                     match app_m {
                         Ok(matches) => match matches.subcommand() {
                             Some(("start", _)) => {
-                                Interactive::start_axons(&m_path);
+                                self.start_axons().await;
                             }
                             Some(("stop", _)) => {
                                 let _output = process::Command::new("docker")
@@ -64,12 +68,13 @@ impl Interactive {
                             Some(("del", _)) => {
                                 let _output = process::Command::new("rm")
                                     .arg("-rf")
-                                    .arg(d_path.as_ref().to_str().unwrap())
+                                    .arg(&self.data_path)
                                     .output()
                                     .expect("delete chain data exception!!!");
                             }
-                            Some(("benchmark", _)) => {
-                                mydocker::Api::start_benchmark();
+                            Some(("bm", _)) => {
+                                // mydocker::Api::create_network("axon-benchmark-net");
+                                docker::DockerApi::start_benchmark(&self.bench_path).await;
                             }
                             // Some(("list", _)) => {
 
@@ -98,31 +103,23 @@ impl Interactive {
         rl.save_history(HISTORY_FILE).unwrap();
     }
 
-    fn start_axons<P: AsRef<Path>>(m_path: &P) {
-        mydocker::Api::create_network("axon-net");
-        mydocker::Api::start_container(
-            "axon1",
-            "node_1.toml",
-            8000,
-            m_path.as_ref().to_str().unwrap(),
-        );
-        mydocker::Api::start_container(
-            "axon2",
-            "node_2.toml",
-            8001,
-            m_path.as_ref().to_str().unwrap(),
-        );
-        mydocker::Api::start_container(
-            "axon3",
-            "node_3.toml",
-            8002,
-            m_path.as_ref().to_str().unwrap(),
-        );
-        mydocker::Api::start_container(
-            "axon4",
-            "node_4.toml",
-            8003,
-            m_path.as_ref().to_str().unwrap(),
-        );
+    async fn start_axons(&self) {
+        let docker_api = docker::DockerApi {
+            network_name: String::from("axon-net"),
+            path:         self.mount_path.to_owned(),
+        };
+        docker_api.create_network().await;
+        docker_api
+            .start_container("axon1", "node_1.toml", 8000)
+            .await;
+        docker_api
+            .start_container("axon2", "node_2.toml", 8001)
+            .await;
+        docker_api
+            .start_container("axon3", "node_3.toml", 8002)
+            .await;
+        docker_api
+            .start_container("axon4", "node_4.toml", 8003)
+            .await;
     }
 }

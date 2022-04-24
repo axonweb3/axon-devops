@@ -1,60 +1,60 @@
-use docker_api::{api::PublishPort, Docker};
-use tokio::runtime::Runtime;
+use std::path::Path;
+
+use docker_api::{
+    api::NetworkCreateOpts, api::PublishPort, container::ContainerCreateOpts, Docker,
+};
+
+const DOCKER_URI: &str = "tcp://127.0.0.1:2375";
 
 #[derive(Default)]
-pub struct Api;
+pub struct DockerApi {
+    pub network_name: String,
+    pub path:         String,
+    // container_name: String,
+    // file_name: String,
+}
 
-impl Api {
+impl DockerApi {
     pub fn new_docker() -> Docker {
-        Docker::new("tcp://127.0.0.1:2375").unwrap()
+        Docker::new(DOCKER_URI).unwrap()
     }
 
-    pub fn run_time() -> Runtime {
-        tokio::runtime::Runtime::new().unwrap()
-    }
+    pub async fn create_network(&self) {
+        let docker = DockerApi::new_docker();
 
-    pub fn create_network(name: &str) {
-        let docker = Api::new_docker();
-        let runtime = Api::run_time();
-
-        use docker_api::api::NetworkCreateOpts;
-        runtime.block_on(async {
-            let network = name;
-            match docker.networks().get(network).inspect().await {
+        {
+            match docker.networks().get(&self.network_name).inspect().await {
                 Ok(_) => {
-                    println!("network {} exist", network);
+                    println!("network {} exist", self.network_name);
                     return;
                 }
                 Err(err) => {
-                    println!("network {} not exist, {:?}", network, err);
+                    println!("network {} not exist, {:?}", self.network_name, err);
                 }
             };
             // let driver = "bridge"; // default driver
             match docker
                 .networks()
-                .create(&NetworkCreateOpts::builder(network).build())
+                .create(&NetworkCreateOpts::builder(&self.network_name).build())
                 .await
             {
-                Ok(info) => println!("{:#?}", info),
+                Ok(info) => println!("{:?}", info),
                 Err(e) => eprintln!("Error: {}", e),
             }
-        });
+        };
     }
 
-    pub fn start_container(name: &str, file_name: &str, port: u32, m_path: &str) {
-        let docker = Api::new_docker();
-        let runtime = Api::run_time();
+    pub async fn start_container(&self, name: &str, file_name: &str, port: u32) {
+        let docker = DockerApi::new_docker();
+        // let runtime = DockerApi::run_time();
 
         let file_para = "-c=/app/devtools/config/".to_owned() + file_name;
+        let genesis_config = "-g=/app/devtools/config/genesis_four_nodes.json";
         println!("{:?}", file_para);
-        let cmd = vec![
-            "./axon",
-            &file_para,
-            "-g=/app/devtools/config/genesis_four_nodes.json",
-        ];
+        let cmd = vec!["./axon", &file_para, genesis_config];
         // let entrypoint = String::from("/app");
-        let vols = vec![m_path.to_owned() + ":/app/devtools"];
-        let opts = docker_api::container::ContainerCreateOpts::builder("axon:v1")
+        let vols = vec![self.path.to_owned() + ":/app/devtools"];
+        let opts = ContainerCreateOpts::builder("axon:v1")
             .name(name)
             // .auto_remove(true)
             .cmd(&cmd)
@@ -65,28 +65,46 @@ impl Api {
             .expose(PublishPort::tcp(8000), port)
             .build();
         println!("{:?}", opts);
-        runtime.block_on(async {
-            match docker.containers().create(&opts).await {
-                Ok(info) => {
-                    println!("{:?}", info);
-                    match info.start().await {
-                        Ok(_) => println!("Start ok"),
-                        Err(err) => eprintln!("Start err {}", err),
-                    }
+        // runtime.block_on(async {
+        match docker.containers().create(&opts).await {
+            Ok(info) => {
+                println!("{:?}", info);
+                match info.start().await {
+                    Ok(_) => println!("Start ok"),
+                    Err(err) => eprintln!("Start err {}", err),
                 }
-                Err(e) => eprintln!("Error: {}", e),
             }
-        });
+            Err(e) => eprintln!("Error: {}", e),
+        };
     }
 
-    pub fn start_benchmark() {
-        let docker = Api::new_docker();
-        let runtime = Api::run_time();
+    pub async fn start_benchmark<P: AsRef<Path>>(benchmark_path: &P) {
+        let docker = DockerApi::new_docker();
 
-        let opts = docker_api::container::ContainerCreateOpts::builder("benchmark")
-            .name("benchmark")
+        let cmd = vec![
+            // "ls",
+            "node",
+            "index.js",
+            "--http_endpoint=http://172.17.0.1:8000",
+        ];
+        // let benchmark_path = "/home/wenyuan/git/axon-devops/benchmark/benchmark/";
+        let benchmark_path = benchmark_path.as_ref().to_str().unwrap();
+        let vols = vec![
+            benchmark_path.to_owned() + "/config.json:/benchmark/config.json",
+            benchmark_path.to_owned() + "/logs:/benchmark/logs",
+        ];
+
+        let opts = ContainerCreateOpts::builder("zhengjianhui/axon-benchmark")
+            .name("bm")
+            .cmd(&cmd)
+            // .restart_policy("always", 0)
+            .volumes(vols)
+            // .working_dir("/app")
+            .network_mode("axon-net")
+            // .expose(PublishPort::tcp(8000), 8000)
             .build();
-        runtime.block_on(async {
+        println!("{:?}", opts);
+        async {
             match docker.containers().create(&opts).await {
                 Ok(info) => {
                     println!("{:?}", info);
@@ -97,7 +115,8 @@ impl Api {
                 }
                 Err(e) => eprintln!("Error: {}", e),
             }
-        });
+        }
+        .await;
     }
 
     // pub fn list() {

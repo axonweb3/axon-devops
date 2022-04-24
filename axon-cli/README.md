@@ -6,7 +6,7 @@
     cargon build --release
 
 3. run axon-cli with correct parameters. For example,
-../target/debug/axon-cli --mount=/home/wenyuan/git/axon-devops/axon-cli/devtools --data=/home/wenyuan/git/axon-devops/axon-cli/devtools/chain
+../target/debug/axon-cli --mount=/home/wenyuan/git/axon-devops/axon-cli/devtools --data=/home/wenyuan/git/axon-devops/axon-cli/devtools/chain --bench=/home/wenyuan/git/axon-devops/benchmark/benchmark
    You have to config mount path and chain data path explicitly.
 
 4. after axon-cli gets run. You have 4 commands to exeute.
