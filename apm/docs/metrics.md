@@ -1,7 +1,7 @@
 # Monitor metrics description
 This document is a description of the monitoring metrics and all headings correspond to the dashboard on Grafana.
 
-## muta-node
+## axon-node
 ### Resource Overview 
 #### Overall total 5m load & average CPU used
 - type: CPU
@@ -485,27 +485,27 @@ irate(node_context_switches_total{instance=~"$node"}[5m])
 
 
 ### Actuator Health
-#### Muta Status
-- type: Muta
-- description: Muta service status
+#### Axon Status
+- type: Axon
+- description: Axon service status
 <details>
 <summary>Legende details</summary>
 
 ##### active
-Number of Muta services in up status
+Number of Axon services in up status
 ```
-count(up{job="muta_exporter"} == 1) 
+count(up{job="axon_exporter"} == 1) 
 ```
 ##### down
-Number of Muta services in down status
+Number of Axon services in down status
 ```
-count(up{job="muta_exporter"} == 0) 
+count(up{job="axon_exporter"} == 0) 
 ```
 
 ##### /
 Not show, for alert
 ```
-up{job="muta_exporter"} == 0
+up{job="axon_exporter"} == 0
 ```
 ###### Alert threshold:
 The value of the Metric variable up is zero
@@ -705,7 +705,7 @@ The value of the Metric variable up is zero
 
 
 
-## muta-benchmark
+## axon-benchmark
 #### TPS
 - description: TPS for consensus
 <details>
@@ -714,7 +714,7 @@ The value of the Metric variable up is zero
 ##### TPS
 TPS for consensus
 ```
-avg(rate(muta_consensus_committed_tx_total[5m]))
+avg(rate(axon_consensus_committed_tx_total[5m]))
 ```
 ###### Alert threshold:
 TPS is zero
@@ -729,13 +729,13 @@ TPS is zero
 ##### time_usage(s)
 Consensus time for P90
 ```
-avg(histogram_quantile(0.90, sum(rate(muta_consensus_duration_seconds_bucket[5m])) by (le, instance)))
+avg(histogram_quantile(0.90, sum(rate(axon_consensus_duration_seconds_bucket[5m])) by (le, instance)))
 ```
 
 ##### /
 Not show, for alert
 ```
-avg(histogram_quantile(0.90, sum(rate(muta_consensus_duration_seconds_bucket[5m])) by (le, instance))) / avg(histogram_quantile(0.90, sum(rate(muta_consensus_time_cost_seconds_bucket{type="exec"}[5m])) by (le, instance))) 
+avg(histogram_quantile(0.90, sum(rate(axon_consensus_duration_seconds_bucket[5m])) by (le, instance))) / avg(histogram_quantile(0.90, sum(rate(axon_consensus_time_cost_seconds_bucket{type="exec"}[5m])) by (le, instance))) 
 ```
 
 ###### Alert threshold:
@@ -750,7 +750,7 @@ More than three rounds of consensus
 ##### /
 Consensus exec time for P90
 ```
-avg(histogram_quantile(0.90, sum(rate(muta_consensus_time_cost_seconds_bucket{type="exec"}[5m])) by (le, instance)))
+avg(histogram_quantile(0.90, sum(rate(axon_consensus_time_cost_seconds_bucket{type="exec"}[5m])) by (le, instance)))
 ```
 </details>
 
@@ -762,7 +762,7 @@ avg(histogram_quantile(0.90, sum(rate(muta_consensus_time_cost_seconds_bucket{ty
 ##### /
 Average time per block for rocksdb running put_cf
 ```
-avg (sum by (instance) (increase(muta_storage_put_cf_seconds[5m]))) / avg(increase(muta_consensus_height[5m]))
+avg (sum by (instance) (increase(axon_storage_put_cf_seconds[5m]))) / avg(increase(axon_consensus_height[5m]))
 ```
 </details>
 
@@ -775,7 +775,7 @@ avg (sum by (instance) (increase(muta_storage_put_cf_seconds[5m]))) / avg(increa
 ##### /
 Average time per block for rocksdb running get_cf
 ```
-avg (sum by (instance) (increase(muta_storage_get_cf_seconds[5m]))) / avg(increase(muta_consensus_height[5m]))
+avg (sum by (instance) (increase(axon_storage_get_cf_seconds[5m]))) / avg(increase(axon_consensus_height[5m]))
 ```
 </details>
 
@@ -789,19 +789,19 @@ avg (sum by (instance) (increase(muta_storage_get_cf_seconds[5m]))) / avg(increa
 ##### Total
 Total number of transaction requests
 ```
-sum(rate(muta_api_request_result_total{type="send_transaction"}[5m]))
+sum(rate(axon_api_request_result_total{type="send_transaction"}[5m]))
 ```
 
 ##### Success Total
 Total number of successful transaction requests
 ```
-sum(rate(muta_api_request_result_total{result="success",type="send_transaction"}[5m]))
+sum(rate(axon_api_request_result_total{result="success",type="send_transaction"}[5m]))
 ```
 
 ##### instance
 processed transaction request count in last 5 minutes (the unit is count/second)
 ```
-rate(muta_api_request_result_total{result="success", type="send_transaction"}[5m])
+rate(axon_api_request_result_total{result="success", type="send_transaction"}[5m])
 ```
 </details>
 
@@ -816,7 +816,7 @@ rate(muta_api_request_result_total{result="success", type="send_transaction"}[5m
 Node current height
 
 ```
-sort_desc(muta_consensus_height)
+sort_desc(axon_consensus_height)
 ```
 </details>
 
@@ -828,7 +828,7 @@ sort_desc(muta_consensus_height)
 ##### Liveness
 Growth in node height
 ```
-increase(muta_consensus_height{job="muta_exporter"}[1m])
+increase(axon_consensus_height{job="axon_exporter"}[1m])
 ```
 ###### Alert threshold:
 Loss of Liveness
@@ -836,7 +836,7 @@ Loss of Liveness
 ##### /
 Not show, for alert
 ```
-up{job="muta_exporter"} == 1
+up{job="axon_exporter"} == 1
 ```
 ###### Alert threshold:
 Loss of Liveness
@@ -852,7 +852,7 @@ Loss of Liveness
 ##### {{instance}}
 Number of blocks synchronized by nodes
 ```
-muta_consensus_sync_block_total 
+axon_consensus_sync_block_total 
 ```
 </details>
 
@@ -867,13 +867,13 @@ Estimate the network message arrival rate in the last five minutes
 ```
 (
   # broadcast_count * (instance_count - 1)
-  sum(increase(muta_network_message_total{target="all", direction="sent"}[5m])) * (count(count by (instance) (muta_network_message_total)) - 1)
+  sum(increase(axon_network_message_total{target="all", direction="sent"}[5m])) * (count(count by (instance) (axon_network_message_total)) - 1)
   # unicast_count
-  + sum(increase(muta_network_message_total{target="single", direction="sent"}[5m]))
+  + sum(increase(axon_network_message_total{target="single", direction="sent"}[5m]))
 ) 
 /
 # received_count
-(sum(increase(muta_network_message_total{direction="received"}[5m])))
+(sum(increase(axon_network_message_total{direction="received"}[5m])))
 ```
 </details>
 
@@ -887,7 +887,7 @@ Estimate the network message arrival rate in the last five minutes
 ##### {{instance}}
 Number of rounds needed to reach consensus
 ```
-(muta_consensus_round > 0 )
+(axon_consensus_round > 0 )
 ```
 ###### Alert threshold:
 More than three rounds of consensus
@@ -902,7 +902,7 @@ More than three rounds of consensus
 ##### {{instance}}
 Number of transactions in the current mempool
 ```
-muta_mempool_tx_count
+axon_mempool_tx_count
 ```
 </details>
 
@@ -914,7 +914,7 @@ muta_mempool_tx_count
 ##### {{instance}}
 Number of nodes on the current connection
 ```
-muta_network_connected_peers
+axon_network_connected_peers
 ```
 </details>
 
@@ -926,13 +926,13 @@ muta_network_connected_peers
 ##### Saved peers
 Total number of peers
 ```
-max(muta_network_saved_peer_count)
+max(axon_network_saved_peer_count)
 ```
 
 ##### Connected Peers
 Number of nodes on the current connection
 ```
-muta_network_connected_peers
+axon_network_connected_peers
 ```
 </details>
 
@@ -945,7 +945,7 @@ muta_network_connected_peers
 ##### {{instance}}
 Number of consensus nodes
 ```
-muta_network_tagged_consensus_peers
+axon_network_tagged_consensus_peers
 ```
 </details>
 
@@ -957,21 +957,21 @@ muta_network_tagged_consensus_peers
 ##### Consensus peers
 Total number of consensus peers
 ```
-max(muta_network_tagged_consensus_peers)
+max(axon_network_tagged_consensus_peers)
 ```
 
 ##### {{instance}}-Connected Consensus Peers (Minus itself)
 Number of consensus nodes
 ```
-muta_network_connected_consensus_peers
+axon_network_connected_consensus_peers
 ```
 
 ##### /
 Average utilization of all CPUs
 ```
-(sum(muta_network_tagged_consensus_peers
+(sum(axon_network_tagged_consensus_peers
 ) by (instance) - 1)
-- sum(muta_network_connected_consensus_peers) by (instance)
+- sum(axon_network_connected_consensus_peers) by (instance)
 ```
 ###### Alert threshold:
 Alert on loss of connection to a consensus node
@@ -986,7 +986,7 @@ Alert on loss of connection to a consensus node
 ##### {{instance}}
 Number of nodes saved peers
 ```
-muta_network_saved_peer_count
+axon_network_saved_peer_count
 ```
 </details>
 
@@ -999,7 +999,7 @@ muta_network_saved_peer_count
 ##### {{instance}}
 Number of consensus nodes on the current connection
 ```
-muta_network_connected_consensus_peers
+axon_network_connected_consensus_peers
 ```
 </details> -->
 
@@ -1011,7 +1011,7 @@ muta_network_connected_consensus_peers
 ##### {{instance}}
 The number of connections in the handshake, requiring verification of the chain id
 ```
-muta_network_unidentified_connections
+axon_network_unidentified_connections
 ```
 </details>
 
@@ -1023,7 +1023,7 @@ muta_network_unidentified_connections
 ##### {{instance}}
 Number of active initiations to establish connections with other machines
 ```
-muta_network_outbound_connecting_peers
+axon_network_outbound_connecting_peers
 ```
 </details>
 
@@ -1035,7 +1035,7 @@ muta_network_outbound_connecting_peers
 ##### {{instance}}
 Disconnected count
 ```
-muta_network_ip_disconnected_count
+axon_network_ip_disconnected_count
 ```
 </details>
 
@@ -1047,7 +1047,7 @@ muta_network_ip_disconnected_count
 ##### {{instance}}
 Number of messages being processed
 ```
-muta_network_received_message_in_processing_guage
+axon_network_received_message_in_processing_guage
 ```
 </details>
 
@@ -1059,7 +1059,7 @@ muta_network_received_message_in_processing_guage
 ##### {{instance}}
 Number of messages being processed (based on IP of received messages)
 ```
-muta_network_received_ip_message_in_processing_guage{instance=~"$node"}
+axon_network_received_ip_message_in_processing_guage{instance=~"$node"}
 ```
 </details>
 
@@ -1071,7 +1071,7 @@ muta_network_received_ip_message_in_processing_guage{instance=~"$node"}
 ##### {{instance}}
 p90 for P2p Ping
 ```
-avg(histogram_quantile(0.90, sum(rate(muta_network_ping_in_ms_bucket[5m])) by (le, instance)))
+avg(histogram_quantile(0.90, sum(rate(axon_network_ping_in_ms_bucket[5m])) by (le, instance)))
 ```
 </details>
 
@@ -1083,7 +1083,7 @@ avg(histogram_quantile(0.90, sum(rate(muta_network_ping_in_ms_bucket[5m])) by (l
 ##### {{instance}}
 ping response time of the current node and other nodes
 ```
-muta_network_ip_ping_in_ms
+axon_network_ip_ping_in_ms
 ```
 </details> -->
 
@@ -1096,33 +1096,33 @@ muta_network_ip_ping_in_ms
 ##### Log labels
 Peer give up warnings
 ```
-{filename="/opt/muta.log"} |~ "WARN" |~ "give up"
+{filename="/opt/axon.log"} |~ "WARN" |~ "give up"
 ```
 </details>
 
 
-## muta-network
+## axon-network
 #### Network bandwidth usage per second all
-[link muta-node (Network bandwidth usage per second all)](#Network-bandwidth-usage-per-second-all)
+[link axon-node (Network bandwidth usage per second all)](#Network-bandwidth-usage-per-second-all)
 
 #### Internet traffic per hour
-[link muta-node (Internet traffic per hour)](#Internet-traffic-per-hour)
+[link axon-node (Internet traffic per hour)](#Internet-traffic-per-hour)
 
 
 #### mempool_cached_tx
-[link muta-benchmark (mempool_cached_tx)](#mempool_cached_tx)
+[link axon-benchmark (mempool_cached_tx)](#mempool_cached_tx)
 
 #### consensus_round_cost
-[link muta-benchmark (consensus_round_cost)](#consensus_round_cost)
+[link axon-benchmark (consensus_round_cost)](#consensus_round_cost)
 
 #### current_height
-[link muta-benchmark (current_height)](#current_height)
+[link axon-benchmark (current_height)](#current_height)
 
 #### synced_block
-[link muta-benchmark (synced_block)](#synced_block)
+[link axon-benchmark (synced_block)](#synced_block)
 
 #### processed_tx_request
-[link muta-benchmark (processed_tx_request)](#processed_tx_request)
+[link axon-benchmark (processed_tx_request)](#processed_tx_request)
 
 
 #### height and round
@@ -1133,19 +1133,19 @@ Peer give up warnings
 ##### height
 Height of consensus
 ```
-muta_consensus_height{instance=~"$node"}
+axon_consensus_height{instance=~"$node"}
 ```
 
 ##### round
 Rounds of consensus
 ```
-(muta_consensus_round{instance=~"$node"} > 0 )
+(axon_consensus_round{instance=~"$node"} > 0 )
 ```
 </details>
 
 
 
-#### muta_network_message_size
+#### axon_network_message_size
 - description: Network transmission size statistics
 <details>
 <summary>Legende details</summary>
@@ -1153,25 +1153,25 @@ Rounds of consensus
 ##### send-total-{{instance}}
 Each node send statistics
 ```
-sum(url:muta_network_message_size:sum5m{direction="send"}) by (instance)
+sum(url:axon_network_message_size:sum5m{direction="send"}) by (instance)
 ```
 
 ##### received-total-{{instance}}
 Each node received statistics
 ```
-sum(url:muta_network_message_size:sum5m{direction="received"}) by (instance)
+sum(url:axon_network_message_size:sum5m{direction="received"}) by (instance)
 ```
 
 ##### send-total
 Total send
 ```
-sum(url:muta_network_message_size:sum5m{direction="send"})
+sum(url:axon_network_message_size:sum5m{direction="send"})
 ```
 
 ##### received-total
 Total received
 ```
-sum(url:muta_network_message_size:sum5m{direction="received"})
+sum(url:axon_network_message_size:sum5m{direction="received"})
 ```
 
 </details>
@@ -1185,13 +1185,13 @@ sum(url:muta_network_message_size:sum5m{direction="received"})
 ##### {{url}}
 Size of each url send
 ```
-sum(url:muta_network_message_size:sum5m{direction="send",instance=~"$node"}) by (url)
+sum(url:axon_network_message_size:sum5m{direction="send",instance=~"$node"}) by (url)
 ```
 
 ##### count_{{action}}
 Count of each url send
 ```
-sum(rate(muta_network_message_total{direction="sent"}[5m])) by (action)
+sum(rate(axon_network_message_total{direction="sent"}[5m])) by (action)
 ```
 </details>
 
@@ -1203,12 +1203,12 @@ sum(rate(muta_network_message_total{direction="sent"}[5m])) by (action)
 ##### {{url}}
 Size of each url received
 ```
-sum(url:muta_network_message_size:sum5m{direction="received",instance=~"$node"}) by (url)
+sum(url:axon_network_message_size:sum5m{direction="received",instance=~"$node"}) by (url)
 ```
 
 ##### count_{{action}}
 Count of each url received
 ```
-sum(rate(muta_network_message_total{direction="received"}[5m])) by (action)
+sum(rate(axon_network_message_total{direction="received"}[5m])) by (action)
 ```
 </details>
