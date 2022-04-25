@@ -9,4 +9,4 @@ license = "MIT"
 clap = { version = "3.1", features = ["cargo", "yaml"] }
 docker-api = "0.8"
 rustyline = { version = "9.1", features = ["case_insensitive_history_search"] }
-tokio = { version = "1.0", features = ["full"] }
+tokio = { version = "1.0", features = ["macros"] }
