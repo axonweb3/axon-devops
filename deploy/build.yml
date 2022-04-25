@@ -21,6 +21,12 @@
       ignore_errors: yes
       tags: 
         - build
+    - name: Build axon
+      shell: "cd {{ deploy_path }} && cargo build --profile release-jemalloc --features=jemalloc"
+      when: enable_jemalloc == 'true'
+      ignore_errors: yes
+      tags:
+        - build
     - name: Copy axon
       shell: "cp {{ deploy_path }}/target/release/axon ./templates"
       ignore_errors: yes
