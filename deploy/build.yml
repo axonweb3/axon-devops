@@ -22,7 +22,7 @@
       tags: 
         - build
     - name: Build axon
-      shell: "cd {{ deploy_path }} && cargo build --release --features=jemalloc"
+      shell: "cd {{ deploy_path }} && cargo build --profile release-jemalloc --features=jemalloc"
       when: enable_jemalloc == 'true'
       ignore_errors: yes
       tags:
