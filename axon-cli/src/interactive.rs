@@ -3,18 +3,26 @@ use std::process;
 use clap::{crate_version, Command};
 use rustyline::{error::ReadlineError, Editor};
 
-use crate::docker;
+use crate::docker::DockerApi;
 
 const HISTORY_FILE: &str = "history.txt";
 
 #[derive(Default)]
 pub struct Interactive {
-    pub mount_path: String,
-    pub data_path:  String,
-    pub bench_path: String,
+    mount_path: String,
+    data_path:  String,
+    bench_path: String,
 }
 
 impl Interactive {
+    pub fn new(mount_path: String, data_path: String, bench_path: String) -> Self {
+        Interactive {
+            mount_path,
+            data_path,
+            bench_path,
+        }
+    }
+
     pub fn build_interactive() -> Command<'static> {
         Command::new("interactive")
             .version(crate_version!())
@@ -74,7 +82,7 @@ impl Interactive {
                             }
                             Some(("bm", _)) => {
                                 // mydocker::Api::create_network("axon-benchmark-net");
-                                docker::DockerApi::start_benchmark(&self.bench_path).await;
+                                DockerApi::start_benchmark(&self.bench_path).await;
                             }
                             // Some(("list", _)) => {
 
@@ -104,10 +112,7 @@ impl Interactive {
     }
 
     async fn start_axons(&self) {
-        let docker_api = docker::DockerApi {
-            network_name: String::from("axon-net"),
-            path:         self.mount_path.to_owned(),
-        };
+        let docker_api = DockerApi::new(String::from("axon-net"), self.mount_path.to_owned());
         docker_api.create_network().await;
         docker_api
             .start_container("axon1", "node_1.toml", 8000)

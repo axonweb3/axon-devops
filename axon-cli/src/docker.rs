@@ -8,13 +8,17 @@ const DOCKER_URI: &str = "tcp://127.0.0.1:2375";
 
 #[derive(Default)]
 pub struct DockerApi {
-    pub network_name: String,
-    pub path:         String,
+    network_name: String,
+    path:         String,
     // container_name: String,
     // file_name: String,
 }
 
 impl DockerApi {
+    pub fn new(network_name: String, path: String) -> Self {
+        DockerApi { network_name, path }
+    }
+
     pub fn new_docker() -> Docker {
         Docker::new(DOCKER_URI).unwrap()
     }

@@ -15,10 +15,6 @@ async fn main() {
     let b_path = matches.value_of("benchmark-data-path").unwrap();
     println!("benchmark data path: {}", b_path);
 
-    let inter = Interactive {
-        mount_path: m_path.to_string(),
-        data_path:  d_path.to_string(),
-        bench_path: b_path.to_string(),
-    };
+    let inter = Interactive::new(m_path.to_string(), d_path.to_string(), b_path.to_string());
     inter.start().await;
 }

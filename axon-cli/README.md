@@ -7,14 +7,15 @@
 
 3. run axon-cli with correct parameters. For example,
 ../target/debug/axon-cli --mount=/home/wenyuan/git/axon-devops/axon-cli/devtools --data=/home/wenyuan/git/axon-devops/axon-cli/devtools/chain --bench=/home/wenyuan/git/axon-devops/benchmark/benchmark
-   You have to config mount path and chain data path explicitly.
+   You have to config mount path, chain data path and benchmark config path explicitly.
 
 4. after axon-cli gets run. You have 4 commands to exeute.
 Before the start of docker containers, you have to enable tcp port for docker(0.0.0.0:2375 in this case).
 1). start, you can start 4 docker axon nodes.
 2). stop, stop the 4 docker nodes just started.
 3). rm, remove the 4 docker containers just created.
-4). delete, delete chain data under the path specified by parameter --data.
+4). del, delete chain data under the path specified by parameter --data.
+5). bm, start benchmark, transactions will be sent to the axon nodes.
 
 5. to be sure of the correctness. You can check by the following commands:
 1) check the liveness of axon nodes
@@ -46,3 +47,30 @@ root@6f816d8be4b7:/app# netstat -tnp | grep axon
 tcp        0      0 172.18.0.3:8001         172.18.0.2:8001         ESTABLISHED 1/./axon
 tcp        0      0 172.18.0.3:8001         172.18.0.5:8001         ESTABLISHED 1/./axon
 tcp        0      0 172.18.0.3:8001         172.18.0.4:8001         ESTABLISHED 1/./axon
+
+6. start benchmark
+bm is short for benchmark, this command will start benchmark. You can run `docker logs bm` to have a look at the benchmark status.
+For example:
+root@yoga:~# docker logs bm
+/////////////////////////////////////////////////////
+benchmark time: 60000 ms
+endpoint: http://172.17.0.1:8000
+/////////////////////////////////////////////////////
+
+waiting...
+preparing...
+
+deploying contract:  ERC20
+contract ERC20 deployed to 0xF67Bc4E50d1df92b0E4C61794A4517AF6a995CB2
+
+prepared
+benchmark case 0: ./benchmark
+
+/////////////////////////////////////////////////////
+benchmark time:  64650.558417998254 ms
+transaction count: 7200
+TPS: 111.3679475658724 ms
+transfer rate: 98.83
+/////////////////////////////////////////////////////
+
+You can check the result by the end of the output.
