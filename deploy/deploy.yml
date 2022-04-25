@@ -6,6 +6,8 @@
   become_method: sudo
   vars_files:
     - config.yml
+  environment:
+    MALLOC_CONF: "prof:true,lg_prof_interval:30"
   tasks:
   ###############################################################################################################
     - name: Pull code
