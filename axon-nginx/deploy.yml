@@ -1,0 +1,48 @@
+---
+- name: axon nginx
+  hosts: localhost
+  vars_files:
+    - config.yml
+
+  tasks:
+  ###############################################################################################################
+
+    - name: down
+      shell: "cd {{ deploy_path }} && docker-compose down"
+      ignore_errors: yes
+      become: yes
+      become_method: sudo
+      tags: 
+        - down
+
+    - name: start 
+      shell: "cd {{ deploy_path }} && docker-compose up -d"
+      become: yes
+      become_method: sudo
+      tags: 
+        - start
+
+    - name: Clean axon logs
+      shell: rm -rf  {{ deploy_path }}/logs
+      become: yes
+      become_method: sudo
+      tags: 
+        - clean
+
+    - name: disable access log.
+      when: enable_access_log == 'false'
+      replace:
+        path: "{{ deploy_path }}/nginx/conf/nginx.conf"
+        regexp: '(.*access_log.*)'
+        replace: '#\1'
+      tags: 
+        - config
+
+    - name: enable access log.
+      when: enable_access_log == 'true'
+      replace:
+        path: "{{ deploy_path }}/nginx/conf/nginx.conf"
+        regexp: '^#(.*access_log.*)'
+        replace: '\1'
+      tags: 
+        - config
