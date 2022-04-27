@@ -15,6 +15,7 @@ http_listening_address = "0.0.0.0:8000"
 ws_listening_address = "0.0.0.0:8010"
 maxconn = 25000
 max_payload_size = 1048576
+client_version = "0.1.0"
 # enable_dump_profile = false
 # [graphql.tls]
 # private_key_file_path = "key.pem"
@@ -34,7 +35,7 @@ multi_address = "/ip4/#bootstraps/tcp/8001/p2p/QmNk6bBwkLPuqnsrtxpp819XLZY3ymgjs
 
 [mempool]
 timeout_gap = 20
-pool_size = 20000
+pool_size = 20000000
 broadcast_txs_size = 200
 broadcast_txs_interval = 200
 
@@ -55,6 +56,11 @@ metrics = true
 
 [rocksdb]
 max_open_files = 64
+cache_size = 134217728
+
+# Provide an options file to tune RocksDB for your workload and your system configuration.
+# More details can be found in [the official tuning guide](https://github.com/facebook/rocksdb/wiki/RocksDB-Tuning-Guide).
+options_file = "default.db-options"
 
 [jaeger]
 service_name = "axon"
@@ -65,17 +71,17 @@ tracing_batch_size = 50
 listening_address = "0.0.0.0:8100"
 
 [cross_client]
-axon_udt_hash = "0xccca1b5cdede63c5cce826947dc4165e8bd0731c6e88636f3c47e8bc6a58ef03"
+axon_udt_hash = "0xf32ec1e3274c27ac4cc018c92efec443847e9b78ba8cbedca36f0fa8c35d1c9e"
 ckb_uri = "https://mercury-testnet.ckbapp.dev/rpc"
 mercury_uri = "#mercury_uri"
 start_block_number = 4096800
-checkpoint_interval = 5
-pk = "0x6fc935dad260867c749cf1ba6602d5f5ed7fb1131f1beb65be2d342e912eaafe"
+checkpoint_interval = 1000
+pk = "0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d"
 enable = #enable_cross_client
-admin_address = "0x8ab0CF264DF99D83525e9E11c7e4db01558AE1b1"
-node_address = "0x8ab0CF264DF99D83525e9E11c7e4db01558AE1b1"
-selection_lock_hash = "0x32b7eebcc847220291d01191c37831f608d8b1d0eecd28f25a96d8f9f8e2482b"
-checkpoint_type_hash = "0xbc3b9e93e517482862e5928419b624b90e2824988c8f3f0e056bccaa2e4eb02b"
+admin_address = "0x0000000000000000000000000000000000000000"
+node_address = "0x0000000000000000000000000000000000000000"
+selection_lock_hash = "0xf32ec1e3274c27ac4cc018c92efec443847e9b78ba8cbedca36f0fa8c35d1c9e"
+checkpoint_type_hash = "0xf32ec1e3274c27ac4cc018c92efec443847e9b78ba8cbedca36f0fa8c35d1c9e"
 
 [interoperability_extension]
 blockchain_extension_transaction_hashes = [
