@@ -67,6 +67,8 @@ class Benchmark {
                 "from": this.account.address,
                 "to": this.contract.options.address,
                 "gasLimit": 200000,
+                "maxPriorityFeePerGas": 3,
+                "maxFeePerGas": 3,
                 "nonce": this.benchmark_info.nonce,
                 "data": this.contract.methods.transfer('0x5cf83df52a32165a7f392168ac009b168c9e8915', 0).encodeABI(),
             }
