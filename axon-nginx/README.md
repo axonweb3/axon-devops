@@ -95,13 +95,34 @@ server {
     }
 }                                                      
 ```
-## Start and stop
-### start
+
+### Step 4
 ```shell
-$ docker-compose up -d
+$ vim config.yml 
+```
+Editor config.yml 
+
+- deploy_path: deploy files path
+- enable_access_log: true or false, 'true' will  generate access.log under niginx/logs.
+
+```yml
+deploy_path: "/home/ckb/axon-devops/axon-nginx"
+enable_access_log: "false"                                 
 ```
 
-### stop
+## Deploy
+### deploy
 ```shell
-$ docker-compose down
+$ make deploy 
+```
+
+
+### clean logs 
+```shell
+$ make clean
+```
+
+### config 
+```shell
+$ make config
 ```
