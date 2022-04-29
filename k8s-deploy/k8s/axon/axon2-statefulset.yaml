@@ -65,6 +65,9 @@ spec:
           - name: config-genesis
             mountPath: /app/devtools/chain/genesis.json
             subPath: genesis.json
+          - name: config-db-options
+            mountPath: /app/devtools/chain/k8s/default.db-options
+            subPath: default.db-options
           - name: data2
             mountPath: /app/devtools/chain/data2
             subPath: data2
@@ -97,6 +100,9 @@ spec:
         - name: config-genesis
           configMap:
             name: genesis
+        - name: config-db-options
+          configMap:
+            name: db-options
       restartPolicy: Always
   volumeClaimTemplates:
   - metadata:
