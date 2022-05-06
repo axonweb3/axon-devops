@@ -1,35 +1,67 @@
-#!/bin/sh
-# create configmap for axon
-kubectl delete configmap node1-toml -n axon
-kubectl delete configmap node2-toml -n axon
-kubectl delete configmap node3-toml -n axon
-kubectl delete configmap node4-toml -n axon
-kubectl delete configmap genesis -n axon
-kubectl delete configmap db-options -n axon
+#!/usr/bin/env bash
 
-kubectl create configmap node1-toml --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/node_1.toml -n axon
-kubectl create configmap node2-toml --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/node_2.toml -n axon
-kubectl create configmap node3-toml --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/node_3.toml -n axon
-kubectl create configmap node4-toml --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/node_4.toml -n axon
-kubectl create configmap genesis --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/genesis.json -n axon
-kubectl create configmap db-options --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/default.db-options -n axon
+function clean() {
+    set +e
+    echo "DEBUG" "Clean env to delete old axons, please wait..."
 
-#delete sts
-k delete -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon1-statefulset.yaml
-k delete -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon2-statefulset.yaml
-k delete -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon3-statefulset.yaml
-k delete -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon4-statefulset.yaml
+    (kubectl get sts -n "axon" -o json | jq --raw-output '.items[].metadata.name' | grep -E "^axon" || true) | while read -r name; do
+        kubectl delete sts "$name" -n "axon">/dev/null 2>&1
+    done
+    (kubectl get pvc -n "axon" -o json | jq --raw-output '.items[].metadata.name' | grep -E "^data" || true) | while read -r name; do
+        kubectl delete pvc "$name" -n "axon">/dev/null 2>&1
+    done
+    (kubectl get cm -n "axon" -o json | jq --raw-output '.items[].metadata.name' | grep -v "^kube" || true) | while read -r name; do
+        kubectl delete cm "$name" -n "axon">/dev/null 2>&1
+    done
+}
 
-#delete pvcs
-k delete pvc data1-axon1-0 -n axon
-k delete pvc data2-axon2-0 -n axon
-k delete pvc data3-axon3-0 -n axon
-k delete pvc data4-axon4-0 -n axon
+function create_configmap() {
+    echo "DEBUG" "create configmap for axons, please wait..."
+    kubectl create configmap node1-toml --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/node_1.toml -n axon
+    kubectl create configmap node2-toml --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/node_2.toml -n axon
+    kubectl create configmap node3-toml --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/node_3.toml -n axon
+    kubectl create configmap node4-toml --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/node_4.toml -n axon
+    kubectl create configmap genesis --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/genesis.json -n axon
+    kubectl create configmap db-options --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/default.db-options -n axon
+}
+function deploy_axon(){
+    echo "DEBUG" "deploy axons, please wait..."
+    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon1-statefulset.yaml
+    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon2-statefulset.yaml
+    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon3-statefulset.yaml
+    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon4-statefulset.yaml
+    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-chain.yaml
+    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/ingress/axon-ingress.yaml
+    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/pv/axon-logs-pv.yaml
+    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/pv/axon-logs-pvc.yaml
+    echo "DEBUG" "waiting for axons running..."
+    sleep 120
+    axon_running_num=`kubectl get pod -n axon | grep -i "axon" |grep -ci "running"`
+    if [[ $axon_running_num -lt 4 ]]; then
+       echo "axons not stable,please have a check"
+    else
+       echo "axons running"
+    fi
+}
 
-# create sts
-k apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon1-statefulset.yaml
-k apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon2-statefulset.yaml
-k apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon3-statefulset.yaml
-k apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon4-statefulset.yaml
-k apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-chain.yaml
+
+function main() {
+    case $1 in
+        "deploy")
+            create_configmap
+            deploy_axon
+            ;;
+        "deploy_axon")
+            deploy_axon
+            ;;
+        "create_configmap")
+            create_configmap
+            ;;
+        "clean")
+            clean
+            ;;
+        esac
+}
+
+main $*
 
