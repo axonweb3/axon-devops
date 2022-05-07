@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+data:
+  containers.input.conf: "<source>\n  @id fluentd-containers.log\n  @type tail                             \n  path /var/log/containers/*.log          \n  pos_file /var/log/es-containers.log.pos\n  tag raw.kubernetes.*                   \n  read_from_head true\n  <parse>                                 # 多行格式化成JSON\n    @type multi_format                    # 使用 multi-format-parser 解析器插件\n    <pattern>\n      format json                        \n      time_key time                      \n      time_format %Y-%m-%dT%H:%M:%S.%NZ   \n    </pattern>\n    <pattern>\n      format /^(?<time>.+) (?<stream>stdout|stderr) [^ ]* (?<log>.*)$/\n      #format /^(?<time>.+) (?<stream>stdout|stderr) (?<partial_flag>[FP]) (?<log>.*)$/\n      time_format %Y-%m-%dT%H:%M:%S.%N%:z\n    </pattern>\n  </parse>\n</source>\n# 在日志输出中检测异常，并将其作为一条日志转发 \n# https://github.com/GoogleCloudPlatform/fluent-plugin-detect-exceptions\n<match raw.kubernetes.**>           # 匹配tag为raw.kubernetes.**日志信息\n  @id raw.kubernetes\n  @type detect_exceptions           # 使用detect-exceptions插件处理异常栈信息\n  remove_tag_prefix raw             # 移除 raw 前缀\n  message log                       \n  stream stream\n  multiline_flush_interval 5\n  max_bytes 500000\n  max_lines 1000\n</match>\n<filter **>  # 拼接日志\n  @id filter_concat\n  @type concat                # Fluentd Filter 插件，用于连接多个事件中分隔的多行日志。\n  key message\n  partial_key partial_flag\n  partial_value P\n  #use_partial_metadata true\n  #multiline_start_regexp /^\\[[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z/\n  #multiline_end_regexp /\\n$/\n  #multiline_end_regexp /main\\n$/\n  flush_interval 60\t\n  #separator \"\"\n</filter> \n# 添加 Kubernetes metadata 数据\n<filter kubernetes.**>\n  @id filter_kubernetes_metadata\n  @type kubernetes_metadata\n</filter>\n# 修复 ES 中的 JSON 字段\n# 插件地址：https://github.com/repeatedly/fluent-plugin-multi-format-parser\n<filter kubernetes.**>\n  @id filter_parser\n  @type parser                # multi-format-parser多格式解析器插件\n  key_name log                # 在要解析的记录中指定字段名称。\n  reserve_data true           # 在解析结果中保留原始键值对。\n  remove_key_name_field true  # key_name 解析成功后删除字段。\n  <parse>\n    @type multi_format\n    <pattern>\n      format json\n    </pattern>\n    <pattern>\n      format none\n    </pattern>\n  </parse>\n</filter>\n<filter kubernetes.**>\n  @type record_transformer\n  remove_keys $.docker.container_id,$.kubernetes.container_image_id,$.kubernetes.pod_id,$.kubernetes.namespace_id,$.kubernetes.master_url,$.kubernetes.labels.pod-template-hash\n</filter>\n 只保留具有logging=true标签的Pod日志\n <filter kubernetes.**>\n  @id filter_log\n  @type grep\n  <regexp>\n    key $.kubernetes.labels.logging\n    pattern ^true$\n  </regexp>\n</filter>"
+  forward.input.conf: |-
+    # 监听通过TCP发送的消息
+    <source>
+      @id forward
+      @type forward
+    </source>
+  output.conf: |-
+    <match **>
+       type elasticsearch_dynamic
+       suppress_type_name true
+       log_level info
+       include_tag_key true
+       host 18.163.87.248
+       port 9200
+       logstash_format true
+       logstash_prefix logs-${record['kubernetes']['container_name']}
+       # Set the chunk limits.
+       buffer_chunk_limit 512M
+       buffer_queue_limit 256
+       flush_interval 10s
+       # Never wait longer than 5 minutes between retries.
+       max_retry_wait 30
+       # Disable the limit on the number of retries (retry forever).
+       disable_retry_limit
+       overflow_action block
+       # Use multiple threads for processing.
+       num_threads 32
+       reload_connections false
+       reconnect_on_error true
+       reload_on_failure true
+    </match>
+  system.conf: |-
+    <system>
+      root_dir /tmp/fluentd-buffers/
+    </system>
+kind: ConfigMap
+metadata:
+  annotations: {}
+  name: fluentd-config
+  namespace: logging
+  resourceVersion: '1093792'
+
