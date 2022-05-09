@@ -3,3 +3,5 @@
 - [Deploy Benchmark](./benchmark/README.md)
 - [Deploy pr-bot](./pr-bot/README.md)
 - [Deploy Axon](./deploy/README.md)
+- [Deploy Axon on k8s](./k8s-deploy/README.md)
+- [Deploy apm](./apm/README.md)
