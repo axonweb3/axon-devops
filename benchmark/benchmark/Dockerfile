@@ -1,10 +1,10 @@
 FROM node:16-slim
 
-WORKDIR /server
+WORKDIR /benchmark
 
 ADD ./ .
 
 RUN yarn install
 
 
-CMD [ "node", "/server/index.js" ]
+CMD [ "node", "/benchmark/index.js" ]
