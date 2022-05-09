@@ -15,3 +15,6 @@ config:
 
 build: 
 	ansible-playbook build.yml --tags build
+
+check:
+	ansible axon -m shell -a "ps -ef | grep axon"
