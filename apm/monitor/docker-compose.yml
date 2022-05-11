@@ -114,19 +114,23 @@ services:
     networks:
       - axon-monitor
 
-  # ================================= Loki  ================================= 
-  loki:
-    image: grafana/loki:1.5.0
-    container_name: axon-loki
-    restart: on-failure
+  elastalert:
+    image: praecoapp/elastalert-server:20210704
+    container_name: elk-elastalert
     ports:
-      - "8103:3100"
+      - 3330:3330
+      - 3333:3333
+    user: 1000:1000
     volumes:
-      - ./config/loki:/etc/loki
-      - ./data/nginx:/var/log/nginx
-    command: -config.file=/etc/loki/loki-local-config.yaml
+      - ./config/elastalert2/elastalert.yaml:/opt/elastalert/config.yaml
+      - ./config/elastalert2/config.json:/opt/elastalert-server/config/config.json
+      - ./config/elastalert2/rules:/opt/elastalert/rules
+      - ./config/elastalert2/rule_templates:/opt/elastalert/rule_templates
     networks:
-      - axon-monitor    
+      - elk
+    depends_on:
+      - elasticsearch
+        #restart: on-failurer   
 
 networks:
   axon-monitor:
