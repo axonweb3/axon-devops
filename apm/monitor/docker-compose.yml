@@ -112,20 +112,6 @@ services:
     depends_on:
       - jaeger-collector  
     networks:
-      - axon-monitor
-
-  # ================================= Loki  ================================= 
-  loki:
-    image: grafana/loki:1.5.0
-    container_name: axon-loki
-    restart: on-failure
-    ports:
-      - "8103:3100"
-    volumes:
-      - ./config/loki:/etc/loki
-      - ./data/nginx:/var/log/nginx
-    command: -config.file=/etc/loki/loki-local-config.yaml
-    networks:
       - axon-monitor    
 
 networks:
