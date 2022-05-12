@@ -1,0 +1,33 @@
+
+es_host: elasticsearch
+es_port: 9200
+#es_username: elastic
+#es_password: IJKh0p2uFa4aKtBMLCBB
+
+
+name: axon-collector-testnet-error
+
+type: any
+
+# (Required)
+# Index to search, wildcard supported
+index: axon*
+filter:
+- query:
+    query_string:
+            #query: "message : error NOT warn"
+        query: "ERROR AND NOT WARN"
+
+# (Required)
+# The alert is use when a match is found
+# alert:
+# - "telegram"
+alert:
+  - discord
+alert_subject: testnet_collector_error
+alert_subject_args: []
+discord_webhook_url: 'https://discord.com/api/webhooks/947774493592518686'
+alert_text: "from elastalert - {0}"
+alert_text_args: ["message"]
+alert_text_type: alert_text_only
+
