@@ -112,7 +112,25 @@ services:
     depends_on:
       - jaeger-collector  
     networks:
-      - axon-monitor    
+      - axon-monitor
+
+  elastalert:
+    image: praecoapp/elastalert-server:20210704
+    container_name: elk-elastalert
+    ports:
+      - 3330:3330
+      - 3333:3333
+    user: 1000:1000
+    volumes:
+      - ./config/elastalert2/elastalert.yaml:/opt/elastalert/config.yaml
+      - ./config/elastalert2/config.json:/opt/elastalert-server/config/config.json
+      - ./config/elastalert2/rules:/opt/elastalert/rules
+      - ./config/elastalert2/rule_templates:/opt/elastalert/rule_templates
+    networks:
+      - axon-monitor
+    depends_on:
+      - elasticsearch
+        #restart: on-failurer     
 
 networks:
   axon-monitor:
