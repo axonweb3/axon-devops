@@ -18,6 +18,7 @@
         - build
     - name: Build axon
       shell: "cd {{ deploy_path }} && cargo build --release"
+      when: enable_jemalloc == 'false'
       ignore_errors: yes
       tags: 
         - build

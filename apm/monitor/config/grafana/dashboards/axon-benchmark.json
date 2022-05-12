@@ -3107,7 +3107,7 @@
           "value": ""
         },
         "datasource": "Prometheus",
-        "definition": "label_values(muta_consensus_height, instance)",
+        "definition": "label_values(axon_consensus_height, instance)",
         "description": null,
         "error": null,
         "hide": 0,
@@ -3117,7 +3117,7 @@
         "name": "node",
         "options": [],
         "query": {
-          "query": "label_values(muta_consensus_height, instance)",
+          "query": "label_values(axon_consensus_height, instance)",
           "refId": "Prometheus-node-Variable-Query"
         },
         "refresh": 1,
