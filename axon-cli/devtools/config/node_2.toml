@@ -65,7 +65,7 @@ metrics = true
 max_open_files = 64
 
 #[apm]
-#service_name = "muta"
+#service_name = "axon"
 #tracing_address = "0.0.0.1:6831"
 #tracing_batch_size = 50
 #prometheus_listening_address = "0.0.0.0:8200"
