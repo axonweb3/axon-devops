@@ -7,13 +7,6 @@ datasources:
   url: http://prometheus:9090
   basicAuth: false
 
-- name: Loki
-  type: loki
-  access: proxy
-  url: http://axon-loki:3100
-  basicAuth: false
-  jsonData:
-    maxLines: 100000000
   
 - name: Prometheus-loki
   type: prometheus
@@ -27,8 +20,12 @@ datasources:
   url: http://jaeger-query:16686
   basicAuth: false
 
-- name: Elasticsearch
-  type: Elasticsearch
+- name: Elasticsearch-axon
+  type: elasticsearch
   access: proxy
-  url: http:/localhost:9200
-  basicAuth: false
+  database: 'axon-*'
+  url: http://localhost:9200
+  jsonData:
+    interval: nil
+    timeField: '@timestamp'
+    esVersion: 70

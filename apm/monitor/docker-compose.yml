@@ -127,10 +127,10 @@ services:
       - ./config/elastalert2/rules:/opt/elastalert/rules
       - ./config/elastalert2/rule_templates:/opt/elastalert/rule_templates
     networks:
-      - elk
+      - axon-monitor
     depends_on:
       - elasticsearch
-        #restart: on-failurer   
+        #restart: on-failurer     
 
 networks:
   axon-monitor:
