@@ -39,7 +39,7 @@
 <!-- /TOC -->
 
 <a id="markdown-axon-monitor-部署" name="axon-monitor-部署"></a>
-# muta monitor 部署
+# axon monitor 部署
 
 <a id="markdown-架构" name="架构"></a>
 ## 架构
@@ -335,19 +335,19 @@ scrape_configs:
     static_configs:
     - targets: ['127.0.0.1:9090']
 
-  # 配置为 muta-jaeger-collector 和  muta-jaeger-query 所在 ip，端口和例子如下
+  # 配置为 axon-jaeger-collector 和  axon-jaeger-query 所在 ip，端口和例子如下
   # Jaeger server 状态监控
   - job_name: 'jaeger'
     static_configs:
-    - targets: ['muta-jaeger-collector:14269','muta-jaeger-query:16687']
+    - targets: ['axon-jaeger-collector:14269','axon-jaeger-query:16687']
 
-  # 这里配置所有 muta 节点， ['node_id_1:14271, 'node_ip_2:14271', 'node_ip_3:14271']
+  # 这里配置所有 axon 节点， ['node_id_1:14271, 'node_ip_2:14271', 'node_ip_3:14271']
   # Jaeger 采集端状态监控
   - job_name: 'jaeger_agent'
     static_configs:
     - targets: [jaeger_agent_ip]  
 
-  # 这里配置所有 muta 节点， ['node_id_1:9100, 'node_ip_2:9100', 'node_ip_3:9100']
+  # 这里配置所有 axon 节点， ['node_id_1:9100, 'node_ip_2:9100', 'node_ip_3:9100']
   # Node_exporter 采集端状态监控
   - job_name: 'node_exporter'
     static_configs:

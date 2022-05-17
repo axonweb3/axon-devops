@@ -10,7 +10,7 @@ filebeat.inputs:
 output.elasticsearch:
   hosts: ["ES_ADDRESS:9200"]
   indices:
-    - index: "axon-%{[agent.version]}-%{+yyyy.MM.dd}"
+    - index: "axon-FILEBEAT_HOSTNAME-%{+yyyy.MM.dd}"
 
 processors:
   - add_docker_metadata:

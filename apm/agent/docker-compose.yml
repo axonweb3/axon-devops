@@ -27,19 +27,6 @@ services:
       - '--reporter.grpc.host-port=${JACGER_COLLECTOR_ADDRESS}'
 
 
-  promtail:
-    image: grafana/promtail:master-9ad98df
-    container_name: axon-promtail
-    restart: on-failure
-    ports:
-      - '8102:9080'
-    volumes:
-      - ./data/promtail/positions:/tmp/promtail/
-      - ./config/promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml
-      - ${AXON_LOG_PATH}:/var/logs
-    command: 
-      -config.file=/etc/promtail/promtail-config.yaml
-
   filebeat:
       image: "docker.elastic.co/beats/filebeat:7.2.0"
       user: root
