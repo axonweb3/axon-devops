@@ -52,11 +52,11 @@
   tags: 
     - config
 
-- name: Replace LOKI_ADDRESS
+- name: Replace FILEBEAT_HOSTNAME
   replace:
-    path: "{{ monitor_agent_dir }}/config/promtail/promtail-config.yaml"
-    regexp: "LOKI_ADDRESS"
-    replace: "{{ monitor_address }}"
+    path: "{{ monitor_agent_dir }}/config/filebeat/filebeat.yml"
+    regexp: "FILEBEAT_HOSTNAME"
+    replace: "{{ ansible_hostname }}"
   tags:
       - config
 

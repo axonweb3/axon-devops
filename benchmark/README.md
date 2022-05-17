@@ -61,5 +61,5 @@ $ nohup yarn start &
 ### Modify specified parameters via pass-through
 The passed parameters will replace the configuration of the corresponding key in config.json
 ```shell
-$ node index.js --benchmark_cases="['./benchmark']"
+$ nohup node index.js --benchmark_cases="['./benchmark']" &
 ```
