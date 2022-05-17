@@ -60,6 +60,7 @@ impl Interactive {
                                     .arg("axon2")
                                     .arg("axon3")
                                     .arg("axon4")
+                                    .arg("bm")
                                     .output()
                                     .expect("stop containers exception!!!");
                             }
@@ -70,6 +71,7 @@ impl Interactive {
                                     .arg("axon2")
                                     .arg("axon3")
                                     .arg("axon4")
+                                    .arg("bm")
                                     .output()
                                     .expect("rm containers exception!!!");
                             }

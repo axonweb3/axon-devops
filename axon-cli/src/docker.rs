@@ -58,7 +58,7 @@ impl DockerApi {
         let cmd = vec!["./axon", &file_para, genesis_config];
         // let entrypoint = String::from("/app");
         let vols = vec![self.path.to_owned() + ":/app/devtools"];
-        let opts = ContainerCreateOpts::builder("axon:v1")
+        let opts = ContainerCreateOpts::builder("axon:v2")
             .name(name)
             // .auto_remove(true)
             .cmd(&cmd)
