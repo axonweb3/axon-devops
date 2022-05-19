@@ -23,8 +23,8 @@
   "editable": true,
   "gnetId": 11074,
   "graphTooltip": 0,
-  "id": 4,
-  "iteration": 1646144208858,
+  "id": 2,
+  "iteration": 1652941139403,
   "links": [
     {
       "icon": "external link",
@@ -551,7 +551,7 @@
         "noDataState": "no_data",
         "notifications": [
           {
-            "uid": "notification-telegram"
+            "uid": "Axon-discord"
           }
         ]
       },
@@ -770,7 +770,7 @@
         "noDataState": "no_data",
         "notifications": [
           {
-            "uid": "notification-telegram"
+            "uid": "Axon-discord"
           }
         ]
       },
@@ -973,7 +973,7 @@
         "noDataState": "no_data",
         "notifications": [
           {
-            "uid": "notification-telegram"
+            "uid": "Axon-discord"
           }
         ]
       },
@@ -2106,7 +2106,7 @@
         "noDataState": "no_data",
         "notifications": [
           {
-            "uid": "notification-telegram"
+            "uid": "Axon-discord"
           }
         ]
       },
@@ -2329,7 +2329,7 @@
         "noDataState": "no_data",
         "notifications": [
           {
-            "uid": "notification-telegram"
+            "uid": "Axon-discord"
           }
         ]
       },
@@ -2678,7 +2678,7 @@
         "noDataState": "no_data",
         "notifications": [
           {
-            "uid": "notification-telegram"
+            "uid": "Axon-discord"
           }
         ]
       },
@@ -3032,7 +3032,7 @@
         "noDataState": "no_data",
         "notifications": [
           {
-            "uid": "notification-telegram"
+            "uid": "Axon-discord"
           }
         ]
       },
@@ -3328,7 +3328,7 @@
         "noDataState": "no_data",
         "notifications": [
           {
-            "uid": "notification-telegram"
+            "uid": "Axon-discord"
           }
         ]
       },
@@ -3971,7 +3971,7 @@
         "noDataState": "ok",
         "notifications": [
           {
-            "uid": "notification-telegram"
+            "uid": "Axon-discord"
           }
         ]
       },
@@ -4137,7 +4137,7 @@
         "noDataState": "ok",
         "notifications": [
           {
-            "uid": "notification-telegram"
+            "uid": "Axon-discord"
           }
         ]
       },
@@ -4299,7 +4299,7 @@
         "noDataState": "ok",
         "notifications": [
           {
-            "uid": "notification-telegram"
+            "uid": "Axon-discord"
           }
         ]
       },
@@ -4482,7 +4482,7 @@
         "noDataState": "ok",
         "notifications": [
           {
-            "uid": "notification-telegram"
+            "uid": "Axon-discord"
           }
         ]
       },
@@ -4663,7 +4663,11 @@
         "message": "jaeger-agent is down",
         "name": "Jaeger Agent alert",
         "noDataState": "ok",
-        "notifications": []
+        "notifications": [
+          {
+            "uid": "Axon-discord"
+          }
+        ]
       },
       "aliasColors": {},
       "bars": false,
@@ -4783,324 +4787,6 @@
         "align": false,
         "alignLevel": null
       }
-    },
-    {
-      "alert": {
-        "alertRuleTags": {},
-        "conditions": [
-          {
-            "evaluator": {
-              "params": [
-                0.9
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "and"
-            },
-            "query": {
-              "params": [
-                "F",
-                "5m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "avg"
-            },
-            "type": "query"
-          }
-        ],
-        "executionErrorState": "alerting",
-        "for": "5m",
-        "frequency": "1m",
-        "handler": 1,
-        "message": "loki is down",
-        "name": "Jaeger Agent alert",
-        "noDataState": "ok",
-        "notifications": []
-      },
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Prometheus",
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "links": []
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 0,
-        "y": 74
-      },
-      "hiddenSeries": false,
-      "id": 215,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.2.0-33922pre",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "count(up{job=\"loki\"} == 1) ",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "active",
-          "refId": "A"
-        },
-        {
-          "expr": "count(up{job=\"loki\"} == 0) ",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "down",
-          "refId": "B"
-        },
-        {
-          "expr": "up{job=\"loki\"} == 0",
-          "hide": true,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "F"
-        }
-      ],
-      "thresholds": [
-        {
-          "colorMode": "critical",
-          "fill": true,
-          "line": true,
-          "op": "gt",
-          "value": 0.9,
-          "visible": true
-        }
-      ],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Loki Status",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "alert": {
-        "alertRuleTags": {},
-        "conditions": [
-          {
-            "evaluator": {
-              "params": [
-                0.9
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "and"
-            },
-            "query": {
-              "params": [
-                "C",
-                "5m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "avg"
-            },
-            "type": "query"
-          }
-        ],
-        "executionErrorState": "alerting",
-        "for": "5m",
-        "frequency": "1m",
-        "handler": 1,
-        "message": "Log collection failed",
-        "name": "promtail status alert",
-        "noDataState": "ok",
-        "notifications": [
-          {
-            "uid": "notification-telegram"
-          }
-        ]
-      },
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "links": []
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 8,
-        "y": 74
-      },
-      "hiddenSeries": false,
-      "id": 209,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.2.0-33922pre",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "count(up{job=\"promtail_agent\"} == 1) ",
-          "instant": false,
-          "interval": "",
-          "legendFormat": "active",
-          "refId": "B"
-        },
-        {
-          "expr": "count(up{job=\"promtail_agent\"} == 0) ",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "down",
-          "refId": "A"
-        },
-        {
-          "expr": "up{job=\"promtail_agent\"} == 0",
-          "hide": true,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "C"
-        }
-      ],
-      "thresholds": [
-        {
-          "colorMode": "critical",
-          "fill": true,
-          "line": true,
-          "op": "gt",
-          "value": 0.9,
-          "visible": true
-        }
-      ],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Promtail Status",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "transformations": [],
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:1706",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:1707",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
     }
   ],
   "refresh": false,
@@ -5112,7 +4798,7 @@
       {
         "allValue": null,
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "node_exporter",
           "value": "node_exporter"
         },
@@ -5174,8 +4860,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "13.114.134.254:8101",
-          "value": "13.114.134.254:8101"
+          "text": "13.113.114.131:8101",
+          "value": "13.113.114.131:8101"
         },
         "datasource": "Prometheus",
         "definition": "label_values(node_uname_info{job=~\"$job\",nodename=~\"$hostname\"},instance)",
@@ -5267,8 +4953,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "axon-04",
-          "value": "axon-04"
+          "text": "axon-readnode-03",
+          "value": "axon-readnode-03"
         },
         "datasource": "Prometheus",
         "definition": "label_values(node_uname_info{job=~\"$job\",instance=~\"$node\"}, nodename)",
@@ -5325,5 +5011,5 @@
   "timezone": "browser",
   "title": "axon-node",
   "uid": "axon-node",
-  "version": 7
+  "version": 1
 }

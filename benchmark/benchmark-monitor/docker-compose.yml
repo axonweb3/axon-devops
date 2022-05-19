@@ -1,0 +1,19 @@
+version: '3.3'
+services:
+  filebeat:
+      image: "docker.elastic.co/beats/filebeat:7.5.0"
+      user: root
+      container_name: benchmark-filebeat
+      volumes:
+          - /var/run/docker.sock:/host_docker/docker.sock
+          - /var/lib/docker:/host_docker/var/lib/docker
+          - ./config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+          - BENCHMARK_DIR/logs:/usr/share/filebeat/logs
+      command: ["--strict.perms=false"]
+      ulimits:
+        memlock:
+          soft: -1
+          hard: -1
+      stdin_open: true
+volumes:
+    elasticsearch_data:
