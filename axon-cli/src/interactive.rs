@@ -1,6 +1,6 @@
 use std::process;
 
-use clap::{crate_version, Command};
+use clap::{crate_version, Arg, Command};
 use rustyline::{error::ReadlineError, Editor};
 
 use crate::docker::DockerApi;
@@ -31,6 +31,34 @@ impl Interactive {
             .subcommand(Command::new("rm").about("Remove four axon containers"))
             .subcommand(Command::new("del").about("Delete chain data"))
             .subcommand(Command::new("bm").about("Start benchmark"))
+            .subcommand(
+                Command::new("apm")
+                    .about("Application Performance Management")
+                    .subcommand(
+                        Command::new("start")
+                            .arg(
+                                Arg::new("path")
+                                    .short('p')
+                                    .long("path")
+                                    .help("path of apm directory")
+                                    .required(true)
+                                    .takes_value(true),
+                            )
+                            .about("Start apm"),
+                    )
+                    .subcommand(
+                        Command::new("stop")
+                            .arg(
+                                Arg::new("path")
+                                    .short('p')
+                                    .long("path")
+                                    .help("path of apm directory")
+                                    .required(true)
+                                    .takes_value(true),
+                            )
+                            .about("Stop apm"),
+                    ),
+            )
             .subcommand(Command::new("list").about("List docker images"))
     }
 
@@ -46,51 +74,74 @@ impl Interactive {
             match readline {
                 Ok(line) => {
                     rl.add_history_entry(line.as_str());
-                    let args = vec!["interactive", &line];
+                    let mut args: Vec<&str> = line.split(' ').collect();
+                    args.insert(0, "interactive");
                     let app_m = parser.clone().try_get_matches_from(args);
                     match app_m {
-                        Ok(matches) => match matches.subcommand() {
-                            Some(("start", _)) => {
-                                self.start_axons().await;
+                        Ok(matches) => {
+                            match matches.subcommand() {
+                                Some(("start", _)) => {
+                                    self.start_axons().await;
+                                }
+                                Some(("stop", _)) => {
+                                    let _output = process::Command::new("docker")
+                                        .arg("stop")
+                                        .arg("axon1")
+                                        .arg("axon2")
+                                        .arg("axon3")
+                                        .arg("axon4")
+                                        .arg("bm")
+                                        .output()
+                                        .expect("stop containers exception!!!");
+                                }
+                                Some(("rm", _)) => {
+                                    let _output = process::Command::new("docker")
+                                        .arg("rm")
+                                        .arg("axon1")
+                                        .arg("axon2")
+                                        .arg("axon3")
+                                        .arg("axon4")
+                                        .arg("bm")
+                                        .output()
+                                        .expect("rm containers exception!!!");
+                                }
+                                Some(("del", _)) => {
+                                    let _output = process::Command::new("rm")
+                                        .arg("-rf")
+                                        .arg(&self.data_path)
+                                        .output()
+                                        .expect("delete chain data exception!!!");
+                                }
+                                Some(("bm", _)) => {
+                                    // mydocker::Api::create_network("axon-benchmark-net");
+                                    DockerApi::start_benchmark(&self.bench_path).await;
+                                }
+                                Some(("apm", apm_matches)) => match apm_matches.subcommand() {
+                                    Some(("start", matches)) => {
+                                        let path =
+                                            matches.value_of("path").unwrap_or("").to_owned()
+                                                + "/apm_start.sh";
+                                        println!("apm path: {}", path);
+                                        let _output = process::Command::new(path)
+                                            .output()
+                                            .expect("Start apm exception!!!");
+                                    }
+                                    Some(("stop", _)) => {
+                                        let path =
+                                            matches.value_of("path").unwrap_or("").to_owned()
+                                                + "/apm_stop.sh";
+                                        println!("apm path: {}", path);
+                                        let _output = process::Command::new(path)
+                                            .output()
+                                            .expect("Stop apm exception!!!");
+                                    }
+                                    _ => {}
+                                },
+                                // Some(("list", _)) => {
+                                // }
+                                _ => {}
                             }
-                            Some(("stop", _)) => {
-                                let _output = process::Command::new("docker")
-                                    .arg("stop")
-                                    .arg("axon1")
-                                    .arg("axon2")
-                                    .arg("axon3")
-                                    .arg("axon4")
-                                    .arg("bm")
-                                    .output()
-                                    .expect("stop containers exception!!!");
-                            }
-                            Some(("rm", _)) => {
-                                let _output = process::Command::new("docker")
-                                    .arg("rm")
-                                    .arg("axon1")
-                                    .arg("axon2")
-                                    .arg("axon3")
-                                    .arg("axon4")
-                                    .arg("bm")
-                                    .output()
-                                    .expect("rm containers exception!!!");
-                            }
-                            Some(("del", _)) => {
-                                let _output = process::Command::new("rm")
-                                    .arg("-rf")
-                                    .arg(&self.data_path)
-                                    .output()
-                                    .expect("delete chain data exception!!!");
-                            }
-                            Some(("bm", _)) => {
-                                // mydocker::Api::create_network("axon-benchmark-net");
-                                DockerApi::start_benchmark(&self.bench_path).await;
-                            }
-                            // Some(("list", _)) => {
-
-                            // }
-                            _ => {}
-                        },
+                        }
                         Err(err) => {
                             println!("{}", err);
                         }

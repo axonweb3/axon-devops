@@ -50,14 +50,17 @@ impl DockerApi {
 
     pub async fn start_container(&self, name: &str, file_name: &str, port: u32) {
         let docker = DockerApi::new_docker();
-        // let runtime = DockerApi::run_time();
 
         let file_para = "-c=/app/devtools/config/".to_owned() + file_name;
         let genesis_config = "-g=/app/devtools/config/genesis_four_nodes.json";
         println!("{:?}", file_para);
         let cmd = vec!["./axon", &file_para, genesis_config];
-        // let entrypoint = String::from("/app");
-        let vols = vec![self.path.to_owned() + ":/app/devtools"];
+
+        let data_mapping = self.path.to_owned() + "/devtools" + ":/app/devtools";
+        let log_mapping = self.path.to_owned() + "/logs/" + name + ":/app/logs";
+        // prometheus collecting port from 8900-8903
+        let collect_port = 8900 + (port - 8000);
+        let vols = vec![data_mapping, log_mapping];
         let opts = ContainerCreateOpts::builder("axon:v2")
             .name(name)
             // .auto_remove(true)
@@ -67,6 +70,7 @@ impl DockerApi {
             .working_dir("/app")
             .network_mode("axon-net")
             .expose(PublishPort::tcp(8000), port)
+            .expose(PublishPort::tcp(8100), collect_port)
             .build();
         println!("{:?}", opts);
         // runtime.block_on(async {

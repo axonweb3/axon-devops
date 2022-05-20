@@ -90,3 +90,15 @@ transfer rate: 98.83
 /////////////////////////////////////////////////////
 
 You can check the result by the end of the output.
+
+## 7. start apm
+We offer `apm start` and `apm stop` commands to start and stop apm features respectively.
+However, before you start, you need to get some configs prepared.
+- In axon-cli/apm/deploy/hosts, change ip of axon_node to your own ip. In my case, it is `172.19.187.44`.
+- I just put the apm monitor and agent dirrectory under `/root/test`, you need to specify your own appropriate paths.  
+  For monitor, you need to change `monitor_dir` in file `axon-cli/apm/deploy/roles/monitor/vars/main.yaml`.  
+  For agent, you need to change `monitor_agent_dir` in file `axon-cli/apm/deploy/roles/agent/vars/main.yaml`.  
+- The right execution of `apm start` and `apm stop` now depends on the apm path. So, to execute locally, you need commands like this: 
+  `apm start -p=/home/wenyuan/git/axon-devops/axon-cli/apm`  
+
+After the right config and the successful start of apm, you can visit Grafana by localhost:8600 in your browser.
