@@ -10,15 +10,20 @@
     MALLOC_CONF: "prof:true,lg_prof_interval:30"
   tasks:
   ###############################################################################################################
-    - name: Pull code
-      git:
-        repo: "{{ axon_repo }}"
-        dest: "{{ deploy_path }}"
-        version: "{{ axon_branch }}"
-        force: yes
-      become: yes
-      become_method: sudo
-      tags: 
+    - name: check monitor dir
+      stat:
+        path: "{{ deploy_path }}"
+      register: file_status
+      tags:
+        - deploy
+
+    - name: create monitor dir
+      file:
+        path: "{{ deploy_path }}"
+        state: directory
+      when:
+        file_status.stat.exists == False
+      tags:
         - deploy
 
 ###############################################################################################################
