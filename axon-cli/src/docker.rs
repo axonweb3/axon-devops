@@ -48,20 +48,53 @@ impl DockerApi {
         };
     }
 
-    pub async fn start_container(&self, name: &str, file_name: &str, port: u32) {
-        let docker = DockerApi::new_docker();
+    // pub async fn start_single_axon(&self, name: &str, file_para: &str,
+    // genesis_para: &str, port: u32) {     let docker =
+    // DockerApi::new_docker();     let cmd = vec!["./axon", &file_para,
+    // genesis_para];     println!("cmd: {:?}", cmd);
 
-        let file_para = "-c=/app/devtools/config/".to_owned() + file_name;
-        let genesis_config = "-g=/app/devtools/config/genesis_four_nodes.json";
-        println!("{:?}", file_para);
-        let cmd = vec!["./axon", &file_para, genesis_config];
+    //     let data_mapping = self.path.to_owned() + "/devtools" + ":/app/devtools";
+    //     let log_mapping = self.path.to_owned() + "/logs/" + name + ":/app/logs";
+    //     let vols = vec![data_mapping, log_mapping];
+    //     println!("mapping: {:?}", vols);
+
+    //     let collect_port = 8900 + (port - 8000);
+    //     let opts = ContainerCreateOpts::builder("axon:v0_no_cmd")
+    //         .name(name)
+    //         // .auto_remove(true)
+    //         .cmd(&cmd)
+    //         .restart_policy("always", 0)
+    //         .volumes(vols)
+    //         .working_dir("/app")
+    //         .network_mode("axon-net")
+    //         .expose(PublishPort::tcp(8000), port)
+    //         .expose(PublishPort::tcp(8100), collect_port)
+    //         .build();
+    //     // runtime.block_on(async {
+    //     match docker.containers().create(&opts).await {
+    //         Ok(info) => {
+    //             // println!("{:?}", info);
+    //             match info.start().await {
+    //                 Ok(_) => println!("Start {} ok", name),
+    //                 Err(err) => eprintln!("Start err {}", err),
+    //             }
+    //         }
+    //         Err(e) => eprintln!("Error: {}", e),
+    //     };
+    // }
+
+    pub async fn start_axon(&self, name: &str, file_para: &str, genesis_para: &str, port: u32) {
+        let docker = DockerApi::new_docker();
+        let cmd = vec!["./axon", file_para, genesis_para];
+        println!("cmd: {:?}", cmd);
 
         let data_mapping = self.path.to_owned() + "/devtools" + ":/app/devtools";
         let log_mapping = self.path.to_owned() + "/logs/" + name + ":/app/logs";
+        let vols = vec![data_mapping, log_mapping];
+        println!("mapping: {:?}", vols);
         // prometheus collecting port from 8900-8903
         let collect_port = 8900 + (port - 8000);
-        let vols = vec![data_mapping, log_mapping];
-        let opts = ContainerCreateOpts::builder("axon:v2")
+        let opts = ContainerCreateOpts::builder("axon:v0_no_cmd")
             .name(name)
             // .auto_remove(true)
             .cmd(&cmd)
@@ -72,13 +105,11 @@ impl DockerApi {
             .expose(PublishPort::tcp(8000), port)
             .expose(PublishPort::tcp(8100), collect_port)
             .build();
-        println!("{:?}", opts);
-        // runtime.block_on(async {
         match docker.containers().create(&opts).await {
             Ok(info) => {
-                println!("{:?}", info);
+                // println!("{:?}", info);
                 match info.start().await {
-                    Ok(_) => println!("Start ok"),
+                    Ok(_) => println!("Start {} ok", name),
                     Err(err) => eprintln!("Start err {}", err),
                 }
             }
@@ -89,12 +120,7 @@ impl DockerApi {
     pub async fn start_benchmark<P: AsRef<Path>>(benchmark_path: &P) {
         let docker = DockerApi::new_docker();
 
-        let cmd = vec![
-            // "ls",
-            "node",
-            "index.js",
-            "--http_endpoint=http://172.17.0.1:8000",
-        ];
+        let cmd = vec!["node", "index.js", "--http_endpoint=http://172.17.0.1:8000"];
         // let benchmark_path = "/home/wenyuan/git/axon-devops/benchmark/benchmark/";
         let benchmark_path = benchmark_path.as_ref().to_str().unwrap();
         let vols = vec![
@@ -111,17 +137,22 @@ impl DockerApi {
             .network_mode("axon-net")
             // .expose(PublishPort::tcp(8000), 8000)
             .build();
-        println!("{:?}", opts);
         async {
             match docker.containers().create(&opts).await {
                 Ok(info) => {
-                    println!("{:?}", info);
+                    // println!("{:?}", info);
                     match info.start().await {
                         Ok(_) => println!("Start Benchmark Successfully"),
                         Err(err) => eprintln!("Start err {}", err),
                     }
                 }
-                Err(e) => eprintln!("Error: {}", e),
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    match docker.containers().get("bm").start().await {
+                        Ok(_) => println!("Exec Benchmark Successfully"),
+                        Err(err) => eprintln!("Exec err {}", err),
+                    }
+                }
             }
         }
         .await;

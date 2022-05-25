@@ -26,7 +26,19 @@ impl Interactive {
     pub fn build_interactive() -> Command<'static> {
         Command::new("interactive")
             .version(crate_version!())
-            .subcommand(Command::new("start").about("Start four axon nodes"))
+            .subcommand(
+                Command::new("start")
+                    .arg(
+                        Arg::new("num")
+                            .short('n')
+                            .long("number")
+                            .help("number of axon nodes")
+                            .required(false)
+                            .default_value("1")
+                            .takes_value(true),
+                    )
+                    .about("Start axon node"),
+            )
             .subcommand(Command::new("stop").about("Stop four axon container nodes"))
             .subcommand(Command::new("rm").about("Remove four axon containers"))
             .subcommand(Command::new("del").about("Delete chain data"))
@@ -80,8 +92,10 @@ impl Interactive {
                     match app_m {
                         Ok(matches) => {
                             match matches.subcommand() {
-                                Some(("start", _)) => {
-                                    self.start_axons().await;
+                                Some(("start", matches)) => {
+                                    let num =
+                                        matches.value_of("num").unwrap().parse::<u32>().unwrap();
+                                    self.start_axons(num).await;
                                 }
                                 Some(("stop", _)) => {
                                     let _output = process::Command::new("docker")
@@ -126,7 +140,7 @@ impl Interactive {
                                             .output()
                                             .expect("Start apm exception!!!");
                                     }
-                                    Some(("stop", _)) => {
+                                    Some(("stop", matches)) => {
                                         let path =
                                             matches.value_of("path").unwrap_or("").to_owned()
                                                 + "/apm_stop.sh";
@@ -164,20 +178,52 @@ impl Interactive {
         rl.save_history(HISTORY_FILE).unwrap();
     }
 
-    async fn start_axons(&self) {
+    async fn start_axons(&self, num: u32) {
         let docker_api = DockerApi::new(String::from("axon-net"), self.mount_path.to_owned());
         docker_api.create_network().await;
-        docker_api
-            .start_container("axon1", "node_1.toml", 8000)
-            .await;
-        docker_api
-            .start_container("axon2", "node_2.toml", 8001)
-            .await;
-        docker_api
-            .start_container("axon3", "node_3.toml", 8002)
-            .await;
-        docker_api
-            .start_container("axon4", "node_4.toml", 8003)
-            .await;
+        if num == 1 {
+            let file_para = "-c=/app/devtools/config/config.toml";
+            let genesis_para = "-g=/app/devtools/config/genesis_single_node.json";
+            docker_api
+                .start_axon("axon1", file_para, genesis_para, 8000)
+                .await;
+        } else if num == 4 {
+            let file_para = "-c=/app/devtools/config/";
+            let genesis_para = "-g=/app/devtools/config/genesis_four_nodes.json";
+            docker_api
+                .start_axon(
+                    "axon1",
+                    &(file_para.to_owned() + "node_1.toml"),
+                    genesis_para,
+                    8000,
+                )
+                .await;
+            docker_api
+                .start_axon(
+                    "axon2",
+                    &(file_para.to_owned() + "node_2.toml"),
+                    genesis_para,
+                    8001,
+                )
+                .await;
+            docker_api
+                .start_axon(
+                    "axon3",
+                    &(file_para.to_owned() + "node_3.toml"),
+                    genesis_para,
+                    8002,
+                )
+                .await;
+            docker_api
+                .start_axon(
+                    "axon4",
+                    &(file_para.to_owned() + "node_4.toml"),
+                    genesis_para,
+                    8003,
+                )
+                .await;
+        } else {
+            println!("Not supported node num: {}", num);
+        }
     }
 }
