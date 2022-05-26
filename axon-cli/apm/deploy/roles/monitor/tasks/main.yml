@@ -1,11 +1,11 @@
 ---
-- name: down 
-  shell: "docker-compose -f {{ monitor_dir }}/docker-compose.yml down"
-  ignore_errors: yes
-  become: yes
-  become_method: sudo
-  tags: 
-    - down
+# - name: down 
+#   shell: "docker-compose -f {{ monitor_dir }}/docker-compose.yml down"
+#   ignore_errors: yes
+#   become: yes
+#   become_method: sudo
+#   tags: 
+#     - down
 
 - name: check monitor dir
   stat:
@@ -45,18 +45,18 @@
   tags: 
     - config
 
-- name: start 
-  shell: "cd {{ monitor_dir }} && docker-compose up -d"
-  become: yes
-  become_method: sudo
-  tags: 
-    - start
+# - name: start 
+#   shell: "cd {{ monitor_dir }} && docker-compose up -d"
+#   become: yes
+#   become_method: sudo
+#   tags: 
+#     - start
 
-- name: pause for 30 seconds 
-  pause:
-    seconds: 30  
-  tags: 
-    - start
+# - name: pause for 30 seconds 
+#   pause:
+#     seconds: 30  
+#   tags: 
+#     - start
 
 - name: chmod apm data
   shell: "chmod 777 {{ monitor_dir }}/data/**"
@@ -65,9 +65,9 @@
   tags: 
     - start
 
-- name: clean apm data
-  shell: rm -rf  {{ monitor_dir }}/data
-  become: yes
-  become_method: sudo
-  tags: 
-    - clean
+# - name: clean apm data
+#   shell: rm -rf  {{ monitor_dir }}/data
+#   become: yes
+#   become_method: sudo
+#   tags: 
+#     - clean

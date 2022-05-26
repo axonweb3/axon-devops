@@ -2,7 +2,7 @@
 #node_type:axon_all_node   
 
 [axon_node]
-172.19.187.44
+172.18.124.188
 
 [prometheus_server]
 xxx.xxx.xxx.xxx

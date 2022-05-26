@@ -37,8 +37,3 @@ notifiers:
     is_default: false
     settings:
       url: https://discord.com/api/webhooks/947774493592518686/
-
-      
-
-
-      

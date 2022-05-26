@@ -1,11 +1,11 @@
 ---
-- name: down 
-  shell: "cd {{ monitor_agent_dir }} && docker-compose down"
-  ignore_errors: yes
-  become: yes
-  become_method: sudo
-  tags: 
-    - down
+# - name: down 
+#   shell: "cd {{ monitor_agent_dir }} && docker-compose down"
+#   ignore_errors: yes
+#   become: yes
+#   become_method: sudo
+#   tags: 
+#     - down
 
 - name: check monitor dir
   stat:
@@ -73,16 +73,16 @@
   tags:
       - config
 
-- name: start 
-  shell: "cd {{ monitor_agent_dir }} && docker-compose up -d"
-  become: yes
-  become_method: sudo
-  tags: 
-    - start
+# - name: start 
+#   shell: "cd {{ monitor_agent_dir }} && docker-compose up -d"
+#   become: yes
+#   become_method: sudo
+#   tags: 
+#     - start
 
-- name: clean axon data
-  shell: rm -rf  {{ monitor_agent_dir }}/data
-  become: yes
-  become_method: sudo
-  tags: 
-    - clean
+# - name: clean axon data
+#   shell: rm -rf  {{ monitor_agent_dir }}/data
+#   become: yes
+#   become_method: sudo
+#   tags: 
+#     - clean

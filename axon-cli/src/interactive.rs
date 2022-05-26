@@ -58,8 +58,9 @@ impl Interactive {
                             )
                             .about("Start apm"),
                     )
+                    .subcommand(Command::new("stop").about("Stop apm"))
                     .subcommand(
-                        Command::new("stop")
+                        Command::new("clean")
                             .arg(
                                 Arg::new("path")
                                     .short('p')
@@ -68,7 +69,7 @@ impl Interactive {
                                     .required(true)
                                     .takes_value(true),
                             )
-                            .about("Stop apm"),
+                            .about("Clean apm"),
                     ),
             )
             .subcommand(Command::new("list").about("List docker images"))
@@ -127,27 +128,35 @@ impl Interactive {
                                         .expect("delete chain data exception!!!");
                                 }
                                 Some(("bm", _)) => {
-                                    // mydocker::Api::create_network("axon-benchmark-net");
                                     DockerApi::start_benchmark(&self.bench_path).await;
                                 }
                                 Some(("apm", apm_matches)) => match apm_matches.subcommand() {
                                     Some(("start", matches)) => {
-                                        let path =
-                                            matches.value_of("path").unwrap_or("").to_owned()
-                                                + "/apm_start.sh";
-                                        println!("apm path: {}", path);
-                                        let _output = process::Command::new(path)
-                                            .output()
-                                            .expect("Start apm exception!!!");
+                                        let path = matches.value_of("path").unwrap_or("");
+                                        // println!("apm path: {}", path);
+
+                                        let _output = process::Command::new(
+                                            path.to_owned() + "/apm_start.sh",
+                                        )
+                                        .output()
+                                        .expect("Start apm exception!!!");
+
+                                        println!("Start monitors!!");
+                                        DockerApi::start_monitor(path).await;
+                                        println!("Sleeping 30 seconds!!");
+                                        let thirty_secs = std::time::Duration::from_secs(30);
+                                        std::thread::sleep(thirty_secs);
+                                        println!("\nStart agents!!");
+                                        DockerApi::start_agent(path).await;
                                     }
-                                    Some(("stop", matches)) => {
-                                        let path =
-                                            matches.value_of("path").unwrap_or("").to_owned()
-                                                + "/apm_stop.sh";
+                                    Some(("stop", _)) => {
+                                        DockerApi::stop_monitor().await;
+                                        DockerApi::stop_agent().await;
+                                    }
+                                    Some(("clean", matches)) => {
+                                        let path = matches.value_of("path").unwrap_or("");
                                         println!("apm path: {}", path);
-                                        let _output = process::Command::new(path)
-                                            .output()
-                                            .expect("Stop apm exception!!!");
+                                        DockerApi::clean(path).await;
                                     }
                                     _ => {}
                                 },
@@ -179,8 +188,8 @@ impl Interactive {
     }
 
     async fn start_axons(&self, num: u32) {
-        let docker_api = DockerApi::new(String::from("axon-net"), self.mount_path.to_owned());
-        docker_api.create_network().await;
+        let docker_api = DockerApi::new(self.mount_path.to_owned());
+        DockerApi::create_network("axon-net").await;
         if num == 1 {
             let file_para = "-c=/app/devtools/config/config.toml";
             let genesis_para = "-g=/app/devtools/config/genesis_single_node.json";
