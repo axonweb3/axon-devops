@@ -1,0 +1,137 @@
+version: "3.2"
+
+services:
+
+  # ================================= Grafana  ================================= 
+  grafana:
+    image: grafana/grafana:master
+    container_name: axon-granafa
+    restart: on-failure
+    ports:
+      - "8600:3000"
+    volumes:
+      - "./config/grafana/grafana.ini:/etc/grafana/grafana.ini"
+      - "./config/grafana/dashboards:/var/lib/grafana/dashboards"
+      - "./config/grafana/provisioning:/etc/grafana/provisioning"
+      - "./data/grafana/log:/var/log/grafana"
+    environment:
+      GF_EXPLORE_ENABLED: "true"
+      GF_RENDERING_SERVER_URL: http://renderer:8081/render
+      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+      GF_LOG_FILTERS: rendering:debug
+    networks:
+      - axon-monitor  
+
+  # link https://github.com/grafana/grafana-image-renderer/blob/master/docs/remote_rendering_using_docker.md    
+  renderer:
+    image:  grafana/grafana-image-renderer:2.0.0
+    container_name: axon-grafana-image-renderer
+    ports:
+      - 8081
+    networks:
+      - axon-monitor 
+    
+  # ================================= Prometheus ================================= 
+  prometheus:
+    image: prom/prometheus:v2.32.1
+    container_name: axon-prometheus
+    hostname: prometheus
+    restart: on-failure
+    volumes:
+      - ./config/promethues/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+      - --web.enable-lifecycle
+    networks:
+      - axon-monitor   
+
+  # ================================= Jaeger  ================================= 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    restart: on-failure
+    environment:
+      - cluster.name=jaeger-cluster
+      - discovery.type=single-node
+      - http.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - ES_JAVA_OPTS=-Xms8192m -Xmx8192m
+      - xpack.security.enabled=false
+    volumes:
+      - ./data/es:/usr/share/elasticsearch/data
+    networks:
+      - axon-monitor   
+
+  jaeger-collector:
+    image: jaegertracing/jaeger-collector:1.32
+    container_name: jaeger-collector
+    ports:
+      - "14269:14269"
+      - "14268:14268"
+      - "8201:14250"
+      - "9411:9411"
+    restart: on-failure
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+    command: [
+      "--es.server-urls=http://elasticsearch:9200",
+      "--es.num-shards=1",
+      "--es.num-replicas=0",
+      "--log-level=error"
+    ]
+    depends_on:
+      - elasticsearch
+    networks:
+      - axon-monitor   
+
+  jaeger-query:
+    image: jaegertracing/jaeger-query:1.32
+    container_name: jaeger-query
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+      - no_proxy=localhost
+    ports:
+      - "8202:16686"
+      - "8203:16687"
+    restart: on-failure
+    command: [
+      "--es.server-urls=http://elasticsearch:9200",
+      "--span-storage.type=elasticsearch",
+      "--log-level=debug",
+      "--query.max-clock-skew-adjustment=0"
+    ]
+    depends_on:
+      - jaeger-collector  
+    networks:
+      - axon-monitor
+
+  elastalert:
+    image: praecoapp/elastalert-server:20210704
+    container_name: elk-elastalert
+    ports:
+      - 3330:3330
+      - 3333:3333
+    user: 1000:1000
+    volumes:
+      - ./config/elastalert2/elastalert.yaml:/opt/elastalert/config.yaml
+      - ./config/elastalert2/config.json:/opt/elastalert-server/config/config.json
+      - ./config/elastalert2/rules:/opt/elastalert/rules
+      - ./config/elastalert2/rule_templates:/opt/elastalert/rule_templates
+    networks:
+      - axon-monitor
+    depends_on:
+      - elasticsearch
+        #restart: on-failurer     
+
+networks:
+  axon-monitor:
+    driver: bridge 

@@ -1,0 +1,5 @@
+# agent
+monitor_agent_dir: /root/test/agent
+log_path: /root/test/logs/axon1
+monitor_address: xxx.xxx.xxx.xxx
+es_address: xxx.xxx.xxx.xxx

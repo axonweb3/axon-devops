@@ -1,0 +1,88 @@
+---
+# - name: down 
+#   shell: "cd {{ monitor_agent_dir }} && docker-compose down"
+#   ignore_errors: yes
+#   become: yes
+#   become_method: sudo
+#   tags: 
+#     - down
+
+- name: check monitor dir
+  stat:
+    path: "{{ monitor_agent_dir }}"
+  register: file_status
+  tags: 
+    - config
+
+- name: create monitor dir
+  file:
+    path: "{{ monitor_agent_dir }}"
+    state: directory
+  when:
+    file_status.stat.exists == False
+  tags: 
+    - config
+
+- name: copy docker-compose.yml
+  copy:
+    src: ../agent/docker-compose.yml
+    dest: "{{ monitor_agent_dir }}/docker-compose.yml"
+    mode: 0755
+  tags: 
+    - config
+
+- name: copy config
+  copy:
+    src: ../agent/config
+    dest: "{{ monitor_agent_dir }}"
+    mode: 0755
+  tags: 
+    - config
+
+- name: copy env
+  copy:
+    src: ../agent/.env.example
+    dest: "{{ monitor_agent_dir }}/.env"
+    mode: 0755
+  tags: 
+    - config
+
+- name: sed env
+  shell: sed -i 's/LOG_COLLECT_PATH/{{ log_path }}/' "{{ monitor_agent_dir }}/.env" && sed -i 's/jaeger-collector/{{monitor_address}}:8201/' "{{ monitor_agent_dir }}/.env"
+  tags: 
+    - config
+
+- name: Replace LOKI_ADDRESS
+  replace:
+    path: "{{ monitor_agent_dir }}/config/promtail/promtail-config.yaml"
+    regexp: "LOKI_ADDRESS"
+    replace: "{{ monitor_address }}"
+  tags:
+      - config
+
+- name: chown filebeat
+  shell: sudo chown root "{{ monitor_agent_dir }}/config/filebeat/filebeat.yml"
+  tags: 
+    - config
+
+- name: Replace es_address
+  replace:
+    path: "{{ monitor_agent_dir }}/config/filebeat/filebeat.yml"
+    regexp: "ES_ADDRESS"
+    replace: "{{ es_address }}"
+  tags:
+      - config
+
+# - name: start 
+#   shell: "cd {{ monitor_agent_dir }} && docker-compose up -d"
+#   become: yes
+#   become_method: sudo
+#   tags: 
+#     - start
+
+# - name: clean axon data
+#   shell: rm -rf  {{ monitor_agent_dir }}/data
+#   become: yes
+#   become_method: sudo
+#   tags: 
+#     - clean
