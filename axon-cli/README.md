@@ -1,23 +1,19 @@
 # Axon CLI
 You need to take the following steps to run axon and benchmark with axon-cli.
-## 1. Build axon docker image
- Build axon on your own machine in the axon project. Replace the Dockerfile of axon project with the one under axon-cli/Dockerfile.
-    `docker build -t axon:v2 .`
-The corresponding axon commit is a2481066b9467f676d24e096786ba58d474ac1d4.
-## 2. build axon-cli
+## 1. build axon-cli
 Under the axon-cli directory, run the following command:
     `cargon build --release`
-## 3. Run axon-cli
+## 2. Run axon-cli
  For example,
 `
 ../target/debug/axon-cli --mount=/home/wenyuan/git/axon-devops/axon-cli/devtools --data=/home/wenyuan/git/axon-devops/axon-cli/devtools/chain --bench=/home/wenyuan/git/axon-devops/benchmark/benchmark`
 
 You have to config mount path, chain data path and benchmark config path explicitly.
-## 4. Interactive Commands
+## 3. Interactive Commands
 After axon-cli gets run. You have 5 commands to execute.
 By the way, before to start docker containers, you have to enable tcp port for docker(0.0.0.0:2375 in this case).
 - start
-you can start 4 docker axon nodes.
+you can start 1 or 4 docker axon nodes. The default is 1, you can start 4 by `start --number=4`.
 - stop
 stop the 4 docker nodes just started.
 - rm
@@ -26,9 +22,8 @@ remove the 4 docker containers just created.
 delete chain data under the path specified by parameter --data.
 - bm
 start benchmark, transactions will be sent to the axon nodes.
-##　5. Check axon status
-To be sure of the correctness. You can check by the following commands:
-
+##　4. Check axon status
+To be sure of the correctness. You can check by the following commands:  
 ### 1．check the liveness of axon nodes 
 >root@yoga:# docker ps
 CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS     NAMES
@@ -64,7 +59,7 @@ tcp        0      0 172.18.0.3:8001         172.18.0.2:8001         ESTABLISHED 
 tcp        0      0 172.18.0.3:8001         172.18.0.5:8001         ESTABLISHED 1/./axon
 tcp        0      0 172.18.0.3:8001         172.18.0.4:8001         ESTABLISHED 1/./axon
 
-## 6. start benchmark
+## 5. start benchmark
 `bm` is short for benchmark, this command will start benchmark. You can run `docker logs bm` to have a look at the benchmark status.
 For example:
 >root@yoga:~# docker logs bm
@@ -90,3 +85,32 @@ transfer rate: 98.83
 /////////////////////////////////////////////////////
 
 You can check the result by the end of the output.
+
+## 6. start apm
+We offer `apm start` and `apm stop` commands to start and stop apm features respectively.
+However, before you start, you need to get some configs prepared.
+- In `axon-cli/apm/deploy/hosts`, change ip of axon_node to your own ip. In my case, it is `172.19.86.210`.
+
+- In `apm/deploy/roles/monitor/vars/main.yaml`, change `monitor_dir` to your dir.  
+All monitor related files willed be moved here, the data will be stored under `monitor_dir/data`.
+
+- In `apm/deploy/roles/agent/vars/main.yaml`.  
+First, set `monitor_agent_dir` to your dir. All agent related files willed be moved here, the data will be stored under `monitor_agent_dir/data`.
+Second, set `log_path`.  
+At present, there is no need to modify `monitor_address` and `es_address`. 
+
+- The correct execution of `apm start` now depends on the apm path. You need commands like this:  
+   `apm start -p=/home/wenyuan/git/axon-devops/axon-cli/apm` or 
+   `apm stop` 
+
+- To clean data, you need command `clean` like this:  
+   `apm clean -p=/home/wenyuan/git/axon-devops/axon-cli/apm`.
+
+After the right config and the successful start of apm, you can visit Grafana by localhost:8600 in your browser.
+You can take a look at the `axon-node` Dashboard.
+<div align=center><img src="./grafana.png"></div>
+<div align=center><img src="./actuator.png"></div>
+
+If you just run the benchmark, you can have a look at the `axon-benchmark` Dashboard.
+<div align=center><img src="./benchmark.png"></div>
+
