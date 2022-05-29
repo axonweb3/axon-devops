@@ -1,0 +1,60 @@
+version: '3.3'
+services:
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v0.18.1
+    container_name: axon-node-exporter
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.tcpstat'
+      - '--web.listen-address=:8101'
+    restart: on-failure
+    network_mode: 'host'
+    pid: 'host'
+    volumes:
+      - /:/host:ro,rslave
+
+  jaeger-agent:
+    image: jaegertracing/jaeger-agent:1.32
+    container_name: jaeger-agent
+    restart: on-failure
+    ports:
+      - '14271:14271'
+      - '5775:5775/udp'
+      - '6831:6831/udp'
+      - '6832:6832/udp'
+      - '5778:5778'
+    command:
+      - '--reporter.grpc.host-port=${JACGER_COLLECTOR_ADDRESS}'
+
+
+  promtail:
+    image: grafana/promtail:master-9ad98df
+    container_name: axon-promtail
+    restart: on-failure
+    ports:
+      - '8102:9080'
+    volumes:
+      - ./data/promtail/positions:/tmp/promtail/
+      - ./config/promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml
+      - ${AXON_LOG_PATH}:/var/logs
+    command: 
+      -config.file=/etc/promtail/promtail-config.yaml
+
+  filebeat:
+      image: "docker.elastic.co/beats/filebeat:7.2.0"
+      user: root
+      volumes:
+          - /var/run/docker.sock:/host_docker/docker.sock
+          - /var/lib/docker:/host_docker/var/lib/docker
+          - ./config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+          - ${AXON_LOG_PATH}:/usr/share/filebeat/logs
+
+      command: ["--strict.perms=false"]
+      ulimits:
+        memlock:
+          soft: -1
+          hard: -1
+      stdin_open: true
+volumes:
+    elasticsearch_data:
+

@@ -1,0 +1,39 @@
+apiVersion: 1
+
+notifiers:
+  # email template
+  # - name: notification-email
+  #   type: email
+  #   uid: notification-email
+  #   org_id: 1
+  #   is_default: true
+  #   settings:
+  #     addresses: zzkouniya@163.com
+
+  # tg template
+  # - name: notification-telegram
+  #   type: telegram
+  #   uid: notification-telegram
+  #   org_id: 1
+  #   is_default: false
+  #   settings:
+  #     bottoken: 1327880119:AAGDTagI5zmhO8lbkMxxxxxxxqop4KvAUTWlFR0VaUxxxx
+  #     chatid: -409123128902xxx
+
+  # dingding template
+  # - name: notification-dingding
+  #   type: dingding
+  #   uid: notifier-dingding
+  #   org_id: 1
+  #   is_default: false
+  #   settings:
+  #     url: https://oapi.dingtalk.com/robot/send?access_token=39b64875bcdxxxxxxxxxxxxae6473ad762d8f09683eaa938e4
+
+  # webhook template
+  - name: Axon-discord
+    type: discord
+    uid: Axon-discord
+    org_id: 1
+    is_default: false
+    settings:
+      url: https://discord.com/api/webhooks/947774493592518686/
