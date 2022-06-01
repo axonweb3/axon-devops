@@ -20,7 +20,7 @@ datasources:
   url: http://jaeger-query:16686
   basicAuth: false
 
-- name: Elasticsearch-axon
+- name: Elasticsearch
   type: elasticsearch
   access: proxy
   database: 'axon-*'
