@@ -265,7 +265,7 @@
                   "type": "logs"
                 }
               ],
-              "query": "message:error",
+              "query": "json.message:error",
               "refId": "A",
               "timeField": "@timestamp"
             }
@@ -325,7 +325,7 @@
                   "type": "logs"
                 }
               ],
-              "query": "message: \"round\" AND message: [3 TO *]",
+              "query": "json.message: \"round\" AND json.message: [3 TO *]",
               "refId": "A",
               "timeField": "@timestamp"
             }
@@ -338,7 +338,7 @@
                 "include": {
                   "names": [
                     "@timestamp",
-                    "message",
+                    "",
                     "_index"
                   ]
                 }
@@ -435,7 +435,7 @@
                   "type": "count"
                 }
               ],
-              "query": "message:error",
+              "query": "json.message:error",
               "refId": "A",
               "timeField": "@timestamp"
             }
