@@ -257,6 +257,9 @@ k8s 部署fluentd 所需要的配置文件
 ## 部署步骤
 
 <a id="markdown-axon-k8s-部署步骤" name="axon-k8s-部署步骤"></a>
+### pre-requried 
+安装 ingress-controller。 参考官方文档[ingress](https://kubernetes.io/zh/docs/concepts/services-networking/ingress/)
+
 ### axon-k8s-部署步骤 
 copy axon-devops 目录到指定机器上
 ```shell
