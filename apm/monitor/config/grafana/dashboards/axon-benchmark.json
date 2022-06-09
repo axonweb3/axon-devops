@@ -108,7 +108,7 @@
           "targets": [
             {
               "exemplar": true,
-              "expr": "rate(axon_memory_trace[5m])",
+              "expr": "axon_memory_trace",
               "interval": "",
               "legendFormat": "",
               "refId": "A"
@@ -189,7 +189,7 @@
           "targets": [
             {
               "exemplar": true,
-              "expr": "rate(axon_db_memory_trace[5m])",
+              "expr": "axon_db_memory_trace",
               "interval": "",
               "legendFormat": "",
               "refId": "A"
