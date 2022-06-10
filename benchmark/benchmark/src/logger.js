@@ -1,4 +1,5 @@
 const log4js =  require('log4js');
+const path = require('path');
 
 log4js.configure({
 	appenders: {
@@ -6,25 +7,17 @@ log4js.configure({
 			type: 'console'
 		},
 		app: {
-			type: 'file',
-			filename: 'logs/app.log',
-			maxLogSize: 10485760,
-			numBackups: 3,
-		},
-		errorFile: {
-			type: 'file',
-			filename: 'logs/errors.log',
-			maxLogSize: 10485760,
-			numBackups: 3,
-		},
-		errors: {
-			type: 'logLevelFilter',
-			level: 'ERROR',
-			appender: 'errorFile',
-		},
+			type: "dateFile",
+			filename: path.join("logs/", "app"),
+			pattern: "yyyy-MM-dd.log",
+			alwaysIncludePattern: true,
+			encoding: "utf-8",
+			maxLogSize: 104857600,
+			keepFileExt: true
+		}
 	},
 	categories: {
-		default: { appenders: ['app', 'errors'], level: 'DEBUG' },
+		default: { appenders: ['app'], level: 'DEBUG' },
 	},
 });
 

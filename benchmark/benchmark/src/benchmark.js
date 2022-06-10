@@ -1,6 +1,6 @@
 const Web3 = require('web3')
 const { WaitableBatchRequest } = require('./utils');
-const logger = require('./logger')
+const logger = require('./logger');
 
 class Benchmark {
     constructor(info) {
