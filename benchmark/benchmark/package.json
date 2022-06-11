@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^13.6.0",
-    "log4js": "^6.4.5",
+    "log4js": "^6.5.2",
     "piscina": "^3.2.0",
     "web3": "^1.6.1"
   },
