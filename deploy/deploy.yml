@@ -10,7 +10,7 @@
     MALLOC_CONF: "prof:true,lg_prof_interval:30"
   tasks:
   ###############################################################################################################
-    - name: check monitor dir
+    - name: check axon dir
       stat:
         path: "{{ deploy_path }}"
       register: file_status
