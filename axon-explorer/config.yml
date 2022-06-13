@@ -1,0 +1,9 @@
+deploy_path: "/home/ckb/axon_explorer"
+explorer_repo: "https://github.com/Magickbase/axon_explorer.git"
+explorer_branch: "main"
+jsonrpc_http_url: "http://xxxx.xxx.xxx.xxx:8000"
+jsonrpc_trace_url: "http://xxxx.xxx.xxx.xxx:8000"
+postgres_user:
+postgres_password:
+postgres_ip:
+posgres_port:
