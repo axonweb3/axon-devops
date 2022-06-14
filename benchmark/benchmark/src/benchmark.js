@@ -75,7 +75,9 @@ class Benchmark {
             txs.add(this.web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
                 if (err) {
                     this.benchmark_info.fail_tx += 1
-                    logger.error("send tx err: ", err)
+                    if(!err.toString().includes('ReachLimit')) {
+                        logger.error("send tx err: ", err)
+                    }
                 }
                 else this.benchmark_info.success_tx += 1
             }), signed_tx.transactionHash);
