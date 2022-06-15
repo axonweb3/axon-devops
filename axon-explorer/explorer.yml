@@ -3,14 +3,99 @@
   hosts: localhost
   become: yes
   become_method: sudo
+  vars_files:
+    - config.yml
   tasks:
     ###############################################################################################################
-    - name: explorer  shutdown
-      shell: "docker-compose -f ./templates/docker-compose.yml down"
+    - name: Pull code
+      git:
+        repo: "{{ explorer_repo }}"
+        dest: "{{ deploy_path }}"
+        version: "{{ explorer_branch }}"
+        force: yes
+      become: yes
+      become_method: sudo
+      tags: 
+        - config
+
+    - name: Replace jsonrpc_http_url
+      replace:
+        path: "{{ deploy_path }}/axon_staging.env"
+        regexp: "jsonrpc_http_url"
+        replace: "{{ jsonrpc_http_url }}"
       tags:
-        - down
-    ###############################################################################################################
-    - name: explorer  start
-      shell: "docker-compose -f ./templates/docker-compose.yml up -d"
+          - config
+
+    - name: Replace jsonrpc_trace_url
+      replace:
+        path: "{{ deploy_path }}/axon_staging.env"
+        regexp: "jsonrpc_trace_url"
+        replace: "{{ jsonrpc_trace_url }}"
+      tags:
+          - config
+
+    - name: Replace postgres_user
+      replace:
+        path: "{{ deploy_path }}/axon_staging.env"
+        regexp: "postgres_user"
+        replace: "{{ postgres_user }}"
+      tags:
+          - config
+
+    - name: Replace postgres_user
+      replace:
+        path: "{{ deploy_path }}/axon_staging.env"
+        regexp: "postgres_user"
+        replace: "{{ postgres_user }}"
+      tags:
+          - config
+
+    - name: Replace postgres_password
+      replace:
+        path: "{{ deploy_path }}/axon_staging.env"
+        regexp: "postgres_password"
+        replace: "{{ postgres_password }}"
+      tags:
+          - config
+
+    - name: Replace postgres_ip
+      replace:
+        path: "{{ deploy_path }}/axon_staging.env"
+        regexp: "postgres_ip"
+        replace: "{{ postgres_ip }}"
+      tags:
+          - config
+
+    - name: Replace posgres_port
+      replace:
+        path: "{{ deploy_path }}/axon_staging.env"
+        regexp: "posgres_port"
+        replace: "{{ posgres_port }}"
+      tags:
+          - config
+
+    - name: build 
+      shell: "cd {{ deploy_path }} && docker-compose --env-file ./axon_staging.env -f ./docker-compose.yml build axon_explorer"
+      ignore_errors: yes
+      become: yes
+      become_method: sudo
+      tags: 
+        - build
+
+    - name: explorer start
+      shell: "cd {{ deploy_path }} &&  docker-compose --env-file ./axon_staging.env -f ./docker-compose.yml up -d --force-recreate axon_explorer"
+      ignore_errors: yes
+      become: yes
+      become_method: sudo
       tags:
         - up
+
+    - name: down 
+      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yml down"
+      ignore_errors: yes
+      become: yes
+      become_method: sudo
+      tags: 
+        - down
+
+    ###############################################################################################################

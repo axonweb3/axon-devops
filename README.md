@@ -5,3 +5,4 @@
 - [Deploy Axon](./deploy/README.md)
 - [Deploy Axon on k8s](./k8s-deploy/README.md)
 - [Deploy apm](./apm/README.md)
+- [Deploy Explorer](./axon-explorer/README.md)
