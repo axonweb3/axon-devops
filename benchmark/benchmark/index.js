@@ -1,8 +1,6 @@
 const Runner = require('./src/runner')
 const config = require('./config.json')
-var bip39 = require('bip39')
-const { hdkey } = require('ethereumjs-wallet')
-const util = require('ethereumjs-util')
+const { ethers } = require('ethers')
 const args = require('minimist')(process.argv.slice(2))
 
 
@@ -50,11 +48,9 @@ async function init_config() {
         config.benchmark_cases = eval(args['benchmark_cases'])
     }
 
-    const seed = await bip39.mnemonicToSeedSync("test test test test test test test test test test test junk")
-    const hdWallet = hdkey.fromMasterSeed(seed)
-    const key = hdWallet.derivePath("m/44'/60'/0'/0/0")
-
-    config.private_key = util.bufferToHex(key._hdkey._privateKey)
+    const hdNode = ethers.utils.HDNode.fromMnemonic(config.mnemonic);
+    let subNode = hdNode.derivePath("m/44'/60'/0'/0/0");
+    config.private_key = subNode.privateKey;
 
 }
 (async () => {
