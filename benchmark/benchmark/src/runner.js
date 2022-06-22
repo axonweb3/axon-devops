@@ -57,7 +57,7 @@ class Runner {
             console.log(`contract ${name} deployed to ${instance.options.address}`);
         } catch (e) {
             logger.error("deploy contract err: ", e)
-            await this.deployContract(jsonPath, name)
+            // await this.deployContract(jsonPath, name)
         }
     }
 
