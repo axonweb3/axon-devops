@@ -3,7 +3,7 @@ use std::process;
 use clap::{crate_version, Arg, Command};
 use rustyline::{error::ReadlineError, Editor};
 
-use crate::docker::DockerApi;
+use crate::{crosschain::CrossChain, docker::DockerApi};
 
 const HISTORY_FILE: &str = "history.txt";
 
@@ -43,6 +43,7 @@ impl Interactive {
             .subcommand(Command::new("rm").about("Remove four axon containers"))
             .subcommand(Command::new("del").about("Delete chain data"))
             .subcommand(Command::new("bm").about("Start benchmark"))
+            .subcommand(CrossChain::get_cs_command())
             .subcommand(
                 Command::new("apm")
                     .about("Application Performance Management")
@@ -160,6 +161,9 @@ impl Interactive {
                                     }
                                     _ => {}
                                 },
+                                Some(("cs", cs_matches)) => {
+                                    let _result = CrossChain::exec_cs_tx(cs_matches);
+                                }
                                 // Some(("list", _)) => {
                                 // }
                                 _ => {}
