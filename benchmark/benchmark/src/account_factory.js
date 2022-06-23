@@ -1,43 +1,47 @@
-const Web3 = require('web3');
-const logger = require('./logger');
+const Web3 = require('web3')
+const { WaitableBatchRequest, sleep } = require('./utils');
+const logger = require('./logger')
 
 class AccountFactory {
     async get_accounts(config) {
 
-        let web3 = new Web3(new Web3.providers.HttpProvider(config.http_endpoint));
-        let account = web3.eth.accounts.privateKeyToAccount(config.private_key);
-        web3.eth.defaultAccount = account.address;
+        let web3 = new Web3(new Web3.providers.HttpProvider(config.http_endpoint))
+        let account = web3.eth.accounts.privateKeyToAccount(config.private_key)
+        web3.eth.defaultAccount = account.address
 
-        let accounts = [];
-        for (let i = 0; i < config.thread_num;) {
-            try {
-                const benchmark_account = web3.eth.accounts.create();
-                const nonce = await web3.eth.getTransactionCount(account.address) + 1
-                let tx = {
-                    "to": benchmark_account.address,
-                    "type": 2,
-                    "value": 10000000000000000,
-                    "maxPriorityFeePerGas": 3,
-                    "maxFeePerGas": 3,
-                    "gasLimit": 21000,
-                    "nonce": nonce,
-                    "chainId": 5
-                };
+        let nonce = await web3.eth.getTransactionCount(account.address)
 
-                let signed_tx = await account.signTransaction(tx);
-                await web3.eth.sendSignedTransaction(signed_tx.rawTransaction);
+        let accounts = []
+        let batch_request = new WaitableBatchRequest(web3);
+        for (let i = 0; i < config.thread_num; i++) {
+            let benchmark_account = web3.eth.accounts.create()
 
-                accounts.push(benchmark_account);
-                i = accounts.length;
-            } catch (e) {
-                logger.error("create account tx err: ", e);
+            nonce += 1
+            let tx = {
+                "to": benchmark_account.address,
+                "type": 2,
+                "value": 10000000000000000,
+                "maxPriorityFeePerGas": 3,
+                "maxFeePerGas": 3,
+                "gasLimit": 21000,
+                "nonce": nonce,
+                "chainId": 5
             }
+            let signed_tx = await account.signTransaction(tx)
+            batch_request.add(web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
+                if (err) logger.error("create account tx err: ", err)
+                else accounts.push(benchmark_account)
+            }), signed_tx.transactionHash);
         }
 
-        console.log("create account tx success");
+        await batch_request.execute()
+        await batch_request.waitFinished();
+        await batch_request.waitConfirmed();
 
-        return accounts;
+        await sleep(300000);
+
+        return accounts
     }
 }
 
-module.exports = AccountFactory;
+module.exports = AccountFactory
