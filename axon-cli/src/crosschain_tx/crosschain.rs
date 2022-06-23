@@ -2,6 +2,7 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 #![allow(non_snake_case)]
+#![allow(clippy::derivable_impls)]
 use molecule::prelude::*;
 #[derive(Clone)]
 pub struct Uint32(molecule::bytes::Bytes);
@@ -57,7 +58,7 @@ impl Uint32 {
         self.as_bytes()
     }
 
-    pub fn as_reader<'r>(&'r self) -> Uint32Reader<'r> {
+    pub fn as_reader(&self) -> Uint32Reader {
         Uint32Reader::new_unchecked(self.as_slice())
     }
 }
@@ -113,7 +114,7 @@ impl<'r> ::core::fmt::Debug for Uint32Reader<'r> {
 impl<'r> ::core::fmt::Display for Uint32Reader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
-        let raw_data = hex_string(&self.raw_data());
+        let raw_data = hex_string(self.raw_data());
         write!(f, "{}(0x{})", Self::NAME, raw_data)
     }
 }
@@ -168,20 +169,11 @@ impl<'r> molecule::prelude::Reader<'r> for Uint32Reader<'r> {
         Ok(())
     }
 }
+#[derive(Default)]
 pub struct Uint32Builder(pub(crate) [Byte; 4]);
 impl ::core::fmt::Debug for Uint32Builder {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:?})", Self::NAME, &self.0[..])
-    }
-}
-impl ::core::default::Default for Uint32Builder {
-    fn default() -> Self {
-        Uint32Builder([
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-        ])
     }
 }
 impl Uint32Builder {
@@ -308,7 +300,7 @@ impl Uint64 {
         self.as_bytes()
     }
 
-    pub fn as_reader<'r>(&'r self) -> Uint64Reader<'r> {
+    pub fn as_reader(&self) -> Uint64Reader {
         Uint64Reader::new_unchecked(self.as_slice())
     }
 }
@@ -373,7 +365,7 @@ impl<'r> ::core::fmt::Debug for Uint64Reader<'r> {
 impl<'r> ::core::fmt::Display for Uint64Reader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
-        let raw_data = hex_string(&self.raw_data());
+        let raw_data = hex_string(self.raw_data());
         write!(f, "{}(0x{})", Self::NAME, raw_data)
     }
 }
@@ -444,24 +436,11 @@ impl<'r> molecule::prelude::Reader<'r> for Uint64Reader<'r> {
         Ok(())
     }
 }
+#[derive(Default)]
 pub struct Uint64Builder(pub(crate) [Byte; 8]);
 impl ::core::fmt::Debug for Uint64Builder {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:?})", Self::NAME, &self.0[..])
-    }
-}
-impl ::core::default::Default for Uint64Builder {
-    fn default() -> Self {
-        Uint64Builder([
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-        ])
     }
 }
 impl Uint64Builder {
@@ -644,7 +623,7 @@ impl Uint128 {
         self.as_bytes()
     }
 
-    pub fn as_reader<'r>(&'r self) -> Uint128Reader<'r> {
+    pub fn as_reader(&self) -> Uint128Reader {
         Uint128Reader::new_unchecked(self.as_slice())
     }
 }
@@ -717,7 +696,7 @@ impl<'r> ::core::fmt::Debug for Uint128Reader<'r> {
 impl<'r> ::core::fmt::Display for Uint128Reader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
-        let raw_data = hex_string(&self.raw_data());
+        let raw_data = hex_string(self.raw_data());
         write!(f, "{}(0x{})", Self::NAME, raw_data)
     }
 }
@@ -820,32 +799,11 @@ impl<'r> molecule::prelude::Reader<'r> for Uint128Reader<'r> {
         Ok(())
     }
 }
+#[derive(Default)]
 pub struct Uint128Builder(pub(crate) [Byte; 16]);
 impl ::core::fmt::Debug for Uint128Builder {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:?})", Self::NAME, &self.0[..])
-    }
-}
-impl ::core::default::Default for Uint128Builder {
-    fn default() -> Self {
-        Uint128Builder([
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-        ])
     }
 }
 impl Uint128Builder {
@@ -1092,7 +1050,7 @@ impl Address {
         self.as_bytes()
     }
 
-    pub fn as_reader<'r>(&'r self) -> AddressReader<'r> {
+    pub fn as_reader(&self) -> AddressReader {
         AddressReader::new_unchecked(self.as_slice())
     }
 }
@@ -1169,7 +1127,7 @@ impl<'r> ::core::fmt::Debug for AddressReader<'r> {
 impl<'r> ::core::fmt::Display for AddressReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
-        let raw_data = hex_string(&self.raw_data());
+        let raw_data = hex_string(self.raw_data());
         write!(f, "{}(0x{})", Self::NAME, raw_data)
     }
 }
@@ -1288,36 +1246,11 @@ impl<'r> molecule::prelude::Reader<'r> for AddressReader<'r> {
         Ok(())
     }
 }
+#[derive(Default)]
 pub struct AddressBuilder(pub(crate) [Byte; 20]);
 impl ::core::fmt::Debug for AddressBuilder {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:?})", Self::NAME, &self.0[..])
-    }
-}
-impl ::core::default::Default for AddressBuilder {
-    fn default() -> Self {
-        AddressBuilder([
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-        ])
     }
 }
 impl AddressBuilder {
@@ -1639,7 +1572,7 @@ impl Hash {
         self.as_bytes()
     }
 
-    pub fn as_reader<'r>(&'r self) -> HashReader<'r> {
+    pub fn as_reader(&self) -> HashReader {
         HashReader::new_unchecked(self.as_slice())
     }
 }
@@ -1728,7 +1661,7 @@ impl<'r> ::core::fmt::Debug for HashReader<'r> {
 impl<'r> ::core::fmt::Display for HashReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
-        let raw_data = hex_string(&self.raw_data());
+        let raw_data = hex_string(self.raw_data());
         write!(f, "{}(0x{})", Self::NAME, raw_data)
     }
 }
@@ -1895,48 +1828,11 @@ impl<'r> molecule::prelude::Reader<'r> for HashReader<'r> {
         Ok(())
     }
 }
+#[derive(Default)]
 pub struct HashBuilder(pub(crate) [Byte; 32]);
 impl ::core::fmt::Debug for HashBuilder {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:?})", Self::NAME, &self.0[..])
-    }
-}
-impl ::core::default::Default for HashBuilder {
-    fn default() -> Self {
-        HashBuilder([
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-            Byte::default(),
-        ])
     }
 }
 impl HashBuilder {
@@ -2394,7 +2290,7 @@ impl BlsPubkey {
         self.as_bytes()
     }
 
-    pub fn as_reader<'r>(&'r self) -> BlsPubkeyReader<'r> {
+    pub fn as_reader(&self) -> BlsPubkeyReader {
         BlsPubkeyReader::new_unchecked(self.as_slice())
     }
 }
@@ -2499,7 +2395,7 @@ impl<'r> ::core::fmt::Debug for BlsPubkeyReader<'r> {
 impl<'r> ::core::fmt::Display for BlsPubkeyReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
-        let raw_data = hex_string(&self.raw_data());
+        let raw_data = hex_string(self.raw_data());
         write!(f, "{}(0x{})", Self::NAME, raw_data)
     }
 }
@@ -3535,7 +3431,7 @@ impl Signautre {
         self.as_bytes()
     }
 
-    pub fn as_reader<'r>(&'r self) -> SignautreReader<'r> {
+    pub fn as_reader(&self) -> SignautreReader {
         SignautreReader::new_unchecked(self.as_slice())
     }
 }
@@ -3688,7 +3584,7 @@ impl<'r> ::core::fmt::Debug for SignautreReader<'r> {
 impl<'r> ::core::fmt::Display for SignautreReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
-        let raw_data = hex_string(&self.raw_data());
+        let raw_data = hex_string(self.raw_data());
         write!(f, "{}(0x{})", Self::NAME, raw_data)
     }
 }
@@ -4893,7 +4789,7 @@ impl BlsPubkeyList {
         BlsPubkey::new_unchecked(self.0.slice(start..end))
     }
 
-    pub fn as_reader<'r>(&'r self) -> BlsPubkeyListReader<'r> {
+    pub fn as_reader(&self) -> BlsPubkeyListReader {
         BlsPubkeyListReader::new_unchecked(self.as_slice())
     }
 }
@@ -5105,7 +5001,7 @@ impl ::core::iter::IntoIterator for BlsPubkeyList {
 }
 impl<'r> BlsPubkeyListReader<'r> {
     pub fn iter<'t>(&'t self) -> BlsPubkeyListReaderIterator<'t, 'r> {
-        BlsPubkeyListReaderIterator(&self, 0, self.len())
+        BlsPubkeyListReaderIterator(self, 0, self.len())
     }
 }
 pub struct BlsPubkeyListReaderIterator<'t, 'r>(&'t BlsPubkeyListReader<'r>, usize, usize);
@@ -5146,8 +5042,8 @@ impl ::core::fmt::Debug for Witness {
 impl ::core::fmt::Display for Witness {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "signature", self.signature())?;
-        write!(f, ", {}: {}", "bls_pubkeys", self.bls_pubkeys())?;
+        write!(f, "signature: {}", self.signature())?;
+        write!(f, ", bls_pubkeys: {}", self.bls_pubkeys())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
             write!(f, ", .. ({} fields)", extra_count)?;
@@ -5207,7 +5103,7 @@ impl Witness {
         }
     }
 
-    pub fn as_reader<'r>(&'r self) -> WitnessReader<'r> {
+    pub fn as_reader(&self) -> WitnessReader {
         WitnessReader::new_unchecked(self.as_slice())
     }
 }
@@ -5265,8 +5161,8 @@ impl<'r> ::core::fmt::Debug for WitnessReader<'r> {
 impl<'r> ::core::fmt::Display for WitnessReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "signature", self.signature())?;
-        write!(f, ", {}: {}", "bls_pubkeys", self.bls_pubkeys())?;
+        write!(f, "signature: {}", self.signature())?;
+        write!(f, ", bls_pubkeys: {}", self.bls_pubkeys())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
             write!(f, ", .. ({} fields)", extra_count)?;
@@ -5356,9 +5252,7 @@ impl<'r> molecule::prelude::Reader<'r> for WitnessReader<'r> {
             return ve!(Self, HeaderIsBroken, offset_first, slice_len);
         }
         let field_count = offset_first / molecule::NUMBER_SIZE - 1;
-        if field_count < Self::FIELD_COUNT {
-            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
-        } else if !compatible && field_count > Self::FIELD_COUNT {
+        if (field_count < Self::FIELD_COUNT) || (!compatible && field_count > Self::FIELD_COUNT) {
             return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
         };
         let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
@@ -5445,9 +5339,9 @@ impl ::core::fmt::Debug for Token {
 impl ::core::fmt::Display for Token {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "ERC20_address", self.erc20_address())?;
-        write!(f, ", {}: {}", "sUDT_typehash", self.sudt_typehash())?;
-        write!(f, ", {}: {}", "fee_ratio", self.fee_ratio())?;
+        write!(f, "ERC20_address: {}", self.erc20_address())?;
+        write!(f, ", sUDT_typehash: {}", self.sudt_typehash())?;
+        write!(f, ", fee_ratio: {}", self.fee_ratio())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
             write!(f, ", .. ({} fields)", extra_count)?;
@@ -5513,7 +5407,7 @@ impl Token {
         }
     }
 
-    pub fn as_reader<'r>(&'r self) -> TokenReader<'r> {
+    pub fn as_reader(&self) -> TokenReader {
         TokenReader::new_unchecked(self.as_slice())
     }
 }
@@ -5572,9 +5466,9 @@ impl<'r> ::core::fmt::Debug for TokenReader<'r> {
 impl<'r> ::core::fmt::Display for TokenReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "ERC20_address", self.erc20_address())?;
-        write!(f, ", {}: {}", "sUDT_typehash", self.sudt_typehash())?;
-        write!(f, ", {}: {}", "fee_ratio", self.fee_ratio())?;
+        write!(f, "ERC20_address: {}", self.erc20_address())?;
+        write!(f, ", sUDT_typehash: {}", self.sudt_typehash())?;
+        write!(f, ", fee_ratio: {}", self.fee_ratio())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
             write!(f, ", .. ({} fields)", extra_count)?;
@@ -5671,9 +5565,7 @@ impl<'r> molecule::prelude::Reader<'r> for TokenReader<'r> {
             return ve!(Self, HeaderIsBroken, offset_first, slice_len);
         }
         let field_count = offset_first / molecule::NUMBER_SIZE - 1;
-        if field_count < Self::FIELD_COUNT {
-            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
-        } else if !compatible && field_count > Self::FIELD_COUNT {
+        if (field_count < Self::FIELD_COUNT) || (!compatible && field_count > Self::FIELD_COUNT) {
             return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
         };
         let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
@@ -5829,7 +5721,7 @@ impl TokenConfig {
         }
     }
 
-    pub fn as_reader<'r>(&'r self) -> TokenConfigReader<'r> {
+    pub fn as_reader(&self) -> TokenConfigReader {
         TokenConfigReader::new_unchecked(self.as_slice())
     }
 }
@@ -6097,7 +5989,7 @@ impl ::core::iter::IntoIterator for TokenConfig {
 }
 impl<'r> TokenConfigReader<'r> {
     pub fn iter<'t>(&'t self) -> TokenConfigReaderIterator<'t, 'r> {
-        TokenConfigReaderIterator(&self, 0, self.len())
+        TokenConfigReaderIterator(self, 0, self.len())
     }
 }
 pub struct TokenConfigReaderIterator<'t, 'r>(&'t TokenConfigReader<'r>, usize, usize);
@@ -6138,10 +6030,10 @@ impl ::core::fmt::Debug for Metadata {
 impl ::core::fmt::Display for Metadata {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "chain_id", self.chain_id())?;
-        write!(f, ", {}: {}", "token_config", self.token_config())?;
-        write!(f, ", {}: {}", "ckb_fee_ratio", self.ckb_fee_ratio())?;
-        write!(f, ", {}: {}", "stake_typehash", self.stake_typehash())?;
+        write!(f, "chain_id: {}", self.chain_id())?;
+        write!(f, ", token_config: {}", self.token_config())?;
+        write!(f, ", ckb_fee_ratio: {}", self.ckb_fee_ratio())?;
+        write!(f, ", stake_typehash: {}", self.stake_typehash())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
             write!(f, ", .. ({} fields)", extra_count)?;
@@ -6214,7 +6106,7 @@ impl Metadata {
         }
     }
 
-    pub fn as_reader<'r>(&'r self) -> MetadataReader<'r> {
+    pub fn as_reader(&self) -> MetadataReader {
         MetadataReader::new_unchecked(self.as_slice())
     }
 }
@@ -6274,10 +6166,10 @@ impl<'r> ::core::fmt::Debug for MetadataReader<'r> {
 impl<'r> ::core::fmt::Display for MetadataReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "chain_id", self.chain_id())?;
-        write!(f, ", {}: {}", "token_config", self.token_config())?;
-        write!(f, ", {}: {}", "ckb_fee_ratio", self.ckb_fee_ratio())?;
-        write!(f, ", {}: {}", "stake_typehash", self.stake_typehash())?;
+        write!(f, "chain_id: {}", self.chain_id())?;
+        write!(f, ", token_config: {}", self.token_config())?;
+        write!(f, ", ckb_fee_ratio: {}", self.ckb_fee_ratio())?;
+        write!(f, ", stake_typehash: {}", self.stake_typehash())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
             write!(f, ", .. ({} fields)", extra_count)?;
@@ -6381,9 +6273,7 @@ impl<'r> molecule::prelude::Reader<'r> for MetadataReader<'r> {
             return ve!(Self, HeaderIsBroken, offset_first, slice_len);
         }
         let field_count = offset_first / molecule::NUMBER_SIZE - 1;
-        if field_count < Self::FIELD_COUNT {
-            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
-        } else if !compatible && field_count > Self::FIELD_COUNT {
+        if (field_count < Self::FIELD_COUNT) || (!compatible && field_count > Self::FIELD_COUNT) {
             return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
         };
         let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
@@ -6492,10 +6382,10 @@ impl ::core::fmt::Debug for Transfer {
 impl ::core::fmt::Display for Transfer {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "axon_address", self.axon_address())?;
-        write!(f, ", {}: {}", "ckb_amount", self.ckb_amount())?;
-        write!(f, ", {}: {}", "sUDT_amount", self.sudt_amount())?;
-        write!(f, ", {}: {}", "ERC20_address", self.erc20_address())?;
+        write!(f, "axon_address: {}", self.axon_address())?;
+        write!(f, ", ckb_amount: {}", self.ckb_amount())?;
+        write!(f, ", sUDT_amount: {}", self.sudt_amount())?;
+        write!(f, ", ERC20_address: {}", self.erc20_address())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
             write!(f, ", .. ({} fields)", extra_count)?;
@@ -6568,7 +6458,7 @@ impl Transfer {
         }
     }
 
-    pub fn as_reader<'r>(&'r self) -> TransferReader<'r> {
+    pub fn as_reader(&self) -> TransferReader {
         TransferReader::new_unchecked(self.as_slice())
     }
 }
@@ -6628,10 +6518,10 @@ impl<'r> ::core::fmt::Debug for TransferReader<'r> {
 impl<'r> ::core::fmt::Display for TransferReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "axon_address", self.axon_address())?;
-        write!(f, ", {}: {}", "ckb_amount", self.ckb_amount())?;
-        write!(f, ", {}: {}", "sUDT_amount", self.sudt_amount())?;
-        write!(f, ", {}: {}", "ERC20_address", self.erc20_address())?;
+        write!(f, "axon_address: {}", self.axon_address())?;
+        write!(f, ", ckb_amount: {}", self.ckb_amount())?;
+        write!(f, ", sUDT_amount: {}", self.sudt_amount())?;
+        write!(f, ", ERC20_address: {}", self.erc20_address())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
             write!(f, ", .. ({} fields)", extra_count)?;
@@ -6735,9 +6625,7 @@ impl<'r> molecule::prelude::Reader<'r> for TransferReader<'r> {
             return ve!(Self, HeaderIsBroken, offset_first, slice_len);
         }
         let field_count = offset_first / molecule::NUMBER_SIZE - 1;
-        if field_count < Self::FIELD_COUNT {
-            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
-        } else if !compatible && field_count > Self::FIELD_COUNT {
+        if (field_count < Self::FIELD_COUNT) || (!compatible && field_count > Self::FIELD_COUNT) {
             return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
         };
         let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]

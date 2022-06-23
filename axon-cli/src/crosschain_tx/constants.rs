@@ -27,8 +27,9 @@ pub const CROSSCHAIN_REQUEST_TX_HASH: H256 =
 pub const CROSSCHAIN_REQUEST_CODE_HASH: H256 =
     h256!("0xd8f9afaad8eb3e26a1ef2538bac91d68635502508358ae901941513bfe2edb1d");
 
-pub const CROSSCHAIN_LOCK_CODE_HASH: H256 =
-    h256!("0x33823dfb574bbfe453dde89eda4832c49abfb649be639c3c629c0657c7da77fb");
+// pub const CROSSCHAIN_LOCK_CODE_HASH: H256 =
+//     h256!("
+// 0x33823dfb574bbfe453dde89eda4832c49abfb649be639c3c629c0657c7da77fb");
 
 // it's empty check, just for test
 pub const CROSSCHAIN_LOCK_CODE_HASH_TEST: H256 =

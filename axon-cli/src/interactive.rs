@@ -3,7 +3,7 @@ use std::process;
 use clap::{crate_version, Arg, Command};
 use rustyline::{error::ReadlineError, Editor};
 
-use crate::{crosschain::CrossChain, docker::DockerApi};
+use crate::{crosschain_tx::CrossChain, docker::DockerApi};
 
 const HISTORY_FILE: &str = "history.txt";
 

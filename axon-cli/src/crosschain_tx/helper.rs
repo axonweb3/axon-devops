@@ -1,4 +1,4 @@
-use crate::crosschain::crosschain;
+use crate::crosschain_tx::crosschain;
 use ckb_types::{
     packed::Byte32,
     // H256,
@@ -29,7 +29,7 @@ pub fn cs_address(value: &[u8; 20]) -> crosschain::Address {
     crosschain::Address::new_unchecked(value.to_vec().into())
 }
 
-pub fn cs_token_config(tokens: &Vec<([u8; 20], Byte32, u32)>) -> crosschain::TokenConfig {
+pub fn cs_token_config(tokens: &[([u8; 20], Byte32, u32)]) -> crosschain::TokenConfig {
     let mut token_config = crosschain::TokenConfigBuilder::default();
     for val in tokens {
         let token = crosschain::Token::new_builder()

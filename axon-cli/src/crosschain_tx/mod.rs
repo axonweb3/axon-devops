@@ -22,7 +22,7 @@ use ckb_types::{
 use clap::{Arg, ArgMatches, Command, Parser};
 use std::{error::Error as StdErr, str::FromStr, sync::mpsc::channel};
 
-use crate::crosschain::{constants::*, helper::*};
+use crate::crosschain_tx::{constants::*, helper::*};
 use ckb_jsonrpc_types as json_types;
 use crossbeam_utils::thread;
 
@@ -231,7 +231,7 @@ impl CrossChain {
             .chain_id(5.into())
             .ckb_fee_ratio(cs_uint32(100))
             .stake_typehash(cs_hash(&Byte32::default()))
-            .token_config(cs_token_config(&vec![]))
+            .token_config(cs_token_config(&[]))
             .build();
 
         // crosschain-metadata lock script
