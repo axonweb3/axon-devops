@@ -20,7 +20,7 @@ class AccountFactory {
             let tx = {
                 "to": benchmark_account.address,
                 "type": 2,
-                "value": 10000000000000000,
+                "value": 1000000000000000000,
                 "maxPriorityFeePerGas": 3,
                 "maxFeePerGas": 3,
                 "gasLimit": 21000,
