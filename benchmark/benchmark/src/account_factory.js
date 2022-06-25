@@ -33,6 +33,7 @@ class AccountFactory {
                     if (err) logger.error("create account tx err: ", err)
                     else accounts.push(benchmark_account)
                 }), signed_tx.transactionHash);
+
             }
 
             await batch_request.execute()
