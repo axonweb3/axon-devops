@@ -12,33 +12,35 @@ class AccountFactory {
         let nonce = await web3.eth.getTransactionCount(account.address)
 
         let accounts = []
-        let batch_request = new WaitableBatchRequest(web3);
-        for (let i = 0; i < config.thread_num; i++) {
-            let benchmark_account = web3.eth.accounts.create()
+        while (accounts.length < config.thread_num) {
+            let batch_request = new WaitableBatchRequest(web3);
+            for (let i = 0; i < config.thread_num - accounts.length; i++) {
+                let benchmark_account = web3.eth.accounts.create()
 
-            nonce += 1
-            let tx = {
-                "to": benchmark_account.address,
-                "type": 2,
-                "value": 1000000000000000000,
-                "maxPriorityFeePerGas": 3,
-                "maxFeePerGas": 3,
-                "gasLimit": 21000,
-                "nonce": nonce,
-                "chainId": 5
+                nonce += 1
+                let tx = {
+                    "to": benchmark_account.address,
+                    "type": 2,
+                    "value": 10000000000000000,
+                    "maxPriorityFeePerGas": 3,
+                    "maxFeePerGas": 3,
+                    "gasLimit": 21000,
+                    "nonce": nonce,
+                    "chainId": 5
+                }
+                let signed_tx = await account.signTransaction(tx)
+                batch_request.add(web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
+                    if (err) logger.error("create account tx err: ", err)
+                    else accounts.push(benchmark_account)
+                }), signed_tx.transactionHash);
+
             }
-            let signed_tx = await account.signTransaction(tx)
-            batch_request.add(web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
-                if (err) logger.error("create account tx err: ", err)
-                else accounts.push(benchmark_account)
-            }), signed_tx.transactionHash);
+
+            await batch_request.execute()
+            await batch_request.waitFinished();
+            await batch_request.waitConfirmed();
         }
 
-        await batch_request.execute()
-        await batch_request.waitFinished();
-        await batch_request.waitConfirmed();
-
-        await sleep(300000);
 
         return accounts
     }
