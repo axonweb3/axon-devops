@@ -62,25 +62,18 @@ class Runner {
     }
 
     async run() {
-        let tasks = [];
+        // let tasks = [];
         this.log_benchmark_config_info()
         await this.prepare()
         for (let i in this.config.benchmark_cases) {
             let benchmarkCase = this.config.benchmark_cases[i];
             console.log(`benchmark case ${i}: ${benchmarkCase}`);
             await this.start()
-            tasks.push(this.exec(benchmarkCase));
-            if(this.config.continuous_benchmark) {
-                continue;
-            } else {
-                await Promise.all(tasks);
-                tasks = [];
-            }
+            await this.exec(benchmarkCase)
             await this.end()
             this.log_benchmark_res()
             await this.send_discord()
         }
-        await Promise.all(tasks);
     }
 
     async prepare() {
