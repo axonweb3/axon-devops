@@ -222,7 +222,7 @@ axon benchmark部署所需的配置文件
     # Number of threads sending transactions
     "id": "936501604767629344",
     #discord webhook's id(When continuous_benchmark is false, the results are pushed to discord)
-    "token": "Fha8Hn6C31VEu3wL5XejIVGocTXiQbJ6HabAC5sLtHHwvqQ63iXj1FmOkH_FVN4mTZwQ",
+    "token": "",
     #discord webhook's token(When continuous_benchmark is false, the results are pushed to discord)
     "benchmark_cases": ["./benchmark", "./contract_benchmark"]
     #Use cases for benchmark
