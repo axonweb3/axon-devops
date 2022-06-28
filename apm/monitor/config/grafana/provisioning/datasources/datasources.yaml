@@ -20,12 +20,28 @@ datasources:
   url: http://jaeger-query:16686
   basicAuth: false
 
-- name: Elasticsearch
-  type: elasticsearch
-  access: proxy
-  database: 'axon-*'
-  url: http://localhost:9200
+- name: "Elasticsearch"
+  access: "proxy"
+  basicAuth: false
+  basicAuthPassword: ""
+  basicAuthUser: ""
+  database: "axon-*"
+  isDefault: false
+  password: ""
+  readOnly: false
+  secureJsonFields: {}
+  type: "elasticsearch"
+  typeLogoUrl: ""
+  uid: "xpsRcf3nz"
+  url: "http://elasticsearch:9200"
+  user: ""
+  version: 2
+  orgId: 1
+  withCredentials: false
   jsonData:
-    interval: nil
-    timeField: '@timestamp'
-    esVersion: 70
+    esVersion: "7.0.0"
+    includeFrozen: false
+    logLevelField: ""
+    logMessageField: ""
+    maxConcurrentShardRequests: 5
+    timeField: "@timestamp"

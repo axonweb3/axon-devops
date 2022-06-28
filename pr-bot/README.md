@@ -27,7 +27,7 @@ Editor config.json
     }
   ],
   "id": "936501604767629344",
-  "token": "Fha8Hn6C31VEu3wL5XejIVGocTXiQbJ6HabAC5sLtHHwvqQ63iXj1FmOkH_FVN4mTZwQ",
+  "token": "",
   "time_interval_for_notification": "2"
 }
                                                

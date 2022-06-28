@@ -6,6 +6,6 @@
     "batch_size": 150,
     "thread_num": 120,
     "id": "936501604767629344",
-    "token": "Fha8Hn6C31VEu3wL5XejIVGocTXiQbJ6HabAC5sLtHHwvqQ63iXj1FmOkH_FVN4mTZwQ",
+    "token": "",
     "benchmark_cases": ["./benchmark", "./contract_benchmark"]
 }
