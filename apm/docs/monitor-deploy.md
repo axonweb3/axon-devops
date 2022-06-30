@@ -432,7 +432,7 @@ monitor和agent 部署命令
 - name: Deploy agent
   #Task name
   hosts: axon_node
-  #该值配置子啊 hosts 文件中
+  #该值配置在 hosts 文件中
   remote_user: ckb
   become: yes
   become_method: sudo

@@ -1,0 +1,24 @@
+
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - '/usr/share/filebeat/logs/errors.log'
+  fields_under_root: true
+  ignore_older: 5m
+  scan_frequency: 1s
+  multiline.type: pattern
+  multiline.pattern: '^[[:space:]]+(at|\.{3})\b|^}'
+  multiline.negate: false
+  multiline.match: after
+
+output.elasticsearch:
+  hosts: ["es_address:9200"]
+  indices:
+    - index: "benchmark-%{+yyyy.MM.dd}"
+
+processors:
+  - add_docker_metadata:
+      host: "unix:///host_docker/docker.sock"
+logging.json: true
+logging.metrics.enabled: false
