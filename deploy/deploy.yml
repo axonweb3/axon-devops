@@ -17,7 +17,7 @@
       tags:
         - deploy
 
-    - name: create monitor dir
+    - name: create axon dir
       file:
         path: "{{ deploy_path }}"
         state: directory
