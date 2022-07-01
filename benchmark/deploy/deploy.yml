@@ -74,7 +74,7 @@
         - start-benchmark-monitor
 
     - name: stop benchmark
-      shell: cd  {{ benchmark_dir }}/benchmark/deploy && docker-compose down
+      shell: cd  {{ benchmark_dir }} && docker-compose down
       become: yes
       ignore_errors: yes
       tags: 
