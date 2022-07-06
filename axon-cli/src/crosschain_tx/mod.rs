@@ -20,7 +20,12 @@ use ckb_types::{
     prelude::*,
 };
 use clap::{Arg, ArgMatches, Command, Parser};
-use std::{error::Error as StdErr, str::FromStr, sync::mpsc::channel};
+use std::{
+    error::Error as StdErr,
+    fmt::{self},
+    str::FromStr,
+    sync::mpsc::channel,
+};
 
 use crate::crosschain_tx::{constants::*, helper::*};
 use ckb_jsonrpc_types as json_types;
@@ -58,6 +63,27 @@ struct Args {
     /// CKB indexer rpc url
     #[clap(long, value_name = "URL", default_value = "http://127.0.0.1:8116")]
     ckb_indexer: String,
+}
+
+/// Send crosschain error.
+#[derive(Debug)]
+pub enum SendTxError {
+    ///
+    LackBalance,
+    NoLiveCell,
+    CollectorErr(String),
+}
+
+impl StdErr for SendTxError {}
+
+impl fmt::Display for SendTxError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            SendTxError::LackBalance => return write!(f, "Not Enough balance"),
+            SendTxError::NoLiveCell => return write!(f, "No live cell"),
+            SendTxError::CollectorErr(e) => return write!(f, "{}", e),
+        }
+    }
 }
 
 pub struct CrossChain {}
@@ -131,7 +157,7 @@ impl CrossChain {
             ckb_rpc:     cs_matches.value_of("ckb-rpc").unwrap().to_string(),
             ckb_indexer: cs_matches.value_of("ckb-indexer").unwrap().to_string(),
         };
-        println!("args {:?}", args);
+        // println!("args {:?}", args);
 
         // sender key is the lock_arg of wallet 1 from https://zero2ckb.ckbapp.dev/learn
         let sender_key = secp256k1::SecretKey::from_slice(args.sender_key.as_bytes())
@@ -154,17 +180,17 @@ impl CrossChain {
             .dep_type(DepType::DepGroup.into())
             .build();
 
-        let mut tx = TransactionBuilder::default().build();
-        println!("{:?}", tx);
-        if args.tx_type == 0 {
-            println!("deploy crosschain metadata");
-            tx =
-                CrossChain::build_deploy_crosschain_metadata_tx(&args, sender, secp256k1_data_dep)?;
-        } else {
-            println!("create crosschain tx, from ckb to axon");
-            tx = CrossChain::build_ckb_axon_tx(&args, sender, secp256k1_data_dep)?;
-        }
+        let create_tx = || {
+            if args.tx_type == 0 {
+                println!("deploy crosschain metadata");
+                CrossChain::build_deploy_crosschain_metadata_tx(&args, sender, secp256k1_data_dep)
+            } else {
+                println!("create crosschain tx, from ckb to axon");
+                CrossChain::build_ckb_axon_tx(&args, sender, secp256k1_data_dep)
+            }
+        };
 
+        let tx = create_tx()?;
         // Send transaction
         let json_tx = json_types::TransactionView::from(tx);
         println!("tx: {}", serde_json::to_string_pretty(&json_tx).unwrap());
@@ -182,7 +208,10 @@ impl CrossChain {
         Ok(())
     }
 
-    fn update_input_cells(args: &Args, sender: Script) -> (CellInput, u64) {
+    fn update_input_cells(
+        args: &Args,
+        sender: Script,
+    ) -> Result<(CellInput, u64), Box<dyn StdErr>> {
         let base_query = {
             let mut query = CellQueryOptions::new_lock(sender);
             query.data_len_range = Some(ValueRangeOption::new_exact(0));
@@ -190,7 +219,8 @@ impl CrossChain {
         };
         let query = {
             let mut query = base_query;
-            query.min_total_capacity = 100;
+            // query will stop if collected celles contain more capacity than this
+            query.min_total_capacity = 10000 * BYTE_SHANNONS;
             query
         };
 
@@ -200,16 +230,57 @@ impl CrossChain {
             s.spawn(move |_| {
                 let mut cell_collector =
                     DefaultCellCollector::new(args.ckb_indexer.as_str(), args.ckb_rpc.as_str());
-                let (more_cells, _) = cell_collector.collect_live_cells(&query, false).unwrap();
-                let input_cap: u64 = more_cells[0].output.capacity().unpack();
-                println!("capacity: {}, size: {}", input_cap, more_cells.len());
-                let input = CellInput::new(more_cells[0].out_point.clone(), 0);
-                tx.send((input, input_cap)).unwrap();
+                let result = cell_collector.collect_live_cells(&query, false);
+                match result {
+                    Ok(ok) => {
+                        let more_cells = ok.0;
+                        println!("live cell size: {}", more_cells.len());
+                        if more_cells.is_empty() {
+                            tx.send(Err(
+                                Box::new(SendTxError::NoLiveCell) as Box<dyn StdErr + Send + Sync>
+                            ))
+                            .unwrap();
+                        } else {
+                            let mut max_cap: u64 = more_cells[0].output.capacity().unpack();
+                            let mut max_cell = more_cells[0].clone();
+                            // println!("{:?}", max_cell);
+                            let mut i = 1;
+                            while i < more_cells.len() {
+                                let cell_cap: u64 = more_cells[i].output.capacity().unpack();
+                                // println!("{:?}", more_cells[i]);
+                                println!("{}, {}", cell_cap, max_cap);
+                                if cell_cap > max_cap {
+                                    max_cap = cell_cap;
+                                    max_cell = more_cells[i].clone();
+                                }
+                                i += 1;
+                            }
+                            println!("capacity: {}", max_cap);
+                            let input = CellInput::new(max_cell.out_point, 0);
+                            tx.send(Ok((input, max_cap))).unwrap();
+                        }
+                    }
+                    Err(err) => {
+                        let err_msg = err.to_string();
+                        tx.send(Err(Box::new(SendTxError::CollectorErr(err_msg))
+                            as Box<dyn StdErr + Send + Sync>))
+                            .unwrap();
+                    }
+                }
+                // let (more_cells, _) =
+                // cell_collector.collect_live_cells(&query, false);
+                // more_cells.into_iter().for_each(|cell| {
+                //     let input_cap: u64 = cell.output.capacity().unpack();
+                //     println!("capacity: {}", input_cap);
+                // });
             });
         })
         .unwrap();
 
-        rx.recv().unwrap()
+        match rx.recv().unwrap() {
+            Ok(ok) => Ok(ok),
+            Err(err) => Err(err as Box<dyn StdErr>),
+        }
     }
 
     fn build_deploy_crosschain_metadata_tx(
@@ -242,7 +313,7 @@ impl CrossChain {
             .args(sender.args())
             .build();
 
-        let (input, input_cap) = CrossChain::update_input_cells(args, sender.clone());
+        let (input, input_cap) = CrossChain::update_input_cells(args, sender.clone())?;
         // crosschain-metadata type script
         let type_script = CrossChain::build_type_id_script(&input, 0);
         // output cell
@@ -328,8 +399,12 @@ impl CrossChain {
         let request_code_hash =
             Byte32::from_slice(CROSSCHAIN_REQUEST_CODE_HASH.as_bytes()).unwrap();
         // prepare corsschain request script
+        let axon_addr: &[u8; 20] = AXON_ADDR
+            .as_bytes()
+            .try_into()
+            .expect("H160 to [u8; 20] error");
         let transfer_args = crosschain::Transfer::new_builder()
-            .axon_address(cs_address(&[0u8; 20]))
+            .axon_address(cs_address(axon_addr))
             .ckb_amount(cs_uint64(450))
             .erc20_address(cs_address(&[0u8; 20]))
             .build();
@@ -346,22 +421,24 @@ impl CrossChain {
             .type_(Some(request_script).pack())
             .build();
 
-        let (input, input_cap) = CrossChain::update_input_cells(args, sender.clone());
+        let (input, input_cap) = CrossChain::update_input_cells(args, sender.clone())?;
         let mut outputs = vec![output0.clone(), output1.clone()];
         let mut outputs_data = vec![Bytes::new().pack(), Bytes::new().pack()];
         let output0_cap: u64 = output0.capacity().unpack();
         let output1_cap: u64 = output1.capacity().unpack();
         let fee = 100_000_000;
-        println!(
-            "input {}, out0 {}, out1 cap {} fee {}, remain",
-            input_cap, output0_cap, output1_cap, fee
-        );
 
+        if input_cap < output0_cap + output1_cap + fee {
+            println!(
+                "unenough balance input {}, out0 {}, out1 cap {} fee {}",
+                input_cap / BYTE_SHANNONS,
+                output0_cap / BYTE_SHANNONS,
+                output1_cap / BYTE_SHANNONS,
+                fee / BYTE_SHANNONS
+            );
+            return Err(Box::new(SendTxError::LackBalance));
+        }
         let remain_cap: u64 = input_cap - output0_cap - output1_cap - fee;
-        println!(
-            "input {}, out0 {}, out1 cap {} fee {}, remain {}",
-            input_cap, output0_cap, output1_cap, fee, remain_cap
-        );
         let min_cap: u64 = 6_100_000_000;
         if remain_cap > min_cap {
             let output2 = CellOutput::new_builder()

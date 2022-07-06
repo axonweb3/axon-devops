@@ -162,7 +162,8 @@ impl Interactive {
                                     _ => {}
                                 },
                                 Some(("cs", cs_matches)) => {
-                                    let _result = CrossChain::exec_cs_tx(cs_matches);
+                                    let result = CrossChain::exec_cs_tx(cs_matches);
+                                    println!("{:?}", result);
                                 }
                                 // Some(("list", _)) => {
                                 // }

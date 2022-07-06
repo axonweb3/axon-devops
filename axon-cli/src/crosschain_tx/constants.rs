@@ -1,5 +1,5 @@
-use ckb_fixed_hash_core::H256;
-use ckb_types::h256;
+use ckb_fixed_hash_core::{H160, H256};
+use ckb_types::{h160, h256};
 
 /// "TYPE_ID" in hex (copied from ckb-chain-spec)
 pub const TYPE_ID_CODE_HASH: H256 = h256!("0x545950455f4944");
@@ -34,6 +34,8 @@ pub const CROSSCHAIN_REQUEST_CODE_HASH: H256 =
 // it's empty check, just for test
 pub const CROSSCHAIN_LOCK_CODE_HASH_TEST: H256 =
     h256!("0x97e6179be134d47ca10322a1534d8dcb65052de7e099b5556bea924137839bab");
+
+pub const AXON_ADDR: H160 = h160!("0x421871e656E04c9A106A55CEd53Fc9A49560a424");
 
 // A `Byte` contains how many `Shannons`.
 pub const BYTE_SHANNONS: u64 = 100_000_000;
