@@ -62,7 +62,6 @@ class Benchmark {
     async send_batch_transactions() {
         let txs = new WaitableBatchRequest(this.web3);
         for (let i = 0; i < this.config.batch_size; i++) {
-            this.benchmark_info.nonce += 1
             let tx = {
                 "from": this.account.address,
                 "to": this.contract.options.address,
@@ -82,10 +81,13 @@ class Benchmark {
                 }
                 else this.benchmark_info.success_tx += 1
             }), signed_tx.transactionHash);
+
+            this.benchmark_info.nonce += 1;
         }
 
         await txs.execute()
         await txs.waitFinished();
+        this.benchmark_info.nonce = await this.web3.eth.getTransactionCount(this.account.address);
     }
 
 }
