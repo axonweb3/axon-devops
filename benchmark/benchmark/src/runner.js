@@ -38,7 +38,7 @@ class Runner {
                 })
                 .send({
                     from: this.account.address,
-                    nonce: (await this.web3.eth.getTransactionCount(this.account.address)) + 1,
+                    nonce: (await this.web3.eth.getTransactionCount(this.account.address)),
                     gas: 2000000,
                 });
             resolve(instance);
@@ -123,6 +123,11 @@ class Runner {
     }
 
     async send_discord() {
+
+        if(!this.config.token || !this.config.id) {
+            return;
+        }
+
         const embed = this.get_message_embed();
         await this.discord.send({
             content: ' ',
