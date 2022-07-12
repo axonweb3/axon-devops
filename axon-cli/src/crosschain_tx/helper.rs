@@ -13,6 +13,10 @@ pub fn cs_hash(hash: &Byte32) -> crosschain::Hash {
     crosschain::Hash::new_unchecked(hash)
 }
 
+pub fn cs_uint16(value: u16) -> crosschain::Uint16 {
+    crosschain::Uint16::new_unchecked(value.to_le_bytes().to_vec().into())
+}
+
 pub fn cs_uint32(value: u32) -> crosschain::Uint32 {
     crosschain::Uint32::new_unchecked(value.to_le_bytes().to_vec().into())
 }

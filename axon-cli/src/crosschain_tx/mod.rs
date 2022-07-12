@@ -299,7 +299,7 @@ impl CrossChain {
 
         // prepare metadata cell data
         let metadata = crosschain::Metadata::new_builder()
-            .chain_id(5.into())
+            .chain_id(cs_uint16(5))
             .ckb_fee_ratio(cs_uint32(100))
             .stake_typehash(cs_hash(&Byte32::default()))
             .token_config(cs_token_config(&[]))
@@ -360,7 +360,7 @@ impl CrossChain {
         // crosschain-metadata dep cell
         // get tx hash created by build_deploy_crosschain_metadata_tx
         let crosschain_metadata_tx_hash = Byte32::from_slice(
-            h256!("0xbdee4ff5b30ee9be7b644f3e55d080adc64fdab4425107076cf1e192163a9dc9").as_bytes(),
+            h256!("0xfaf6e7a689ee8f3839f5a117b50df84c155ec232405869b3c904d23e3d866ae7").as_bytes(),
         )
         .unwrap();
         let contract_out_point = OutPoint::new(crosschain_metadata_tx_hash, 0);
@@ -380,11 +380,11 @@ impl CrossChain {
 
         // crosschain-lock lock script
         // code hash of crosschain-lock
-        let lock_code_hash = Byte32::from_slice(CROSSCHAIN_LOCK_CODE_HASH_TEST.as_bytes()).unwrap();
+        let lock_code_hash = Byte32::from_slice(CROSSCHAIN_LOCK_TYPE_ID_TEST.as_bytes()).unwrap();
         // type id of cross-chain metadata, the typeid of
         // build_deploy_crosschain_metadata_tx calculated in build_type_id_script
         let lock_args =
-            h256!("0x9d150f92179f315fffe35eb3ef79d9e66bc37de1764b2fe440c264c956facdae").as_bytes();
+            h256!("0x01b75db2124ce629e18fc88eb9b78b7f9f9f0b1bdc4d287a598c61b9f79fb663").as_bytes();
         let lock_script = Script::new_builder()
             .code_hash(lock_code_hash)
             .hash_type(ScriptHashType::Type.into())
@@ -393,7 +393,7 @@ impl CrossChain {
         // crosschain-lock cell
         let output0 = CellOutput::new_builder()
             .lock(lock_script)
-            .capacity(7_300_000_000.pack())
+            .capacity(50_000_000_000.pack())
             .build();
 
         let request_code_hash =
@@ -416,7 +416,7 @@ impl CrossChain {
             .build();
         // corsschain-request cell
         let output1 = CellOutput::new_builder()
-            .capacity(17_800_000_000.pack())
+            .capacity(50_000_000_000.pack())
             .lock(sender.clone())
             .type_(Some(request_script).pack())
             .build();
