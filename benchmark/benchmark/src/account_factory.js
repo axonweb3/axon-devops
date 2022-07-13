@@ -3,18 +3,17 @@ const { WaitableBatchRequest, sleep } = require('./utils');
 const logger = require('./logger')
 
 class AccountFactory {
-    async get_accounts(config, value) {
+    async get_accounts(config, value, account_num) {
 
         let web3 = new Web3(new Web3.providers.HttpProvider(config.http_endpoint))
         let account = web3.eth.accounts.privateKeyToAccount(config.private_key)
         web3.eth.defaultAccount = account.address
 
-        let nonce = await web3.eth.getTransactionCount(account.address)
-
         let accounts = []
-        while (accounts.length < config.thread_num) {
+        while (accounts.length < account_num) {
+            let nonce = await web3.eth.getTransactionCount(account.address);
             let batch_request = new WaitableBatchRequest(web3);
-            for (let i = 0; i < config.thread_num - accounts.length; i++) {
+            for (let i = 0; i < account_num - accounts.length; i++) {
                 let benchmark_account = web3.eth.accounts.create()
                 let tx = {
                     "to": benchmark_account.address,
@@ -33,14 +32,12 @@ class AccountFactory {
                 }), signed_tx.transactionHash);
 
                 nonce += 1;
-
             }
 
-            await batch_request.execute()
+            await batch_request.execute();
             await batch_request.waitFinished();
             await batch_request.waitConfirmed();
         }
-
 
         return accounts
     }
