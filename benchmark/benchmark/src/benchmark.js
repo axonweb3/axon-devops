@@ -1,5 +1,6 @@
 const Web3 = require('web3')
 const { WaitableBatchRequest } = require('./utils');
+const AccountFactory = require('./account_factory')
 const logger = require('./logger');
 
 class Benchmark {
@@ -30,6 +31,7 @@ class Benchmark {
         this.account = this.web3.eth.accounts.privateKeyToAccount(private_key)
         this.web3.eth.defaultAccount = this.account.address
 
+
     }
 
     async exec() {
@@ -44,6 +46,12 @@ class Benchmark {
         this.benchmark_info.total_time = 0
         this.benchmark_info.start_time = performance.now()
         this.benchmark_info.nonce = await this.web3.eth.getTransactionCount(this.account.address)
+        this.accounts = [];
+        const accountFactory = new AccountFactory()
+        for (let i = 0; i < 10; i++) {
+            let accounts = await accountFactory.get_accounts(this.config, 1000000000000);
+            this.accounts.push(...accounts);
+        }
     }
 
     async end() {
@@ -60,34 +68,48 @@ class Benchmark {
     async send_batch_transactions() {
         const txs = new WaitableBatchRequest(this.web3);
 
-        for (let i = 0; i < this.config.batch_size; i++) {
-            let tx = {
-                "to": '0x5cf83df52a32165a7f392168ac009b168c9e8915',
-                "type": 2,
-                "value": 1,
-                "maxPriorityFeePerGas": 3,
-                "maxFeePerGas": 3,
-                "gasLimit": 21000,
-                "nonce": this.benchmark_info.nonce,
-                "chainId": 5
-            }
-        let signed_tx = await this.account.signTransaction(tx)
-            txs.add(this.web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
-                if (err) {
-                    this.benchmark_info.fail_tx += 1
-                    if(!err.toString().includes('ReachLimit')) {
-                        logger.error("send tx err: ", err)
-                    }
-                }
-                else this.benchmark_info.success_tx += 1
-            }), signed_tx.transactionHash);
+        let idx = 0;
+        while (idx < this.accounts) {
 
-            this.benchmark_info.nonce += 1;
+            if(idx == this.accounts.length - 1) {
+                idx = 0;
+            }
+
+
+            let nonce = await this.web3.eth.getTransactionCount(this.account.address);
+
+            for (let i = 0; i < this.config.batch_size; i++) {
+                let tx = {
+                    "to": '0x5cf83df52a32165a7f392168ac009b168c9e8915',
+                    "type": 2,
+                    "value": 1,
+                    "maxPriorityFeePerGas": 3,
+                    "maxFeePerGas": 3,
+                    "gasLimit": 21000,
+                    "nonce": nonce,
+                    "chainId": 5
+                }
+                let signed_tx = await this.accounts[idx].signTransaction(tx);
+                txs.add(this.web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
+                    if (err) {
+                        this.benchmark_info.fail_tx += 1
+                        if(!err.toString().includes('ReachLimit')) {
+                            logger.error("send tx err: ", err)
+                        }
+                    }
+                    else this.benchmark_info.success_tx += 1
+                }), signed_tx.transactionHash);
+
+                nonce += 1;
+            }
+
+            await txs.execute()
+            await txs.waitFinished();
+
+
+            idx += 1;
         }
 
-        await txs.execute()
-        await txs.waitFinished();
-        this.benchmark_info.nonce = await this.web3.eth.getTransactionCount(this.account.address);
     }
 
 }

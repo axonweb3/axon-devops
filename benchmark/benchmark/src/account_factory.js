@@ -3,7 +3,7 @@ const { WaitableBatchRequest, sleep } = require('./utils');
 const logger = require('./logger')
 
 class AccountFactory {
-    async get_accounts(config) {
+    async get_accounts(config, value) {
 
         let web3 = new Web3(new Web3.providers.HttpProvider(config.http_endpoint))
         let account = web3.eth.accounts.privateKeyToAccount(config.private_key)
@@ -19,7 +19,7 @@ class AccountFactory {
                 let tx = {
                     "to": benchmark_account.address,
                     "type": 2,
-                    "value": 10000000000000000,
+                    "value": value,
                     "maxPriorityFeePerGas": 3,
                     "maxFeePerGas": 3,
                     "gasLimit": 21000,
