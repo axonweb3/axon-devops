@@ -84,7 +84,7 @@ class Runner {
 
     async exec(benchmarkCase) {
         let accountFactory = new AccountFactory()
-        let accounts = await accountFactory.get_accounts(this.config, 10000000000000000)
+        let accounts = await accountFactory.get_accounts(this.config, 1000000000000000000, this.config.thread_num)
 
         const piscina = new Piscina({
             filename: path.resolve(__dirname, 'worker.js')
