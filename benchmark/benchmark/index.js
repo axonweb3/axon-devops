@@ -43,14 +43,22 @@ async function init_config() {
         config.mnemonic = args['token'];
     }
 
+    if(args['mnemonic_index']) {
+        config.mnemonic_index = eval(args['mnemonic_index'])
+    }
 
     if(args['benchmark_cases']) {
         config.benchmark_cases = eval(args['benchmark_cases'])
     }
-
+    
     const hdNode = ethers.utils.HDNode.fromMnemonic(config.mnemonic);
-    let subNode = hdNode.derivePath("m/44'/60'/0'/0/0");
-    config.private_key = subNode.privateKey;
+    const keys = [];
+    for (let i = 0; i < 10; i++) {
+        let subNode = hdNode.derivePath(`m/44'/60'/0'/0/${i}`);
+        keys.push(subNode.privateKey);
+    }
+
+    config.private_key = keys[config.mnemonic_index];
 
 }
 (async () => {
