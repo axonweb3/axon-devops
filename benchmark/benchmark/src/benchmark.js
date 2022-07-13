@@ -69,11 +69,10 @@ class Benchmark {
     }
 
     async send_batch_transactions() {
-        const txs = new WaitableBatchRequest(this.web3);
-
         let idx = 0;
         while (idx < this.accounts.length) {
             let nonce = await this.web3.eth.getTransactionCount(this.accounts[idx].address);
+            const txs = new WaitableBatchRequest(this.web3);
 
             for (let i = 0; i < this.config.batch_size; i++) {
                 let tx = {
