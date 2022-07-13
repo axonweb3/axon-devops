@@ -9,7 +9,7 @@ class Benchmark {
         let private_key = info.private_key
         this.config = {
                 http_endpoint: config.http_endpoint,
-                private_key : config.private_key,
+                private_key : private_key,
                 continuous_benchmark: config.continuous_benchmark,
                 benchmark_time: config.benchmark_time,
                 batch_size: config.batch_size,
@@ -48,10 +48,13 @@ class Benchmark {
         this.benchmark_info.nonce = await this.web3.eth.getTransactionCount(this.account.address)
         this.accounts = [];
         const accountFactory = new AccountFactory()
-        for (let i = 0; i < 10; i++) {
-            let accounts = await accountFactory.get_accounts(this.config, 1000000000000);
-            this.accounts.push(...accounts);
+        for (let i = 0; i < 20; i++) {
+            let accounts = await accountFactory.get_accounts(this.config, 10000000000000, 50);
+            for (const account of accounts) {
+                this.accounts.push(account)
+            }
         }
+
     }
 
     async end() {
@@ -69,14 +72,8 @@ class Benchmark {
         const txs = new WaitableBatchRequest(this.web3);
 
         let idx = 0;
-        while (idx < this.accounts) {
-
-            if(idx == this.accounts.length - 1) {
-                idx = 0;
-            }
-
-
-            let nonce = await this.web3.eth.getTransactionCount(this.account.address);
+        while (idx < this.accounts.length) {
+            let nonce = await this.web3.eth.getTransactionCount(this.accounts[idx].address);
 
             for (let i = 0; i < this.config.batch_size; i++) {
                 let tx = {
