@@ -1,0 +1,85 @@
+---
+- name: start faucet
+  hosts: localhost
+  become: yes
+  become_method: sudo
+  vars_files:
+    - config.yml
+  tasks:
+    ###############################################################################################################
+    - name: Pull code
+      git:
+        repo: "{{ faucet_repo }}"
+        dest: "{{ deploy_path }}"
+        version: "{{ faucet_branch }}"
+        force: yes
+      become: yes
+      become_method: sudo
+      tags: 
+        - config
+
+    - name: Copy the env file
+      copy:
+        src: ./templates/
+        dest: "{{ deploy_path }}"
+        mode: 0755
+      tags: 
+        - config
+
+    - name: Replace axon_faucet_rpc_url
+      replace:
+        path: "{{ deploy_path }}/.env"
+        regexp: "axon_faucet_rpc_url"
+        replace: "{{ axon_faucet_rpc_url }}"
+      tags:
+          - config
+
+    - name: Replace axon_faucet_claim_value
+      replace:
+        path: "{{ deploy_path }}/.env"
+        regexp: "axon_faucet_claim_value"
+        replace: "{{ axon_faucet_claim_value }}"
+      tags:
+          - config
+
+    - name: Replace react_app_backend_ppoint
+      replace:
+        path: "{{ deploy_path }}/.env"
+        regexp: "react_app_backend_ppoint"
+        replace: "{{ react_app_backend_ppoint }}"
+      tags:
+          - config
+
+    - name: Replace mongodb_url
+      replace:
+        path: "{{ deploy_path }}/.env"
+        regexp: "mongodb_url"
+        replace: "{{ mongodb_url }}"
+      tags:
+          - config
+
+    - name: Replace mongodb_password
+      replace:
+        path: "{{ deploy_path }}/.env"
+        regexp: "mongodb_password"
+        replace: "{{ mongodb_password }}"
+      tags:
+          - config
+
+    - name: faucet start
+      shell: "cd {{ deploy_path }} &&  docker-compose up -d"
+      ignore_errors: yes
+      become: yes
+      become_method: sudo
+      tags:
+        - up
+
+    - name: down 
+      shell: "docker-compose -f {{ deploy_path }}/docker-compose.yml down"
+      ignore_errors: yes
+      become: yes
+      become_method: sudo
+      tags: 
+        - down
+
+    ###############################################################################################################
