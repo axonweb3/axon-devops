@@ -40,5 +40,17 @@ pub const CROSSCHAIN_LOCK_TYPE_ID_TEST: H256 =
 
 pub const AXON_ADDR: H160 = h160!("0x421871e656E04c9A106A55CEd53Fc9A49560a424");
 
+// pub const CROSSCHAIN_TYPE_SCRIPT_ARGS: H256 =
+//     h256!("
+// 0x8de2c7322dd816fb245897403bb8fe9e15170231ea6675054b4cf45bc1d01999");
+
 // A `Byte` contains how many `Shannons`.
 pub const BYTE_SHANNONS: u64 = 100_000_000;
+
+pub const SUDT_LOCK_HASH: H256 =
+    h256!("0x695480b96d41a2af956f3cf86a4f1dac6ab2cf81ad143788f77183eda512b051");
+
+// for debug
+// needs to be changed after every update
+pub const CROSSCHAIN_TYPE_SCRIPT_ARGS_DEBUG: H256 =
+    h256!("0x5bdcaa8c3fa923b7378d28d9c26f90a86f871ea456f93b3a9a06a15f10120bcd");

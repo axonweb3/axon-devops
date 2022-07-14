@@ -50,7 +50,7 @@ impl Uint16 {
         self.as_bytes()
     }
 
-    pub fn as_reader<'r>(&'r self) -> Uint16Reader<'r> {
+    pub fn as_reader(&self) -> Uint16Reader {
         Uint16Reader::new_unchecked(self.as_slice())
     }
 }

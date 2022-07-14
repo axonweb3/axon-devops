@@ -21,6 +21,7 @@ use ckb_types::{
 };
 use clap::{Arg, ArgMatches, Command, Parser};
 use std::{
+    any::Any,
     error::Error as StdErr,
     fmt::{self},
     str::FromStr,
@@ -184,9 +185,12 @@ impl CrossChain {
             if args.tx_type == 0 {
                 println!("deploy crosschain metadata");
                 CrossChain::build_deploy_crosschain_metadata_tx(&args, sender, secp256k1_data_dep)
-            } else {
+            } else if args.tx_type == 1 {
                 println!("create crosschain tx, from ckb to axon");
                 CrossChain::build_ckb_axon_tx(&args, sender, secp256k1_data_dep)
+            } else {
+                println!("update crosschain metadata");
+                CrossChain::build_update_crosschain_metadata_tx(&args, sender, secp256k1_data_dep)
             }
         };
 
@@ -210,13 +214,8 @@ impl CrossChain {
 
     fn update_input_cells(
         args: &Args,
-        sender: Script,
-    ) -> Result<(CellInput, u64), Box<dyn StdErr>> {
-        let base_query = {
-            let mut query = CellQueryOptions::new_lock(sender);
-            query.data_len_range = Some(ValueRangeOption::new_exact(0));
-            query
-        };
+        base_query: CellQueryOptions,
+    ) -> Result<(CellInput, ScriptOpt, u64), Box<dyn StdErr>> {
         let query = {
             let mut query = base_query;
             // query will stop if collected celles contain more capacity than this
@@ -257,7 +256,8 @@ impl CrossChain {
                             }
                             println!("capacity: {}", max_cap);
                             let input = CellInput::new(max_cell.out_point, 0);
-                            tx.send(Ok((input, max_cap))).unwrap();
+                            let type_script = max_cell.output.type_();
+                            tx.send(Ok((input, type_script, max_cap))).unwrap();
                         }
                     }
                     Err(err) => {
@@ -267,12 +267,6 @@ impl CrossChain {
                             .unwrap();
                     }
                 }
-                // let (more_cells, _) =
-                // cell_collector.collect_live_cells(&query, false);
-                // more_cells.into_iter().for_each(|cell| {
-                //     let input_cap: u64 = cell.output.capacity().unpack();
-                //     println!("capacity: {}", input_cap);
-                // });
             });
         })
         .unwrap();
@@ -283,27 +277,49 @@ impl CrossChain {
         }
     }
 
-    fn build_deploy_crosschain_metadata_tx(
+    fn build_signed_tx(
+        input: CellInput,
+        outputs: Vec<CellOutput>,
+        outputs_data: Vec<OtherBytes>,
+        cell_deps: Vec<CellDep>,
+        args: &Args,
+    ) -> Result<TransactionView, Box<dyn StdErr>> {
+        let tx = TransactionBuilder::default()
+            .input(input)
+            .outputs(outputs)
+            .outputs_data(outputs_data)
+            .cell_deps(cell_deps.clone())
+            .build();
+
+        tx.as_advanced_builder()
+            .set_cell_deps(Vec::new())
+            .cell_deps(cell_deps.into_iter().collect::<Vec<_>>().pack())
+            .build();
+
+        let key = Privkey::from_slice(args.sender_key.as_bytes());
+        let tx = CrossChain::sign_tx(tx, &key);
+
+        Ok(tx)
+    }
+
+    fn build_update_crosschain_metadata_tx(
         args: &Args,
         sender: Script,
         secp256k1_data_dep: CellDep,
     ) -> Result<TransactionView, Box<dyn StdErr>> {
-        // crosschain-metadata dep cell
-        let crosschain_metadata_tx_hash =
-            Byte32::from_slice(CROSSCHAIN_METADATA_TX_HASH.as_bytes()).unwrap();
-        let crosschain_metadata_out_point = OutPoint::new(crosschain_metadata_tx_hash, 0);
-        let crosschain_metadata_dep = CellDep::new_builder()
-            .out_point(crosschain_metadata_out_point)
-            .dep_type(DepType::Code.into())
+        // args of type script from deploy crosschain metadata tx
+        let hash256 = CROSSCHAIN_TYPE_SCRIPT_ARGS_DEBUG.as_bytes().to_vec();
+        let deploy_type = Script::new_builder()
+            .code_hash(TYPE_ID_CODE_HASH.pack())
+            .hash_type(ScriptHashType::Type.into())
+            .args(Bytes::from(hash256).pack())
             .build();
-
-        // prepare metadata cell data
-        let metadata = crosschain::Metadata::new_builder()
-            .chain_id(cs_uint16(5))
-            .ckb_fee_ratio(cs_uint32(100))
-            .stake_typehash(cs_hash(&Byte32::default()))
-            .token_config(cs_token_config(&[]))
-            .build();
+        let base_query = {
+            let mut query = CellQueryOptions::new_type(deploy_type);
+            query.data_len_range = Some(ValueRangeOption::new_min(0));
+            query
+        };
+        let (input, type_script, input_cap) = CrossChain::update_input_cells(args, base_query)?;
 
         // crosschain-metadata lock script
         let code_hash = Byte32::from_slice(CROSSCHAIN_METADATA_CODE_HASH.as_bytes()).unwrap();
@@ -312,8 +328,58 @@ impl CrossChain {
             .hash_type(ScriptHashType::Data.into())
             .args(sender.args())
             .build();
+        // output cell
+        let tx_fee = 100_000_000;
+        let output = CellOutput::new_builder()
+            .lock(meta_script)
+            .type_(type_script)
+            .capacity((input_cap - tx_fee).pack())
+            .build();
+        let out_cap: u64 = output.capacity().unpack();
+        println!("out cap {}", out_cap);
+        let outputs = vec![output];
 
-        let (input, input_cap) = CrossChain::update_input_cells(args, sender.clone())?;
+        // prepare metadata cell data
+        let metadata = crosschain::Metadata::new_builder()
+            .chain_id(cs_uint16(5))
+            .ckb_fee_ratio(cs_uint32(100))
+            .stake_typehash(cs_hash(&Byte32::default()))
+            .token_config(cs_token_config(&[([0u8; 20], SUDT_LOCK_HASH.pack(), 0)]))
+            .build();
+        let outputs_data = vec![metadata.as_bytes().pack()];
+
+        // crosschain-metadata dep cell
+        let crosschain_metadata_tx_hash =
+            Byte32::from_slice(CROSSCHAIN_METADATA_TX_HASH.as_bytes()).unwrap();
+        let crosschain_metadata_out_point = OutPoint::new(crosschain_metadata_tx_hash, 0);
+        let crosschain_metadata_dep = CellDep::new_builder()
+            .out_point(crosschain_metadata_out_point)
+            .dep_type(DepType::Code.into())
+            .build();
+        let cell_deps = vec![crosschain_metadata_dep, secp256k1_data_dep];
+
+        CrossChain::build_signed_tx(input, outputs, outputs_data, cell_deps, args)
+    }
+
+    fn build_deploy_crosschain_metadata_tx(
+        args: &Args,
+        sender: Script,
+        secp256k1_data_dep: CellDep,
+    ) -> Result<TransactionView, Box<dyn StdErr>> {
+        let base_query = {
+            let mut query = CellQueryOptions::new_lock(sender.clone());
+            query.data_len_range = Some(ValueRangeOption::new_exact(0));
+            query
+        };
+        let (input, _, input_cap) = CrossChain::update_input_cells(args, base_query)?;
+
+        // crosschain-metadata lock script
+        let code_hash = Byte32::from_slice(CROSSCHAIN_METADATA_CODE_HASH.as_bytes()).unwrap();
+        let meta_script = Script::new_builder()
+            .code_hash(code_hash)
+            .hash_type(ScriptHashType::Data.into())
+            .args(sender.args())
+            .build();
         // crosschain-metadata type script
         let type_script = CrossChain::build_type_id_script(&input, 0);
         // output cell
@@ -330,26 +396,28 @@ impl CrossChain {
             .lock(sender)
             .capacity(remain_cap.pack())
             .build();
+        let outputs = vec![output, output1];
 
-        let cell_deps = vec![crosschain_metadata_dep, secp256k1_data_dep];
+        // prepare metadata cell data
+        let metadata = crosschain::Metadata::new_builder()
+            .chain_id(cs_uint16(5))
+            .ckb_fee_ratio(cs_uint32(100))
+            .stake_typehash(cs_hash(&Byte32::default()))
+            .token_config(cs_token_config(&[]))
+            .build();
         let outputs_data = vec![metadata.as_bytes().pack(), Bytes::new().pack()];
-        let tx = TransactionBuilder::default()
-            .input(input)
-            .output(output)
-            .output(output1)
-            .outputs_data(outputs_data)
-            .cell_deps(cell_deps.clone())
+
+        // crosschain-metadata dep cell
+        let crosschain_metadata_tx_hash =
+            Byte32::from_slice(CROSSCHAIN_METADATA_TX_HASH.as_bytes()).unwrap();
+        let crosschain_metadata_out_point = OutPoint::new(crosschain_metadata_tx_hash, 0);
+        let crosschain_metadata_dep = CellDep::new_builder()
+            .out_point(crosschain_metadata_out_point)
+            .dep_type(DepType::Code.into())
             .build();
+        let cell_deps = vec![crosschain_metadata_dep, secp256k1_data_dep];
 
-        tx.as_advanced_builder()
-            .set_cell_deps(Vec::new())
-            .cell_deps(cell_deps.into_iter().collect::<Vec<_>>().pack())
-            .build();
-
-        let key = Privkey::from_slice(args.sender_key.as_bytes());
-        let tx = CrossChain::sign_tx(tx, &key);
-
-        Ok(tx)
+        CrossChain::build_signed_tx(input, outputs, outputs_data, cell_deps, args)
     }
 
     fn build_ckb_axon_tx(
@@ -357,26 +425,12 @@ impl CrossChain {
         sender: Script,
         secp256k1_data_dep: CellDep,
     ) -> Result<TransactionView, Box<dyn StdErr>> {
-        // crosschain-metadata dep cell
-        // get tx hash created by build_deploy_crosschain_metadata_tx
-        let crosschain_metadata_tx_hash = Byte32::from_slice(
-            h256!("0xfaf6e7a689ee8f3839f5a117b50df84c155ec232405869b3c904d23e3d866ae7").as_bytes(),
-        )
-        .unwrap();
-        let contract_out_point = OutPoint::new(crosschain_metadata_tx_hash, 0);
-        let contract_dep = CellDep::new_builder()
-            .out_point(contract_out_point)
-            .dep_type(DepType::Code.into())
-            .build();
-
-        // crosschain-request dep cell
-        let crosschain_request_tx_hash =
-            Byte32::from_slice(CROSSCHAIN_REQUEST_TX_HASH.as_bytes()).unwrap();
-        let cs_req_out_point = OutPoint::new(crosschain_request_tx_hash, 0);
-        let cs_req_dep = CellDep::new_builder()
-            .out_point(cs_req_out_point)
-            .dep_type(DepType::Code.into())
-            .build();
+        let base_query = {
+            let mut query = CellQueryOptions::new_lock(sender.clone());
+            query.data_len_range = Some(ValueRangeOption::new_exact(0));
+            query
+        };
+        let (input, _, input_cap) = CrossChain::update_input_cells(args, base_query)?;
 
         // crosschain-lock lock script
         // code hash of crosschain-lock
@@ -384,7 +438,7 @@ impl CrossChain {
         // type id of cross-chain metadata, the typeid of
         // build_deploy_crosschain_metadata_tx calculated in build_type_id_script
         let lock_args =
-            h256!("0x01b75db2124ce629e18fc88eb9b78b7f9f9f0b1bdc4d287a598c61b9f79fb663").as_bytes();
+            h256!("0xfd4d056c08e1c1625145149ef6f45bc2d05b07687d9796f33cc82354e003e83f").as_bytes();
         let lock_script = Script::new_builder()
             .code_hash(lock_code_hash)
             .hash_type(ScriptHashType::Type.into())
@@ -421,7 +475,6 @@ impl CrossChain {
             .type_(Some(request_script).pack())
             .build();
 
-        let (input, input_cap) = CrossChain::update_input_cells(args, sender.clone())?;
         let mut outputs = vec![output0.clone(), output1.clone()];
         let mut outputs_data = vec![Bytes::new().pack(), Bytes::new().pack()];
         let output0_cap: u64 = output0.capacity().unpack();
@@ -449,25 +502,30 @@ impl CrossChain {
             outputs_data.push(Bytes::new().pack());
         }
 
+        // crosschain-metadata dep cell
+        // get tx hash created by build_deploy_crosschain_metadata_tx
+        let crosschain_metadata_tx_hash = Byte32::from_slice(
+            h256!("0x0770e2d917105aae2a84407562933a9351ab57daf93e289442f02b412a6b3a39").as_bytes(),
+        )
+        .unwrap();
+        let contract_out_point = OutPoint::new(crosschain_metadata_tx_hash, 0);
+        let contract_dep = CellDep::new_builder()
+            .out_point(contract_out_point)
+            .dep_type(DepType::Code.into())
+            .build();
+
+        // crosschain-request dep cell
+        let crosschain_request_tx_hash =
+            Byte32::from_slice(CROSSCHAIN_REQUEST_TX_HASH.as_bytes()).unwrap();
+        let cs_req_out_point = OutPoint::new(crosschain_request_tx_hash, 0);
+        let cs_req_dep = CellDep::new_builder()
+            .out_point(cs_req_out_point)
+            .dep_type(DepType::Code.into())
+            .build();
+
         let cell_deps = vec![contract_dep, secp256k1_data_dep, cs_req_dep];
 
-        let tx = TransactionBuilder::default()
-            .input(input)
-            .outputs(outputs)
-            .outputs_data(outputs_data)
-            .cell_deps(cell_deps.clone())
-            .build();
-
-        tx.as_advanced_builder()
-            .set_cell_deps(Vec::new())
-            .cell_deps(cell_deps.into_iter().collect::<Vec<_>>().pack())
-            .build();
-
-        let key = Privkey::from_slice(args.sender_key.as_bytes());
-
-        let tx = CrossChain::sign_tx(tx, &key);
-
-        Ok(tx)
+        CrossChain::build_signed_tx(input, outputs, outputs_data, cell_deps, args)
     }
 
     fn build_type_id_script(input: &CellInput, output_index: u64) -> ScriptOpt {
@@ -476,6 +534,7 @@ impl CrossChain {
         blake2b.update(&output_index.to_le_bytes());
         let mut ret = [0; 32];
         blake2b.finalize(&mut ret);
+        // print and save this for reuse?
         let script_arg = Bytes::from(ret.to_vec());
         let code_hash = Byte32::from_slice(TYPE_ID_CODE_HASH.as_bytes()).unwrap();
         let script = Script::new_builder()
