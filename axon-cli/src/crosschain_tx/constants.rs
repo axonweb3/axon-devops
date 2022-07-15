@@ -23,9 +23,9 @@ pub const CROSSCHAIN_METADATA_CODE_HASH: H256 =
     h256!("0x4f0eac26544fe1ed861711ba7cb9379c47b792c08a7ed1e22875e4d5a2a0fdc2");
 
 pub const CROSSCHAIN_REQUEST_TX_HASH: H256 =
-    h256!("0x695480b96d41a2af956f3cf86a4f1dac6ab2cf81ad143788f77183eda512b051");
+    h256!("0x272168c3d7c4576398f6cb82a15490ad07b11602c0af8810f7dc0fd4252717fb");
 pub const CROSSCHAIN_REQUEST_CODE_HASH: H256 =
-    h256!("0xd8f9afaad8eb3e26a1ef2538bac91d68635502508358ae901941513bfe2edb1d");
+    h256!("0xb14817a81bea1231a787122943a487884b193bcf90db94a7afe9ef1ac8c5deb5");
 
 // pub const CROSSCHAIN_LOCK_CODE_HASH: H256 =
 //     h256!("
@@ -46,11 +46,21 @@ pub const AXON_ADDR: H160 = h160!("0x421871e656E04c9A106A55CEd53Fc9A49560a424");
 
 // A `Byte` contains how many `Shannons`.
 pub const BYTE_SHANNONS: u64 = 100_000_000;
+pub const ETHER: u64 = 1_000_000_000_000_000_000; // 10^18
 
-pub const SUDT_LOCK_HASH: H256 =
-    h256!("0x695480b96d41a2af956f3cf86a4f1dac6ab2cf81ad143788f77183eda512b051");
+// sudt owner lock hash
+pub const SUDT_OWNER_LOCK_HASH: H256 =
+    h256!("0xc2ca3b067635ecf9a5b17a398a2509a2bd93ed172bfb6699c7b046704ded529a");
 
+pub const SUDT_WAT_CODE_HASH: H256 =
+    h256!("0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4");
 // for debug
 // needs to be changed after every update
 pub const CROSSCHAIN_TYPE_SCRIPT_ARGS_DEBUG: H256 =
-    h256!("0x5bdcaa8c3fa923b7378d28d9c26f90a86f871ea456f93b3a9a06a15f10120bcd");
+    h256!("0x490d951fe6d4d34d0c4f238b50b8b1d524ddf737275b1a1f1e3216f0af5c522e");
+
+pub const CROSSCHAIN_DEPLOY_METADATA_TYPEID: H256 =
+    h256!("0xedc5d491da94ef638eefec43372a293879c518dbb4af3be0766ce6806befa3ec");
+
+pub const CROSSCHAIN_DEPLOY_METADATA_TX_HASH: H256 =
+    h256!("0xa59fd4394821ab90558f9c33f64847cd9209283418dd548a34c366ac012addc7");

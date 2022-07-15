@@ -11,7 +11,7 @@ use ckb_sdk::{
 };
 use ckb_types::{
     bytes::Bytes,
-    core::{DepType, ScriptHashType, TransactionBuilder, TransactionView},
+    core::{Capacity, DepType, ScriptHashType, TransactionBuilder, TransactionView},
     h256,
     packed::{
         Byte32, Bytes as OtherBytes, CellDep, CellInput, CellOutput, OutPoint, Script, ScriptOpt,
@@ -21,9 +21,9 @@ use ckb_types::{
 };
 use clap::{Arg, ArgMatches, Command, Parser};
 use std::{
-    any::Any,
     error::Error as StdErr,
     fmt::{self},
+    ops::Mul,
     str::FromStr,
     sync::mpsc::channel,
 };
@@ -32,21 +32,13 @@ use crate::crosschain_tx::{constants::*, helper::*};
 use ckb_jsonrpc_types as json_types;
 use crossbeam_utils::thread;
 
-/// Transfer some CKB from one sighash address to other address
-/// # Example:
-///     ./target/debug/examples/transfer_from_sighash \
-///       --sender-key <key-hex> \
-///       --receiver <address> \
-///       --capacity 61.0
 #[derive(Parser, Debug, Default)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
     /// deploy crosschain metadata or ckb->axon crosschain tx
-    #[clap(long, value_name = "TYPE", default_value = "0")]
     tx_type: u16,
 
     /// The sender private key (hex string)
-    #[clap(long, value_name = "KEY")]
     sender_key: H256,
 
     /// The receiver address
@@ -54,16 +46,15 @@ struct Args {
     // receiver: Address,
 
     /// The capacity to transfer (unit: CKB, example: 102.43)
-    #[clap(long, value_name = "CKB")]
     capacity: HumanCapacity,
 
     /// CKB rpc url
-    #[clap(long, value_name = "URL", default_value = "http://127.0.0.1:8114")]
     ckb_rpc: String,
 
     /// CKB indexer rpc url
-    #[clap(long, value_name = "URL", default_value = "http://127.0.0.1:8116")]
     ckb_indexer: String,
+
+    sudt_amount: f64,
 }
 
 /// Send crosschain error.
@@ -136,6 +127,15 @@ impl CrossChain {
                     .default_value("http://3.235.223.161:18116")
                     .takes_value(true),
             )
+            .arg(
+                Arg::new("sudt-amount")
+                    .short('u')
+                    .long("sudt-amount")
+                    .help("transfer sudt from ckb to axon")
+                    .required(false)
+                    .default_value("0")
+                    .takes_value(true),
+            )
     }
 
     pub fn exec_cs_tx(cs_matches: &ArgMatches) -> Result<(), Box<dyn StdErr>> {
@@ -157,6 +157,11 @@ impl CrossChain {
             ),
             ckb_rpc:     cs_matches.value_of("ckb-rpc").unwrap().to_string(),
             ckb_indexer: cs_matches.value_of("ckb-indexer").unwrap().to_string(),
+            sudt_amount: cs_matches
+                .value_of("sudt-amount")
+                .unwrap()
+                .parse::<f64>()
+                .unwrap(),
         };
         // println!("args {:?}", args);
 
@@ -247,7 +252,7 @@ impl CrossChain {
                             while i < more_cells.len() {
                                 let cell_cap: u64 = more_cells[i].output.capacity().unpack();
                                 // println!("{:?}", more_cells[i]);
-                                println!("{}, {}", cell_cap, max_cap);
+                                // println!("{}, {}", cell_cap, max_cap);
                                 if cell_cap > max_cap {
                                     max_cap = cell_cap;
                                     max_cell = more_cells[i].clone();
@@ -321,6 +326,9 @@ impl CrossChain {
         };
         let (input, type_script, input_cap) = CrossChain::update_input_cells(args, base_query)?;
 
+        // let type_id_script = type_script.to_opt().unwrap();
+        // println!("type id {}", type_id_script.calc_script_hash());
+
         // crosschain-metadata lock script
         let code_hash = Byte32::from_slice(CROSSCHAIN_METADATA_CODE_HASH.as_bytes()).unwrap();
         let meta_script = Script::new_builder()
@@ -344,7 +352,11 @@ impl CrossChain {
             .chain_id(cs_uint16(5))
             .ckb_fee_ratio(cs_uint32(100))
             .stake_typehash(cs_hash(&Byte32::default()))
-            .token_config(cs_token_config(&[([0u8; 20], SUDT_LOCK_HASH.pack(), 0)]))
+            .token_config(cs_token_config(&[(
+                [0u8; 20],
+                SUDT_OWNER_LOCK_HASH.pack(),
+                0,
+            )]))
             .build();
         let outputs_data = vec![metadata.as_bytes().pack()];
 
@@ -403,7 +415,11 @@ impl CrossChain {
             .chain_id(cs_uint16(5))
             .ckb_fee_ratio(cs_uint32(100))
             .stake_typehash(cs_hash(&Byte32::default()))
-            .token_config(cs_token_config(&[]))
+            .token_config(cs_token_config(&[(
+                [0u8; 20],
+                SUDT_OWNER_LOCK_HASH.pack(),
+                0,
+            )]))
             .build();
         let outputs_data = vec![metadata.as_bytes().pack(), Bytes::new().pack()];
 
@@ -425,6 +441,7 @@ impl CrossChain {
         sender: Script,
         secp256k1_data_dep: CellDep,
     ) -> Result<TransactionView, Box<dyn StdErr>> {
+        let is_usdt = args.sudt_amount > 0.0;
         let base_query = {
             let mut query = CellQueryOptions::new_lock(sender.clone());
             query.data_len_range = Some(ValueRangeOption::new_exact(0));
@@ -437,18 +454,47 @@ impl CrossChain {
         let lock_code_hash = Byte32::from_slice(CROSSCHAIN_LOCK_TYPE_ID_TEST.as_bytes()).unwrap();
         // type id of cross-chain metadata, the typeid of
         // build_deploy_crosschain_metadata_tx calculated in build_type_id_script
-        let lock_args =
-            h256!("0xfd4d056c08e1c1625145149ef6f45bc2d05b07687d9796f33cc82354e003e83f").as_bytes();
+        let lock_args = CROSSCHAIN_DEPLOY_METADATA_TYPEID.as_bytes();
         let lock_script = Script::new_builder()
             .code_hash(lock_code_hash)
             .hash_type(ScriptHashType::Type.into())
             .args(lock_args.pack())
             .build();
+
+        let option_user_input_ckb = Capacity::bytes(500).unwrap();
         // crosschain-lock cell
-        let output0 = CellOutput::new_builder()
-            .lock(lock_script)
-            .capacity(50_000_000_000.pack())
-            .build();
+        let mut output0 = if is_usdt {
+            println!("sudt-amount {}", args.sudt_amount);
+            let type_code_hash = SUDT_WAT_CODE_HASH.pack();
+            // type id of cross-chain metadata, the typeid of
+            // build_deploy_crosschain_metadata_tx calculated in build_type_id_script
+            let type_args = SUDT_OWNER_LOCK_HASH.pack().as_bytes();
+            let type_script = Script::new_builder()
+                .code_hash(type_code_hash)
+                .hash_type(ScriptHashType::Type.into())
+                .args(type_args.pack())
+                .build();
+            let type_script = ScriptOpt::new_builder().set(Some(type_script)).build();
+            let sudt_cs_size = 16;
+            CellOutput::new_builder()
+                .lock(lock_script)
+                .type_(type_script)
+                .build_exact_capacity(Capacity::bytes(sudt_cs_size).unwrap())
+                .unwrap()
+        } else {
+            CellOutput::new_builder()
+                .lock(lock_script)
+                .build_exact_capacity(Capacity::bytes(0).unwrap())
+                .unwrap()
+        };
+
+        let output_capacity: Capacity = output0.capacity().unpack();
+        if output_capacity.as_u64() < option_user_input_ckb.as_u64() {
+            output0 = output0
+                .as_builder()
+                .capacity(option_user_input_ckb.pack())
+                .build();
+        }
 
         let request_code_hash =
             Byte32::from_slice(CROSSCHAIN_REQUEST_CODE_HASH.as_bytes()).unwrap();
@@ -460,7 +506,7 @@ impl CrossChain {
         let transfer_args = crosschain::Transfer::new_builder()
             .axon_address(cs_address(axon_addr))
             .ckb_amount(cs_uint64(450))
-            .erc20_address(cs_address(&[0u8; 20]))
+            .erc20_address(cs_address(&[1u8; 20]))
             .build();
 
         let request_script = Script::new_builder()
@@ -470,13 +516,20 @@ impl CrossChain {
             .build();
         // corsschain-request cell
         let output1 = CellOutput::new_builder()
-            .capacity(50_000_000_000.pack())
+            .capacity(20_000_000_000.pack())
             .lock(sender.clone())
             .type_(Some(request_script).pack())
             .build();
 
         let mut outputs = vec![output0.clone(), output1.clone()];
-        let mut outputs_data = vec![Bytes::new().pack(), Bytes::new().pack()];
+        let lock_data: OtherBytes = if is_usdt {
+            let sudt_amount = args.sudt_amount.mul(ETHER as f64) as u128;
+            println!("U128: {:10.3e}", sudt_amount);
+            sudt_amount.to_le_bytes().pack()
+        } else {
+            Bytes::new().pack()
+        };
+        let mut outputs_data: Vec<OtherBytes> = vec![lock_data, Bytes::new().pack()];
         let output0_cap: u64 = output0.capacity().unpack();
         let output1_cap: u64 = output1.capacity().unpack();
         let fee = 100_000_000;
@@ -504,10 +557,7 @@ impl CrossChain {
 
         // crosschain-metadata dep cell
         // get tx hash created by build_deploy_crosschain_metadata_tx
-        let crosschain_metadata_tx_hash = Byte32::from_slice(
-            h256!("0x0770e2d917105aae2a84407562933a9351ab57daf93e289442f02b412a6b3a39").as_bytes(),
-        )
-        .unwrap();
+        let crosschain_metadata_tx_hash = CROSSCHAIN_DEPLOY_METADATA_TX_HASH.pack();
         let contract_out_point = OutPoint::new(crosschain_metadata_tx_hash, 0);
         let contract_dep = CellDep::new_builder()
             .out_point(contract_out_point)
@@ -523,7 +573,21 @@ impl CrossChain {
             .dep_type(DepType::Code.into())
             .build();
 
-        let cell_deps = vec![contract_dep, secp256k1_data_dep, cs_req_dep];
+        let mut cell_deps = vec![contract_dep, secp256k1_data_dep, cs_req_dep];
+        if is_usdt {
+            // this tx hash is fixed provided in rfcs25
+            let sudt_wat_tx_hash = Byte32::from_slice(
+                h256!("0xe12877ebd2c3c364dc46c5c992bcfaf4fee33fa13eebdf82c591fc9825aab769")
+                    .as_bytes(),
+            )
+            .unwrap();
+            let sudt_wat_out_point = OutPoint::new(sudt_wat_tx_hash, 0);
+            let sudt_wat_dep = CellDep::new_builder()
+                .out_point(sudt_wat_out_point)
+                .dep_type(DepType::Code.into())
+                .build();
+            cell_deps.push(sudt_wat_dep);
+        }
 
         CrossChain::build_signed_tx(input, outputs, outputs_data, cell_deps, args)
     }
@@ -575,4 +639,10 @@ impl CrossChain {
             .set_witnesses(signed_witnesses)
             .build()
     }
+}
+
+#[test]
+fn get_raw_bytes_from_hex() {
+    let hash = Byte32::from_slice(SUDT_OWNER_LOCK_HASH.as_bytes()).unwrap();
+    println!("{:?}", hash.as_slice());
 }
