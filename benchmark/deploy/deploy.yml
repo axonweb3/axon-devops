@@ -104,9 +104,16 @@
       tags: 
         - config
 
+      copy:
+        src: docker-compose.yml
+        dest: "{{ benchmark_dir }}"
+        mode: 0755
+      tags:
+        - config
+
     - name: Copy the config.yml file
       copy:
-        src: ../benchmark/config.json
+        src: ./templates/
         dest: "{{ benchmark_dir }}"
         mode: 0755
       tags: 
@@ -138,6 +145,11 @@
       register: thread_num
       tags: 
         - config
+    - name: Register mnemonic_index
+      shell: "cat {{ benchmark_dir }}/node_batchsize_threadnum.yml | grep '{{ hostname.stdout }}' | awk '{print $2}' | awk -F '/' '{print $3}'  "
+      register: mnemonic_index
+      tags:
+        - config
 
     - name: Replace batch_size
       shell:  sed -i "s/#batch_size/{{ batch_size.stdout }}/g" "{{ benchmark_dir }}/config.json"
@@ -147,6 +159,10 @@
     - name: Replace thread_num
       shell:  sed -i "s/#thread_num/{{ thread_num.stdout }}/g" "{{ benchmark_dir }}/config.json"
       tags: 
+        - config
+    - name: Replace mnemonic_index
+      shell:  sed -i "s/#mnemonic_index/{{ mnemonic_index.stdout }}/g" "{{ benchmark_dir }}/config.json"
+      tags:
         - config
 
     - name: Register internal_ip
@@ -166,7 +182,7 @@
         - config
 
     - name: start benchmark
-      shell: cd  {{ benchmark_dir }} && docker-compose up -d
+      shell: cd  {{ benchmark_dir }} && docker-compose pull && docker-compose up -d
       become: yes
       tags: 
         - start-benchmark
@@ -187,8 +203,8 @@
         - clean
 
     - name: clean benchmark logs
-      shell: rm -rf  {{ benchmark_dir }}/benchmark/benchmark/logs
+      shell: rm -rf  {{ benchmark_dir }}/logs
       become: yes
       become_method: sudo
       tags: 
-        - clean  
+        - clean
