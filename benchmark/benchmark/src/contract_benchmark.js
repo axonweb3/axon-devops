@@ -3,6 +3,7 @@ const { WaitableBatchRequest } = require('./utils');
 const ERC20JSON = require('./ERC20.json');
 const AccountFactory = require('./account_factory');
 const logger = require('./logger');
+const ethers = require('ethers');
 
 class Benchmark {
     constructor(info) {
@@ -49,7 +50,7 @@ class Benchmark {
         this.benchmark_info.nonce = await this.web3.eth.getTransactionCount(this.account.address)
         this.accounts = [];
         const accountFactory = new AccountFactory()
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < 20; i++) {
             let accounts = await accountFactory.get_accounts(this.config, 10000000, 50);
             for (const account of accounts) {
                 this.accounts.push(account)
@@ -77,12 +78,13 @@ class Benchmark {
                 let tx = {
                     "from": this.account.address,
                     "to": this.contract.options.address,
-                    "gasLimit": 200000,
-                    "maxPriorityFeePerGas": 3,
-                    "maxFeePerGas": 3,
+                    "maxPriorityFeePerGas": ethers.utils.parseUnits('2', 'gwei'),
+                    "maxFeePerGas": ethers.utils.parseUnits('2', 'gwei'),
+                    "gasLimit": 60000,
                     "nonce": nonce,
                     "data": this.contract.methods.transfer('0x5cf83df52a32165a7f392168ac009b168c9e8915', 0).encodeABI(),
                 }
+
                 let signed_tx = await account.signTransaction(tx)
                 txs.add(this.web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
                     if (err) {
