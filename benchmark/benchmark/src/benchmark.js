@@ -70,9 +70,8 @@ class Benchmark {
     }
 
     async send_batch_transactions() {
-        let idx = 0;
-        while (idx < this.accounts.length) {
-            let nonce = await this.web3.eth.getTransactionCount(this.accounts[idx].address);
+        for (const account of this.accounts) {
+            let nonce = await this.web3.eth.getTransactionCount(account.address);
             const txs = new WaitableBatchRequest(this.web3);
 
             for (let i = 0; i < this.config.batch_size; i++) {
@@ -86,7 +85,7 @@ class Benchmark {
                     "nonce": nonce,
                     "chainId": 5
                 }
-                let signed_tx = await this.accounts[idx].signTransaction(tx);
+                let signed_tx = await account.signTransaction(tx);
                 txs.add(this.web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
                     if (err) {
                         this.benchmark_info.fail_tx += 1
@@ -102,9 +101,6 @@ class Benchmark {
 
             await txs.execute()
             await txs.waitFinished();
-
-
-            idx += 1;
         }
 
     }
