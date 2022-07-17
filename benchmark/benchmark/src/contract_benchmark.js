@@ -11,7 +11,7 @@ class Benchmark {
         let private_key = info.private_key
         this.config = {
                 http_endpoint: config.http_endpoint,
-                private_key : config.private_key,
+                private_key : private_key,
                 continuous_benchmark: config.continuous_benchmark,
                 benchmark_time: config.benchmark_time,
                 batch_size: config.batch_size,
