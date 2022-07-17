@@ -50,7 +50,7 @@ class Benchmark {
         this.accounts = [];
         const accountFactory = new AccountFactory()
         for (let i = 0; i < 2; i++) {
-            let accounts = await accountFactory.get_accounts(this.config, 10000000000000, 20);
+            let accounts = await accountFactory.get_accounts(this.config, 10000000, 50);
             for (const account of accounts) {
                 this.accounts.push(account)
             }
