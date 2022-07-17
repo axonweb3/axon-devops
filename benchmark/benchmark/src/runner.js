@@ -4,6 +4,7 @@ const { MessageEmbed, WebhookClient } = require('discord.js')
 const Web3 = require('web3')
 const AccountFactory = require('./account_factory')
 const logger = require('./logger')
+const ethers = require('ethers');
 
 
 class Runner {
@@ -84,7 +85,7 @@ class Runner {
 
     async exec(benchmarkCase) {
         let accountFactory = new AccountFactory()
-        let accounts = await accountFactory.get_accounts(this.config, 1000000000000000000, this.config.thread_num)
+        let accounts = await accountFactory.get_accounts(this.config, 100000000000, this.config.thread_num)
 
         const piscina = new Piscina({
             filename: path.resolve(__dirname, 'worker.js')

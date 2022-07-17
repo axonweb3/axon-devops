@@ -1,13 +1,14 @@
 const Web3 = require('web3')
 const { WaitableBatchRequest, sleep } = require('./utils');
 const logger = require('./logger')
+const ethers = require('ethers');
 
 class AccountFactory {
     async get_accounts(config, value, account_num) {
 
-        let web3 = new Web3(new Web3.providers.HttpProvider(config.http_endpoint))
-        let account = web3.eth.accounts.privateKeyToAccount(config.private_key)
-        web3.eth.defaultAccount = account.address
+        let web3 = new Web3(new Web3.providers.HttpProvider(config.http_endpoint));
+        let account = web3.eth.accounts.privateKeyToAccount(config.private_key);
+        web3.eth.defaultAccount = account.address;
 
         let accounts = []
         while (accounts.length < account_num) {
@@ -18,10 +19,10 @@ class AccountFactory {
                 let tx = {
                     "to": benchmark_account.address,
                     "type": 2,
-                    "value": value,
-                    "maxPriorityFeePerGas": 3,
-                    "maxFeePerGas": 3,
-                    "gasLimit": 21000,
+                    "value": ethers.utils.parseEther(value.toString()),
+                    "maxPriorityFeePerGas": ethers.utils.parseUnits('1', 'gwei'),
+                    "maxFeePerGas": ethers.utils.parseUnits('2', 'gwei'),
+                    "gasLimit": 2100000,
                     "nonce": nonce,
                     "chainId": 5
                 }
