@@ -2,6 +2,7 @@ const Web3 = require('web3')
 const { WaitableBatchRequest } = require('./utils');
 const AccountFactory = require('./account_factory')
 const logger = require('./logger');
+const ethers = require('ethers');
 
 class Benchmark {
     constructor(info) {
@@ -43,13 +44,13 @@ class Benchmark {
     }
 
     async start() {
-        this.benchmark_info.total_time = 0
-        this.benchmark_info.start_time = performance.now()
-        this.benchmark_info.nonce = await this.web3.eth.getTransactionCount(this.account.address)
+        this.benchmark_info.total_time = 0;
+        this.benchmark_info.start_time = performance.now();
+        this.benchmark_info.nonce = await this.web3.eth.getTransactionCount(this.account.address);
         this.accounts = [];
         const accountFactory = new AccountFactory()
         for (let i = 0; i < 20; i++) {
-            let accounts = await accountFactory.get_accounts(this.config, 10000000000000, 50);
+            let accounts = await accountFactory.get_accounts(this.config, 10000000, 50);
             for (const account of accounts) {
                 this.accounts.push(account)
             }
@@ -69,23 +70,22 @@ class Benchmark {
     }
 
     async send_batch_transactions() {
-        let idx = 0;
-        while (idx < this.accounts.length) {
-            let nonce = await this.web3.eth.getTransactionCount(this.accounts[idx].address);
+        for (const account of this.accounts) {
+            let nonce = await this.web3.eth.getTransactionCount(account.address);
             const txs = new WaitableBatchRequest(this.web3);
 
             for (let i = 0; i < this.config.batch_size; i++) {
                 let tx = {
                     "to": '0x5cf83df52a32165a7f392168ac009b168c9e8915',
                     "type": 2,
-                    "value": 1,
-                    "maxPriorityFeePerGas": 3,
-                    "maxFeePerGas": 3,
+                    "value": ethers.utils.parseEther("0.0001"),
+                    "maxPriorityFeePerGas": ethers.utils.parseUnits('2', 'gwei'),
+                    "maxFeePerGas": ethers.utils.parseUnits('2', 'gwei'),
                     "gasLimit": 21000,
                     "nonce": nonce,
                     "chainId": 5
                 }
-                let signed_tx = await this.accounts[idx].signTransaction(tx);
+                let signed_tx = await account.signTransaction(tx);
                 txs.add(this.web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
                     if (err) {
                         this.benchmark_info.fail_tx += 1
@@ -101,9 +101,6 @@ class Benchmark {
 
             await txs.execute()
             await txs.waitFinished();
-
-
-            idx += 1;
         }
 
     }

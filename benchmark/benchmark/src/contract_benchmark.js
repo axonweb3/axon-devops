@@ -55,8 +55,6 @@ class Benchmark {
                 this.accounts.push(account)
             }
         }
-
-        console.log(this.accounts)
     }
 
     async end() {
@@ -71,10 +69,10 @@ class Benchmark {
     }
 
     async send_batch_transactions() {
-        let idx = 0;
-        while (idx < this.accounts.length) {
-            let nonce = await this.web3.eth.getTransactionCount(this.accounts[idx].address);
-            let txs = new WaitableBatchRequest(this.web3);
+        for (const account of this.accounts) {
+            let nonce = await this.web3.eth.getTransactionCount(account.address);
+            const txs = new WaitableBatchRequest(this.web3);
+
             for (let i = 0; i < this.config.batch_size; i++) {
                 let tx = {
                     "from": this.account.address,
@@ -82,10 +80,10 @@ class Benchmark {
                     "gasLimit": 200000,
                     "maxPriorityFeePerGas": 3,
                     "maxFeePerGas": 3,
-                    "nonce": this.benchmark_info.nonce,
+                    "nonce": nonce,
                     "data": this.contract.methods.transfer('0x5cf83df52a32165a7f392168ac009b168c9e8915', 0).encodeABI(),
                 }
-                let signed_tx = await this.this.accounts[idx].signTransaction(tx)
+                let signed_tx = await account.signTransaction(tx)
                 txs.add(this.web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
                     if (err) {
                         this.benchmark_info.fail_tx += 1
@@ -95,12 +93,11 @@ class Benchmark {
                     } else this.benchmark_info.success_tx += 1
                 }), signed_tx.transactionHash);
 
-                this.benchmark_info.nonce += 1;
+                nonce += 1;
             }
 
             await txs.execute()
             await txs.waitFinished();
-            this.benchmark_info.nonce = await this.web3.eth.getTransactionCount(this.account.address);
         }
     }
 
