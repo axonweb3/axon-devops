@@ -26,7 +26,7 @@
       },
       "last_checkpoint_block_hash": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "call_system_script_count": 0,
-      "chain_id": 5
+      "chain_id": 2022
     },
     "tx_hashes": [
       "0xb517d9e01b5bebe8bf4bae42224635bb0926aadf520557a4636cd77e8ca1d36b",
@@ -678,7 +678,7 @@
           ],
           "standard_v": 1
         },
-        "chain_id": 5,
+        "chain_id": 2022,
         "hash": "0xb517d9e01b5bebe8bf4bae42224635bb0926aadf520557a4636cd77e8ca1d36b"
       },
       "sender": "0x8ab0cf264df99d83525e9e11c7e4db01558ae1b1",
@@ -1509,7 +1509,7 @@
           ],
           "standard_v": 0
         },
-        "chain_id": 5,
+        "chain_id": 2022,
         "hash": "0xf55cfa69e1a6c760c2d5f9e95a2684d1ede5797cfb3052f83cb56a00d5b984d6"
       },
       "sender": "0x8ab0cf264df99d83525e9e11c7e4db01558ae1b1",
@@ -1650,7 +1650,7 @@
           ],
           "standard_v": 1
         },
-        "chain_id": 5,
+        "chain_id": 2022,
         "hash": "0xca0f91ef2eeb88c3f36023fa467d41908ef57de2c43ad2f05f415c3398fa0b8d"
       },
       "sender": "0x8ab0cf264df99d83525e9e11c7e4db01558ae1b1",
@@ -2480,7 +2480,7 @@
           ],
           "standard_v": 0
         },
-        "chain_id": 5,
+        "chain_id": 2022,
         "hash": "0x5b524e9de399d0095f3d7fe4b6953e18b25a4fe073b40d9f724d9f101a808fd0"
       },
       "sender": "0x8ab0cf264df99d83525e9e11c7e4db01558ae1b1",

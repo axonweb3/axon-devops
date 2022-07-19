@@ -25,7 +25,7 @@
         "bitmap": []
       },
       "last_checkpoint_block_hash": "0x0000000000000000000000000000000000000000000000000000000000000000",
-      "chain_id": 5
+      "chain_id": 2022
     },
     "tx_hashes": [
       "0xc7f4550888dc48b9f36996dfa0653344b862e9384dea999f99f5560ec8c427f0",
@@ -510,7 +510,7 @@
           "s": "0x379d4d8dcebc75d26c002e2bd40533bf6d563ff9b9f546bf7f28d7e009ecf9b0",
           "standard_v": 1
         },
-        "chain_id": 5,
+        "chain_id": 2022,
         "hash": "0x8612c1833c6bc876ac1389b65831adb5cbb662734492dafb9906cc7f1a29d6be"
       },
       "sender": "0x8ab0cf264df99d83525e9e11c7e4db01558ae1b1",
@@ -649,7 +649,7 @@
           "s": "0x47826a8027a544384569b8b7cc73df3b2feaf734ce25962e3982bd71d8fb6f6a",
           "standard_v": 1
         },
-        "chain_id": 5,
+        "chain_id": 2022,
         "hash": "0x5b5e5a774f76b0cb01dfc2a0b25c6dbd60a7e8e2964ba289fc26c8e7c7316e88"
       },
       "sender": "0x8ab0cf264df99d83525e9e11c7e4db01558ae1b1",
@@ -774,7 +774,7 @@
           "s": "0x47826a8027a544384569b8b7cc73df3b2feaf734ce25962e3982bd71d8fb6f6a",
           "standard_v": 1
         },
-        "chain_id": 5,
+        "chain_id": 2022,
         "hash": "0x5b5e5a774f76b0cb01dfc2a0b25c6dbd60a7e8e2964ba289fc26c8e7c7316e88"
       },
       "sender": "0x8ab0cf264df99d83525e9e11c7e4db01558ae1b1",
