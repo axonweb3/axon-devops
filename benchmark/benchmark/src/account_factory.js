@@ -14,6 +14,8 @@ class AccountFactory {
         while (accounts.length < account_num) {
             let nonce = await web3.eth.getTransactionCount(account.address);
             let batch_request = new WaitableBatchRequest(web3);
+            let tempAccounts = [];
+
             for (let i = 0; i < account_num - accounts.length; i++) {
                 let benchmark_account = web3.eth.accounts.create()
                 let tx = {
@@ -29,7 +31,7 @@ class AccountFactory {
                 let signed_tx = await account.signTransaction(tx)
                 batch_request.add(web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
                     if (err) logger.error("create account tx err: ", err)
-                    else accounts.push(benchmark_account)
+                    else tempAccounts.push(benchmark_account)
                 }), signed_tx.transactionHash);
 
                 nonce += 1;
@@ -38,6 +40,15 @@ class AccountFactory {
             await batch_request.execute();
             await batch_request.waitFinished();
             await batch_request.waitConfirmed();
+
+            for (const tempAccount of tempAccounts) {
+                const balance = await web3.eth.getBalance(tempAccount.address);
+                if(balance != 0) {
+                    accounts.push(tempAccount);
+                }
+
+            }
+
         }
 
         return accounts
