@@ -114,3 +114,10 @@ You can take a look at the `axon-node` Dashboard.
 If you just run the benchmark, you can have a look at the `axon-benchmark` Dashboard.
 <div align=center><img src="./benchmark.png"></div>
 
+# 7. CKB -> AXON tx
+## 1. deploy crosschain metadata
+`cs --sender-key=dd50cac37ec6dd12539a968c1a2cbedda75bd8724f7bcad486548eaabb87fc8b --capacity=1000 --tx-type=0`
+
+## 2. transfer token from CKB to AXON
+`cs --sender-key=dd50cac37ec6dd12539a968c1a2cbedda75bd8724f7bcad486548eaabb87fc8b --capacity=1000 --tx-type=1`
+

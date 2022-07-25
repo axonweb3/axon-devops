@@ -1,4 +1,5 @@
 mod cli;
+mod crosschain_tx;
 mod docker;
 mod interactive;
 
