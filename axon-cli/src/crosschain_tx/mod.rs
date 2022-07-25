@@ -1,3 +1,6 @@
+extern crate derive_more;
+use derive_more::Display;
+
 mod constants;
 mod crosschain;
 mod helper;
@@ -19,13 +22,7 @@ use ckb_types::{
     prelude::*,
 };
 use clap::{Arg, ArgMatches, Command, Parser};
-use std::{
-    error::Error as StdErr,
-    fmt::{self},
-    ops::Mul,
-    str::FromStr,
-    sync::mpsc::channel,
-};
+use std::{error::Error as StdErr, ops::Mul, str::FromStr, sync::mpsc::channel};
 
 use crate::crosschain_tx::{constants::*, helper::*};
 use ckb_jsonrpc_types as json_types;
@@ -57,7 +54,7 @@ struct Args {
 }
 
 /// Send crosschain error.
-#[derive(Debug)]
+#[derive(Debug, Display)]
 pub enum SendTxError {
     ///
     LackBalance,
@@ -65,19 +62,7 @@ pub enum SendTxError {
     CollectorErr(String),
     ExecErr(String),
 }
-
 impl StdErr for SendTxError {}
-
-impl fmt::Display for SendTxError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            SendTxError::LackBalance => return write!(f, "Not Enough balance"),
-            SendTxError::NoLiveCell => return write!(f, "No live cell"),
-            SendTxError::CollectorErr(e) => return write!(f, "{}", e),
-            SendTxError::ExecErr(e) => return write!(f, "{}", e),
-        }
-    }
-}
 
 pub struct CrossChain {}
 
@@ -465,9 +450,9 @@ impl CrossChain {
             args.capacity, cs_real_amount
         );
         let transfer_args = crosschain::Transfer::new_builder()
-            .axon_address(cs_address(axon_addr))
-            .ckb_amount(cs_uint64(cs_real_amount))
-            .erc20_address(cs_address(&[1u8; 20]))
+            .axon_address(axon_addr.into())
+            .ckb_amount(cs_real_amount.into())
+            .erc20_address((&[1u8; 20]).into())
             .build();
 
         let request_script = Script::new_builder()
@@ -551,9 +536,9 @@ impl CrossChain {
 
         // prepare metadata cell data
         crosschain::Metadata::new_builder()
-            .chain_id(cs_uint16(CHAIN_ID))
-            .ckb_fee_ratio(cs_uint32(CKB_FEE_RATIO))
-            .stake_typehash(cs_hash(&Byte32::default()))
+            .chain_id(CHAIN_ID.into())
+            .ckb_fee_ratio(CKB_FEE_RATIO.into())
+            .stake_typehash((&Byte32::default()).into())
             .token_config(token_config)
             .build()
     }
@@ -613,4 +598,18 @@ impl CrossChain {
 fn get_raw_bytes_from_hex() {
     let hash = Byte32::from_slice(SUDT_OWNER_LOCK_HASH.as_bytes()).unwrap();
     println!("{:?}", hash.as_slice());
+}
+#[test]
+fn sendtx_err() {
+    let err = SendTxError::LackBalance;
+    println!("{}", err);
+
+    let err = SendTxError::NoLiveCell;
+    println!("{}", err);
+
+    let err = SendTxError::CollectorErr("test collector err".to_string());
+    println!("{}", err);
+
+    let err = SendTxError::ExecErr("test exec err".to_string());
+    println!("{}", err);
 }

@@ -6,15 +6,16 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ckb-crypto = { version = "=0.103.0", features = ["secp"] }
-ckb-fixed-hash-core = "0.103.0"
-ckb-hash = "=0.103.0"
-ckb-jsonrpc-types = "=0.103.0"
-ckb-sdk = "1.0.1"
-ckb-types = "=0.103.0"
+ckb-crypto = { version = "=0.104.0", features = ["secp"] }
+ckb-fixed-hash-core = "0.104.0"
+ckb-hash = "=0.104.0"
+ckb-jsonrpc-types = "=0.104.0"
+ckb-sdk = "1.1.0"
+ckb-types = "=0.104.0"
 
 clap = { version = "3.1", features = ["cargo", "derive", "yaml"] }
 crossbeam-utils = "0.8"
+derive_more = "0.99.0"
 docker-api = "0.8"
 molecule = "0.7.2"
 rustyline = { version = "9.1", features = ["case_insensitive_history_search"] }
