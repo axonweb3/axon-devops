@@ -58,7 +58,7 @@ impl DockerApi {
         println!("mapping: {:?}", vols);
         // prometheus collecting port from 8900-8903
         let collect_port = 8900 + (port - 8000);
-        let opts = ContainerCreateOpts::builder("axon-test:debug")
+        let opts = ContainerCreateOpts::builder("wenyuancas/axon:v1")
             .name(name)
             .cmd(&cmd)
             .restart_policy("always", 0)
