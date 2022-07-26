@@ -1,0 +1,6 @@
+# agent
+benchmark_dir: /home/ckb/axon-devops
+benchmark_monitor_dir: /home/ckb/axon-benchmark-monitor
+es_address: xxx.xxx.xxx.xxx
+token: "xxxxxxxxxx"
+

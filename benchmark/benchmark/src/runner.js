@@ -4,6 +4,7 @@ const { MessageEmbed, WebhookClient } = require('discord.js')
 const Web3 = require('web3')
 const AccountFactory = require('./account_factory')
 const logger = require('./logger')
+const ethers = require('ethers');
 
 
 class Runner {
@@ -38,7 +39,7 @@ class Runner {
                 })
                 .send({
                     from: this.account.address,
-                    nonce: (await this.web3.eth.getTransactionCount(this.account.address)) + 1,
+                    nonce: (await this.web3.eth.getTransactionCount(this.account.address)),
                     gas: 2000000,
                 });
             resolve(instance);
@@ -57,30 +58,23 @@ class Runner {
             console.log(`contract ${name} deployed to ${instance.options.address}`);
         } catch (e) {
             logger.error("deploy contract err: ", e)
-            throw e
+            await this.deployContract(jsonPath, name)
         }
     }
 
     async run() {
-        let tasks = [];
+        // let tasks = [];
         this.log_benchmark_config_info()
         await this.prepare()
         for (let i in this.config.benchmark_cases) {
             let benchmarkCase = this.config.benchmark_cases[i];
             console.log(`benchmark case ${i}: ${benchmarkCase}`);
             await this.start()
-            tasks.push(this.exec(benchmarkCase));
-            if(this.config.continuous_benchmark) {
-                continue;
-            } else {
-                await Promise.all(tasks);
-                tasks = [];
-            }
+            await this.exec(benchmarkCase)
             await this.end()
             this.log_benchmark_res()
             await this.send_discord()
         }
-        await Promise.all(tasks);
     }
 
     async prepare() {
@@ -91,7 +85,7 @@ class Runner {
 
     async exec(benchmarkCase) {
         let accountFactory = new AccountFactory()
-        let accounts = await accountFactory.get_accounts(this.config)
+        let accounts = await accountFactory.get_accounts(this.config, 100000000000, this.config.thread_num)
 
         const piscina = new Piscina({
             filename: path.resolve(__dirname, 'worker.js')
@@ -130,6 +124,11 @@ class Runner {
     }
 
     async send_discord() {
+
+        if(!this.config.token || !this.config.id) {
+            return;
+        }
+
         const embed = this.get_message_embed();
         await this.discord.send({
             content: ' ',
