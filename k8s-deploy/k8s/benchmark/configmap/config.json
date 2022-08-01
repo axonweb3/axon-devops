@@ -1,6 +1,7 @@
 {
     "http_endpoint": "http://axon-chain:8000",
-    "private_key" : "0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d",
+    "mnemonic": "test test test test test test test test test test test junk",
+    "mnemonic_index": 0,
     "continuous_benchmark": true,
     "benchmark_time": 60000,
     "batch_size": 150,
