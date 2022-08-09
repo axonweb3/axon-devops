@@ -6,22 +6,22 @@ Under the axon-cli directory, run the following command:
 ## 2. Run axon-cli
  For example,
 `
-../target/debug/axon-cli --mount=/home/wenyuan/git/axon-devops/axon-cli/devtools --data=/home/wenyuan/git/axon-devops/axon-cli/devtools/chain --bench=/home/wenyuan/git/axon-devops/benchmark/benchmark`
+../target/debug/axon-cli`
 
-You have to config mount path, chain data path and benchmark config path explicitly.
 ## 3. Interactive Commands
 After axon-cli gets run. You have 5 commands to execute.
 By the way, before to start docker containers, you have to enable tcp port for docker(0.0.0.0:2375 in this case).
 - start
-you can start 1 or 4 docker axon nodes. The default is 1, you can start 4 by `start --number=4`.
+you can start 1 or 4 docker axon nodes. The default is 1, you can start 4 by `axon start --number=4`.
+you can specify the axon dir by adding things like `-d=/root/test`. 
 - stop
 stop the 4 docker nodes just started.
 - rm
 remove the 4 docker containers just created.
 - del
-delete chain data under the path specified by parameter --data.
+delete chain data under the path specified by parameter --data-dir. If not specified, it will be the dir specified by `axon start -d` plus `devtools/chain`.
 - bm
-start benchmark, transactions will be sent to the axon nodes.
+start benchmark, transactions will be sent to the axon nodes. You must specify benchmark dir by --data-dir like `axon bm --data-dir=/home/wenyuan/git/axon-devops/benchmark/benchmark`.
 ##　4. Check axon status
 To be sure of the correctness. You can check by the following commands:  
 ### 1．check the liveness of axon nodes 

@@ -1,4 +1,5 @@
 extern crate derive_more;
+use async_trait::async_trait;
 use derive_more::Display;
 
 mod constants;
@@ -24,7 +25,10 @@ use ckb_types::{
 use clap::{Arg, ArgMatches, Command, Parser};
 use std::{error::Error as StdErr, ops::Mul, str::FromStr, sync::mpsc::channel};
 
-use crate::crosschain_tx::{constants::*, helper::*};
+use crate::{
+    crosschain_tx::{constants::*, helper::*},
+    sub_command::SubCommand,
+};
 use ckb_jsonrpc_types as json_types;
 use crossbeam_utils::thread;
 
@@ -32,24 +36,19 @@ use crossbeam_utils::thread;
 #[clap(author, version, about, long_about = None)]
 struct Args {
     /// deploy crosschain metadata or ckb->axon crosschain tx
-    tx_type: u16,
-
+    tx_type:     u16,
     /// The sender private key (hex string)
-    sender_key: H256,
-
+    sender_key:  H256,
     /// The receiver address
     // #[clap(long, value_name = "ADDRESS")]
     // receiver: Address,
 
     /// The capacity to transfer (unit: CKB, example: 102.43)
-    capacity: u64,
-
+    capacity:    u64,
     /// CKB rpc url
-    ckb_rpc: String,
-
+    ckb_rpc:     String,
     /// CKB indexer rpc url
     ckb_indexer: String,
-
     sudt_amount: f64,
 }
 
@@ -64,10 +63,12 @@ pub enum SendTxError {
 }
 impl StdErr for SendTxError {}
 
+#[derive(Debug, Default)]
 pub struct CrossChain {}
 
-impl CrossChain {
-    pub fn get_cs_command() -> Command<'static> {
+#[async_trait]
+impl SubCommand for CrossChain {
+    fn get_command(&self) -> Command<'static> {
         Command::new("cs")
             .about("CKB AXON Crosschain")
             .arg(
@@ -124,7 +125,7 @@ impl CrossChain {
             )
     }
 
-    pub fn exec_cs_tx(cs_matches: &ArgMatches) -> Result<(), Box<dyn StdErr>> {
+    async fn exec_command(&self, cs_matches: &ArgMatches) -> Result<(), Box<dyn StdErr>> {
         // Parse arguments
         let args = Args {
             tx_type:     cs_matches
@@ -205,7 +206,9 @@ impl CrossChain {
 
         Ok(())
     }
+}
 
+impl CrossChain {
     fn update_input_cells(
         args: &Args,
         base_query: CellQueryOptions,
