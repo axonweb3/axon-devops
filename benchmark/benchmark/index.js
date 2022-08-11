@@ -10,6 +10,10 @@ async function init_config() {
         config.http_endpoint = args['http_endpoint']
     }
 
+    if(args['chain_id']) {
+        config.chain_id = args['chain_id']
+    }
+
     if(args['continuous_benchmark']) {
         config.continuous_benchmark = args['continuous_benchmark']
     }
