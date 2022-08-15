@@ -7,16 +7,16 @@ const ethers = require('ethers');
 
 class Benchmark {
     constructor(info) {
-        let config = info.config
         let private_key = info.private_key
         this.config = {
-                http_endpoint: config.http_endpoint,
+                http_endpoint: info.config.http_endpoint,
                 private_key : private_key,
-                continuous_benchmark: config.continuous_benchmark,
-                benchmark_time: config.benchmark_time,
-                batch_size: config.batch_size,
-                id: config.id,
-                token: config.token,
+                continuous_benchmark: info.config.continuous_benchmark,
+                benchmark_time: info.config.benchmark_time,
+                batch_size: info.config.batch_size,
+                id: info.config.id,
+                token: info.config.token,
+                chain_id: info.config.chain_id
         }
 
         this.benchmark_info = {
@@ -29,7 +29,7 @@ class Benchmark {
             nonce: 0,
         }
 
-        this.web3 = new Web3(new Web3.providers.HttpProvider(config.http_endpoint))
+        this.web3 = new Web3(new Web3.providers.HttpProvider(info.config.http_endpoint))
         this.account = this.web3.eth.accounts.privateKeyToAccount(private_key)
         this.web3.eth.defaultAccount = this.account.address
 
@@ -83,6 +83,7 @@ class Benchmark {
                     "gasLimit": 60000,
                     "nonce": nonce,
                     "data": this.contract.methods.transfer('0x5cf83df52a32165a7f392168ac009b168c9e8915', 0).encodeABI(),
+                    "chainId": this.config.chain_id
                 }
 
                 let signed_tx = await account.signTransaction(tx)

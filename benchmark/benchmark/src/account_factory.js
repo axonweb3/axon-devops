@@ -26,7 +26,7 @@ class AccountFactory {
                     "maxFeePerGas": ethers.utils.parseUnits('2', 'gwei'),
                     "gasLimit": 2100000,
                     "nonce": nonce,
-                    "chainId": 5
+                    "chainId": config.chain_id
                 }
                 let signed_tx = await account.signTransaction(tx)
                 batch_request.add(web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
