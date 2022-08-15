@@ -1,5 +1,6 @@
 {
     "http_endpoint": "http://#internal_ip:8000",
+    "chain_id": 2022,
     "mnemonic": "test test test test test test test test test test test junk",
     "mnemonic_index": 0,
     "continuous_benchmark": false,
