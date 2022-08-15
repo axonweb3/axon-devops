@@ -27,14 +27,9 @@
         - deploy
 
 ###############################################################################################################
-    - name: Check if the process exists
-      shell: ps -ef | grep axon | grep -v grep | awk '{print $2}'
-      register: process_exists
-      tags: 
-        - shutdown
     - name: Shutdown 
-      shell: "kill {{ process_exists.stdout }}"
-      when: process_exists.stdout != ""
+      service: name={{ axon_node_service }} state=stopped
+      become: yes
       tags: 
         - shutdown
 ###############################################################################################################
@@ -108,16 +103,7 @@
         replace: "{{ enable_cross_client }}"
       tags:
         - deploy
-        - config   
-
-    - name: Replace enable_profile_debug
-      replace:
-        path: "{{ deploy_path }}/config.toml"
-        regexp: '#enable_profile_debug'
-        replace: "{{ enable_profile_debug }}"
-      tags:
-        - deploy
-        - config  
+        - config    
 
 ###############################################################################################################
     - name: chmod axon
@@ -127,8 +113,23 @@
       tags: 
         - start
 
+    - name: copy ckb service file
+      template:
+        src: ./templates/axon-node.service
+        dest: /etc/systemd/system/axon-node.service
+      become: yes
+      tags: 
+        - start
+
+    - name: systemctl daemon-reload
+      shell: systemctl daemon-reload
+      become: yes
+      tags: 
+        - start
+
     - name: Start axon
-      shell: cd {{ deploy_path }} && echo "nohup {{ deploy_path }}/axon -c={{ deploy_path }}/config.toml -g={{ deploy_path }}/genesis.json &" > run.sh && sh run.sh
+      service: name={{ axon_node_service }} state=started
+      become: yes
       when: enable_profile == 'false'
       tags: 
         - start
