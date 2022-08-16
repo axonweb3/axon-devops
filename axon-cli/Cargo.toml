@@ -6,6 +6,8 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+async-trait = "0.1.57"
+
 ckb-crypto = { version = "=0.104.0", features = ["secp"] }
 ckb-fixed-hash-core = "0.104.0"
 ckb-hash = "=0.104.0"
