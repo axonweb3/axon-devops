@@ -5,15 +5,20 @@ Under the axon-cli directory, run the following command:
     `cargon build --release`
 ## 2. Run axon-cli
  For example,
-`
-../target/debug/axon-cli`
+`../target/debug/axon-cli`
 
 ## 3. Interactive Commands
-After axon-cli gets run. You have 5 commands to execute.
-By the way, before to start docker containers, you have to enable tcp port for docker(0.0.0.0:2375 in this case).
+Before the execution of axon commands, you have to enable tcp port for docker(0.0.0.0:2375 in this case).  
+Moreover, to execute the following commands successfully, you need to copy the dir `axon-cli/devtools` in this repository into dir `$HOME/.axon/` in your local machine. If `$HOME/.axon` does not exist, please create it mannully.  
+If you start axon without copying the config files to `$HOME/.axon`, this command will create `$HOME/.axon` for you. But, the axon process in the docker won't work. In fact, the axon process will panic due to lack of config files. You can run `docker logs axon1` to have a look, the output will be similar to the following:
+>thread 'main' panicked at 'called `Result::unwrap()` on an `Err` value: IO(Os { code: 2, kind: NotFound, message: "No such file or directory" })', core/cli/src/lib.rs:43:65 
+
+After axon-cli gets run. You have 5 commands to execute.  
+
 - start  
-you can start 1 or 4 docker axon nodes. The default is 1, you can start 4 by `axon start --number=4`.
-you can specify the axon dir by adding things like `-d=/root/test`. 
+You can start 1 or 4 docker axon nodes. The default is 1, you can start 4 by `axon start --number=4`.  
+Also, you can specify the axon dir by adding things like `-d=/root/.axon`.  
+
 - stop  
 stop the 4 docker nodes just started.
 - rm  

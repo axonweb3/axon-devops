@@ -2,7 +2,7 @@ use clap::{Arg, ArgMatches, Command};
 
 use crate::{docker::DockerApi, sub_command::SubCommand};
 use async_trait::async_trait;
-use std::{error::Error as StdErr, process};
+use std::{env, error::Error as StdErr, process};
 use tokio::sync::Mutex;
 
 #[derive(Debug, Default)]
@@ -10,9 +10,20 @@ pub struct AxonNode {
     mount_dir: Mutex<String>,
 }
 
+fn string_to_static_str(s: String) -> &'static str {
+    Box::leak(s.into_boxed_str())
+}
+
 #[async_trait]
 impl SubCommand for AxonNode {
     fn get_command(&self) -> Command<'static> {
+        let home_dir = env::var("HOME").unwrap();
+        println!("home dir:{}.", home_dir);
+        let axon_dir = home_dir + "/.axon";
+        println!("axon dir:{}.", axon_dir);
+        let axon_data_dir = axon_dir.clone() + "/devtools/chain";
+        println!("axon data dir:{}.", axon_data_dir);
+
         Command::new("axon")
             .about("AXON NODE")
             .subcommand(
@@ -32,7 +43,7 @@ impl SubCommand for AxonNode {
                             .long("mount-dir")
                             .help("the local working dir for axon processes running in docker")
                             .required(false)
-                            .default_value("/root/test")
+                            .default_value(string_to_static_str(axon_dir))
                             .takes_value(true),
                     )
                     .about("Start axon node"),
@@ -47,7 +58,7 @@ impl SubCommand for AxonNode {
                             .long("data-dir")
                             .help("the local data dir for axon processes running in docker")
                             .required(false)
-                            .default_value("/root/test/devtools/chain")
+                            .default_value(string_to_static_str(axon_data_dir))
                             .takes_value(true),
                     )
                     .about("Delete chain data"),
