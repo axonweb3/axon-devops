@@ -1,0 +1,101 @@
+#V2
+cs --sender-key=475bdfb231bbbf0964df94251bf1e184d59633c5fcd500a3c03daf84aeccf325 --capacity=1000 --tx-type=0
+cs --sender-key=f2462a5b1eb08885ce66c41dfcd76d0fb339ee7c92f8143992e0b88d5345cec6 --capacity=1000 --tx-type=1
+cs --sender-key=f2462a5b1eb08885ce66c41dfcd76d0fb339ee7c92f8143992e0b88d5345cec6 --capacity=1000 --tx-type=1 --sudt-amount=0
+cs --sender-key=475bdfb231bbbf0964df94251bf1e184d59633c5fcd500a3c03daf84aeccf325 --capacity=1000 --tx-type=0
+cs --sender-key=f2462a5b1eb08885ce66c41dfcd76d0fb339ee7c92f8143992e0b88d5345cec6 --capacity=1000 --tx-type=1 --sudt-amount=100
+cs --sender-key=f2462a5b1eb08885ce66c41dfcd76d0fb339ee7c92f8143992e0b88d5345cec6 --capacity=1000 --tx-type=1 --sudt-amount=0
+cs --sender-key=f2462a5b1eb08885ce66c41dfcd76d0fb339ee7c92f8143992e0b88d5345cec6 --capacity=10 --tx-type=1 --sudt-amount=0
+cs --sender-key=475bdfb231bbbf0964df94251bf1e184d59633c5fcd500a3c03daf84aeccf325 --capacity=800 --tx-type=0
+cs --sender-key=f2462a5b1eb08885ce66c41dfcd76d0fb339ee7c92f8143992e0b88d5345cec6 --capacity=900 --tx-type=1 --sudt-amount=0
+cs --sender-key=f2462a5b1eb08885ce66c41dfcd76d0fb339ee7c92f8143992e0b88d5345cec6 --capacity=90 --tx-type=1 --sudt-amount=0
+cs --sender-key=f2462a5b1eb08885ce66c41dfcd76d0fb339ee7c92f8143992e0b88d5345cec6 --capacity=90 --tx-type=1 --sudt-amount=0.2
+cs --sender-key=475bdfb231bbbf0964df94251bf1e184d59633c5fcd500a3c03daf84aeccf325 --capacity=800 --tx-type=0
+cs --sender-key=f2462a5b1eb08885ce66c41dfcd76d0fb339ee7c92f8143992e0b88d5345cec6 --capacity=90 --tx-type=1 --sudt-amount=0.2
+cs --sender-key=475bdfb231bbbf0964df94251bf1e184d59633c5fcd500a3c03daf84aeccf325 --capacity=800 --tx-type=0
+cs --sender-key=475bdfb231bbbf0964df94251bf1e184d59633c5fcd500a3c03daf84aeccf325 --capacity=800 --tx-type=2
+cs --sender-key=475bdfb231bbbf0964df94251bf1e184d59633c5fcd500a3c03daf84aeccf325 --capacity=800 --tx-type=0
+del
+help
+start --help
+start
+bm
+start
+del
+start -n=4
+del
+start -n=4
+bm
+del
+start
+help
+hardhat -h
+hardhat compile
+hardhat test
+help
+axon help
+axon --help
+axon start
+axon stop
+del
+axon del
+axon start
+axon --help
+stop
+axon stop
+axon rm
+del
+axon del
+axon start
+axon rm
+axon stop
+axon rm
+axon start
+axon stop
+axon start
+axon rm
+axon del
+axon start
+help
+axon help
+axon bm help
+axon bm --help
+axon bm -d=/home/wenyuan/git/axon-devops/benchmark/benchmark
+cs help
+cs --help
+help
+cs --help
+axon -h
+help
+apm help
+axon help
+cs help
+cs --help
+axon help
+help
+axon help
+axon start -h
+axon start 
+axon start
+axon stop
+axon rm
+axon del
+axon start -n=4
+axon stop
+axon rm
+axon del
+axon start -h
+axon start
+axon stop
+axon rm
+axon start
+axon bm
+axon bm -h
+axon bm -d=/home/wenyuan/git/axon-devops/benchmark/benchmark
+axon start
+axon stop
+axon rm
+axon start
+axon stop
+axon rm
+axon start

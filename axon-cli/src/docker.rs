@@ -3,10 +3,15 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 use docker_api::{
-    api::NetworkCreateOpts, api::PublishPort, container::ContainerCreateOpts, docker::Docker,
+    api::NetworkCreateOpts, api::PublishPort, api::PullOpts, container::ContainerCreateOpts,
+    docker::Docker,
 };
+use futures::StreamExt;
 
 const DOCKER_URI: &str = "tcp://127.0.0.1:2375";
+const AXON_IMAGE_NAME: &str = "wenyuancas/axon";
+const AXON_IMAGE_TAG: &str = "v1";
+const BM_IMAGE_NAME: &str = "zhengjianhui/axon-benchmark";
 
 #[derive(Default)]
 pub struct DockerApi {
@@ -47,8 +52,22 @@ impl DockerApi {
         };
     }
 
+    async fn pull_image(docker: &Docker, name: &str, tag: &str) {
+        let images = docker.images();
+        let opts = PullOpts::builder().image(name).tag(tag).build();
+        let mut stream = images.pull(&opts);
+        while let Some(pull_result) = stream.next().await {
+            match pull_result {
+                Ok(_output) => {}
+                Err(e) => eprintln!("error {}", e),
+            }
+        }
+    }
+
     pub async fn start_axon(&self, name: &str, file_para: &str, genesis_para: &str, port: u32) {
         let docker = DockerApi::new_docker();
+        DockerApi::pull_image(&docker, AXON_IMAGE_NAME, AXON_IMAGE_TAG).await;
+
         let cmd = vec!["./axon", file_para, genesis_para];
         println!("cmd: {:?}", cmd);
 
@@ -58,7 +77,7 @@ impl DockerApi {
         println!("mapping: {:?}", vols);
         // prometheus collecting port from 8900-8903
         let collect_port = 8900 + (port - 8000);
-        let opts = ContainerCreateOpts::builder("wenyuancas/axon:v1")
+        let opts = ContainerCreateOpts::builder(AXON_IMAGE_NAME.to_owned() + ":" + AXON_IMAGE_TAG)
             .name(name)
             .cmd(&cmd)
             .restart_policy("always", 0)
@@ -82,6 +101,7 @@ impl DockerApi {
 
     pub async fn start_benchmark<P: AsRef<Path>>(benchmark_path: &P) {
         let docker = DockerApi::new_docker();
+        DockerApi::pull_image(&docker, BM_IMAGE_NAME, "latest").await;
 
         let cmd = vec!["node", "index.js", "--http_endpoint=http://172.17.0.1:8000"];
         // let benchmark_path = "/home/wenyuan/git/axon-devops/benchmark/benchmark/";
@@ -91,7 +111,7 @@ impl DockerApi {
             benchmark_path.to_owned() + "/logs:/benchmark/logs",
         ];
 
-        let opts = ContainerCreateOpts::builder("zhengjianhui/axon-benchmark")
+        let opts = ContainerCreateOpts::builder(BM_IMAGE_NAME)
             .name("bm")
             .cmd(&cmd)
             .volumes(vols)

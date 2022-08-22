@@ -1,3 +1,4 @@
+extern crate derive_more;
 use async_trait::async_trait;
 use derive_more::Display;
 

@@ -67,7 +67,7 @@ impl Interactive {
                     match app_m {
                         Ok(matches) => {
                             if let Some((name, matches)) = matches.subcommand() {
-                                println!("cmd name: {}", name);
+                                // println!("cmd name: {}", name);
                                 let sub_cmd = &self.sub_cmds[&name.to_string()];
                                 sub_cmd.exec_command(matches).await.unwrap();
                             } else {
