@@ -21,9 +21,9 @@ class AccountFactory {
                 let tx = {
                     "to": benchmark_account.address,
                     "type": 2,
-                    "value": ethers.utils.parseEther(value.toString()),
-                    "maxPriorityFeePerGas": ethers.utils.parseUnits('1', 'gwei'),
-                    "maxFeePerGas": ethers.utils.parseUnits('2', 'gwei'),
+                    "value": ethers.utils.parseEther(value.toString()).toString(),
+                    "maxPriorityFeePerGas": ethers.utils.parseUnits('1', 'gwei').toString(),
+                    "maxFeePerGas": ethers.utils.parseUnits('2', 'gwei').toString(),
                     "gasLimit": 2100000,
                     "nonce": nonce,
                     "chainId": config.chain_id
