@@ -26,7 +26,7 @@ Editor config.yml
 
 ```yml
 deploy_path: "/home/ckb/axon-faucet"
-faucet_repo: "https://github.com/nervosnetwork/axon-faucet.git"
+faucet_repo: "https://github.com/axonweb3/axon-faucet.git"
 faucet_branch: "master"
 axon_faucet_rpc_url: http://xxxx.xxx.xxx.xxx:8000
 axon_faucet_claim_value: 1000000000000000000
