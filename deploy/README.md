@@ -41,24 +41,24 @@ deploy
 
 <a id="markdown-templates-目录" name="templates-目录"></a>
 ### templates 目录
-该目录放置axon 启动的配置文件，与 [nervosnetwork/axon](https://github.com/nervosnetwork/axon/tree/main/devtools/chain) 下的同名文件保持一致
+该目录放置axon 启动的配置文件，与 [axonweb3/axon](https://github.com/axonweb3/axon/tree/main/devtools/chain) 下的同名文件保持一致
 
 ****
 
 <a id="markdown-config.toml" name="config.toml"></a>
 #### config.toml
-[配置文件，基本与 axon 保持一致](https://github.com/nervosnetwork/axon/blob/main/devtools/chain/config.toml)
+[配置文件，基本与 axon 保持一致](https://github.com/axonweb3/axon/blob/main/devtools/chain/config.toml)
 
 `私钥替换` 
-[修改私钥为 #private_key 后续部署脚本会根据配置替换](https://github.com/nervosnetwork/axon-devops/blob/main/deploy/templates/config.toml#L2)
+[修改私钥为 #private_key 后续部署脚本会根据配置替换](https://github.com/axonweb3/axon-devops/blob/main/deploy/templates/config.toml#L2)
 
-`p2p boot 节点替换` [替换 boot ip 为 #bootstraps, 后续部署脚本会根据配置哦替换](https://github.com/nervosnetwork/axon-devops/blob/main/deploy/templates/config.toml#L34)
+`p2p boot 节点替换` [替换 boot ip 为 #bootstraps, 后续部署脚本会根据配置哦替换](https://github.com/axonweb3/axon-devops/blob/main/deploy/templates/config.toml#L34)
 
 ****
 
 <a id="markdown-genesis.json" name="genesis.json"></a>
 #### genesis.json
-[创世块配置，与 axon genesis_multi_nodes.json 配置保持一致](https://github.com/nervosnetwork/axon/blob/main/devtools/chain/nodes/genesis_multi_nodes.json)
+[创世块配置，与 axon genesis_multi_nodes.json 配置保持一致](https://github.com/axonweb3/axon/blob/main/devtools/chain/nodes/genesis_multi_nodes.json)
 
 ****
 
@@ -68,7 +68,7 @@ deploy
 ```default.db-options
 RocksDB 默认配置文件, 这个文件需要和 config.toml 在一个目录。
 默认在 config 目录搜，如果不存在就 default。
-该配置文件保持与nervosnetwork/axon 下同名文件保持一致
+该配置文件保持与axonweb3/axon 下同名文件保持一致
 ```
 ****
 
@@ -102,7 +102,7 @@ xxx.xxx.xxx.xxx
 ### node_priv_key.yml
 Register private key.
 
-key 是部署节点的 hostname，value 来自 [devtools/chain/nodes](https://github.com/nervosnetwork/axon/tree/main/devtools/chain/nodes) 的 node_*.toml 中的 privkey
+key 是部署节点的 hostname，value 来自 [devtools/chain/nodes](https://github.com//axon/tree/main/devtools/chain/nodes) 的 node_*.toml 中的 privkey
 
 ```node_priv_key.yml
 xxx.xxx.xxx.xxx: "0x21716c9844c7e0548b62c5a0720923c70ca74d92278a217ff2b23699d6888110"
@@ -122,7 +122,7 @@ ansible 部署axon时所需的axon的配置文件
 deploy_path: "/home/ckb/axon"
 
 # axon code repo
-axon_repo: "https://github.com/nervosnetwork/axon.git"
+axon_repo: "https://github.com/axonweb3/axon.git"
 
 # build axon 指定的 branch、tag 等
 axon_branch: "main"
@@ -161,7 +161,7 @@ ansible tasks，用于deploy axon 的所有任务，包括copy axon 相关文件
 ### axon-deploy 
 copy axon-devops 目录到指定机器上
 ```shell
-$ git clone https://github.com/nervosnetwork/axon-devops
+$ git clone https://github.com/axonweb3/axon-devops
 $ cd axon-devops/deploy
 ```
 

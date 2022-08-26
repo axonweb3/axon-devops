@@ -1,5 +1,5 @@
 deploy_path: "/home/ckb/axon-docker"
-axon_repo: "https://github.com/nervosnetwork/axon.git"
+axon_repo: "https://github.com/axonweb3/axon.git"
 axon_branch: "main"
 enable_cross_client: "false"
 mercury_uri: "http://127.0.0.1:8116"
