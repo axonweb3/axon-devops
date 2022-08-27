@@ -5,7 +5,5 @@ apm/agent/.env
 node_modules
 dist
 build
-/target/
-**/*.rs.bk
 contract_Uni_V2_Address.yaml
 contract_Uni_V3_Address.yaml
