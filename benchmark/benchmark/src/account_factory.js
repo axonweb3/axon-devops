@@ -39,7 +39,9 @@ class AccountFactory {
 
             await batch_request.execute();
             await batch_request.waitFinished();
-            await batch_request.waitConfirmed();
+            if (!await batch_request.waitConfirmed()) {
+                continue;
+            }
 
             for (const tempAccount of tempAccounts) {
                 const balance = await web3.eth.getBalance(tempAccount.address);

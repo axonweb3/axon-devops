@@ -10,6 +10,7 @@
     "benchmark_time": 60000,
     "batch_size": #batch_size,
     "thread_num": #thread_num,
+    "accounts_num": #accounts_num,
     "id": "936501604767629344",
     "token": "#token",
     "benchmark_cases": {
