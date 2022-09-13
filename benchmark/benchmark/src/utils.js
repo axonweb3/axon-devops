@@ -5,7 +5,7 @@ async function sleep(ms) {
 }
 
 async function waitForTransaction(web3, hash) {
-    for (let retry_count = 0; retry_count < 100; retry_count += 1) {
+    for (let retry_count = 0; retry_count < 5; retry_count += 1) {
         try {
             const receipt = await web3.eth.getTransactionReceipt(hash);
 
@@ -53,10 +53,10 @@ class WaitableBatchRequest {
     }
 
     async waitConfirmed() {
-        for (let i in this.txHashes) {
-            let hash = this.txHashes[i];
-            await waitForTransaction(this.web3, hash);
-        }
+        const res = await Promise.all(
+            this.txHashes.map((hash) => waitForTransaction(this.web3, hash)),
+        );
+        return res.every((r) => r);
     }
 }
 

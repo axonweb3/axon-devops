@@ -47,12 +47,32 @@ async function init_config() {
         config.mnemonic = args['token'];
     }
 
+    if(args['uni']) {
+        config.mnemonic = args['token'];
+    }
+
+    if(args['uniswapFactoryAddress']) {
+        config.uniswapFactoryAddress = args['uniswapFactoryAddress'];
+    }
+
+    if(args['uniswapNonfungiblePositionManagerAddress']) {
+        config.uniswapNonfungiblePositionManagerAddress = args['uniswapNonfungiblePositionManagerAddress'];
+    }
+
+    if(args['uniswapSwapRouterAddress']) {
+        config.uniswapSwapRouterAddress = args['uniswapSwapRouterAddress'];
+    }
+
+    if(args['accounts_num']) {
+        config.accounts_num = JSON.parse(args['accounts_num']);
+    }
+
     if(args['mnemonic_index']) {
-        config.mnemonic_index = eval(args['mnemonic_index'])
+        config.mnemonic_index = JSON.parse(args['mnemonic_index']);
     }
 
     if(args['benchmark_cases']) {
-        config.benchmark_cases = eval(args['benchmark_cases'])
+        config.benchmark_cases = JSON.parse(args['benchmark_cases'].replaceAll("\'", "\""));
     }
     
     const hdNode = ethers.utils.HDNode.fromMnemonic(config.mnemonic);
