@@ -1,5 +1,5 @@
-const logger = require('./logger');
-const ethers = require('ethers');
+const logger = require("./logger");
+const ethers = require("ethers");
 const { NonceManager } = require("@ethersproject/experimental");
 
 module.exports = (async (info) => {

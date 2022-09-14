@@ -1,16 +1,16 @@
-const { ethers } = require('ethers');
+const { ethers } = require("ethers");
 const {
     Pool,
     Position,
     nearestUsableTick,
     NonfungiblePositionManager,
     encodeSqrtRatioX96,
-} = require('@uniswap/v3-sdk');
-const { Token, Percent } = require('@uniswap/sdk-core');
+} = require("@uniswap/v3-sdk");
+const { Token, Percent } = require("@uniswap/sdk-core");
 
-const { abi: IUniswapV3PoolInitializerABI } = require('@uniswap/v3-periphery/artifacts/contracts/interfaces/IPoolInitializer.sol/IPoolInitializer.json');
-const { abi: IUniswapV3PoolABI } = require('@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json');
-const { abi: SwapRouterABI } = require('@uniswap/swap-router-contracts/artifacts/contracts/interfaces/IV3SwapRouter.sol/IV3SwapRouter.json');
+const { abi: IUniswapV3PoolInitializerABI } = require("@uniswap/v3-periphery/artifacts/contracts/interfaces/IPoolInitializer.sol/IPoolInitializer.json");
+const { abi: IUniswapV3PoolABI } = require("@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json");
+const { abi: SwapRouterABI } = require("@uniswap/swap-router-contracts/artifacts/contracts/interfaces/IV3SwapRouter.sol/IV3SwapRouter.json");
 
 async function getPoolImmutables(contract) {
     const [factory, token0, token1, fee, tickSpacing, maxLiquidityPerTick] = await Promise.all([
@@ -133,9 +133,9 @@ class Benchmark {
             getPoolState(poolContract),
         ]);
 
-        const tokenA = new Token(chainId, immutables.token0, 18, 'TK0', 'Token 0');
+        const tokenA = new Token(chainId, immutables.token0, 18, "TK0", "Token 0");
 
-        const tokenB = new Token(chainId, immutables.token1, 18, 'TK1', 'Token 1');
+        const tokenB = new Token(chainId, immutables.token1, 18, "TK1", "Token 1");
 
         const pool = new Pool(
             tokenA,
