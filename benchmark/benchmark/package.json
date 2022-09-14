@@ -9,11 +9,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@ethersproject/experimental": "^5.7.0",
     "discord.js": "^13.6.0",
     "ethers": "^5.6.8",
     "log4js": "^6.5.2",
-    "piscina": "^3.2.0",
-    "web3": "^1.6.1"
+    "minimist": "^1.2.6",
+    "piscina": "^3.2.0"
   },
   "husky": {
     "hooks": {

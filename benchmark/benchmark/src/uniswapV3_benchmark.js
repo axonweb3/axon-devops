@@ -1,5 +1,4 @@
 const { ethers } = require('ethers');
-const { sleep } = require('./utils');
 const {
     Pool,
     Position,
@@ -12,9 +11,6 @@ const { Token, Percent } = require('@uniswap/sdk-core');
 const { abi: IUniswapV3PoolInitializerABI } = require('@uniswap/v3-periphery/artifacts/contracts/interfaces/IPoolInitializer.sol/IPoolInitializer.json');
 const { abi: IUniswapV3PoolABI } = require('@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json');
 const { abi: SwapRouterABI } = require('@uniswap/swap-router-contracts/artifacts/contracts/interfaces/IV3SwapRouter.sol/IV3SwapRouter.json');
-const Web3 = require('web3');
-const AccountFactory = require('./account_factory');
-const logger = require('./logger');
 
 async function getPoolImmutables(contract) {
     const [factory, token0, token1, fee, tickSpacing, maxLiquidityPerTick] = await Promise.all([
@@ -58,8 +54,6 @@ class Benchmark {
     constructor(info) {
         this.config = info.config;
 
-        this.web3 = new Web3(new Web3.providers.HttpProvider(info.config.http_endpoint));
-
         this.provider = new ethers.providers.JsonRpcProvider(info.config.http_endpoint);
 
         this.contract = new ethers.Contract(
@@ -73,17 +67,8 @@ class Benchmark {
             this.provider,
         );
 
-        this.accounts = [];
+        this.accounts = info.accounts;
         this.index = 0;
-    }
-
-    async prepare() {
-        console.log('preparing for uniswapV3_benchmark.js...');
-
-        const accountFactory = new AccountFactory()
-        this.accounts = await accountFactory.get_accounts(this.config, 10000000, this.config.accounts_num);
-
-        console.log('\nuniswapV3_benchmark.js prepared');
     }
 
     async gen_tx() {
@@ -91,31 +76,24 @@ class Benchmark {
         this.index += 1;
 
         const account = this.accounts[index % this.accounts.length];
-        const nonce = await this.web3.eth.getTransactionCount(account.address);
 
-        const [immutables, state] = await Promise.all([
-            getPoolImmutables(this.contract),
-            getPoolState(this.contract),
-        ]);
+        const immutables = await getPoolImmutables(this.contract);
 
-        const callTx = await this.swapRouterContract.populateTransaction.exactInputSingle({
-            tokenIn: immutables.token0,
-            tokenOut: immutables.token1,
-            fee: immutables.fee,
-            recipient: account.address,
-            amountIn: 1,
-            amountOutMinimum: 0,
-            sqrtPriceLimitX96: 0,
-        });
+        const callTx = await this.swapRouterContract
+            .connect(account)
+            .populateTransaction
+            .exactInputSingle({
+                tokenIn: immutables.token0,
+                tokenOut: immutables.token1,
+                fee: immutables.fee,
+                recipient: account.address,
+                amountIn: 1,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0,
+            });
 
-        const tx = {
-            ...callTx,
-            from: account.address,
-            maxPriorityFeePerGas: ethers.utils.parseUnits('2', 'gwei').toString(),
-            maxFeePerGas: ethers.utils.parseUnits('2', 'gwei').toString(),
-            gasLimit: 60000,
-            nonce: nonce + 1,
-        };
+        const tx = await account.populateTransaction(callTx);
+        account.incrementTransactionCount();
 
         return account.signTransaction(tx);
     }
