@@ -1,10 +1,10 @@
-const log4js =  require('log4js');
-const path = require('path');
+const log4js =  require("log4js");
+const path = require("path");
 
 log4js.configure({
 	appenders: {
 		console: {
-			type: 'console'
+			type: "console"
 		},
 		app: {
 			type: "dateFile",
@@ -17,11 +17,11 @@ log4js.configure({
 		}
 	},
 	categories: {
-		default: { appenders: ['app'], level: 'DEBUG' },
+		default: { appenders: ["app"], level: "DEBUG" },
 	},
 });
 
 const logger = log4js.getLogger();
-logger.level = 'info';
+logger.level = "info";
 
 module.exports = logger

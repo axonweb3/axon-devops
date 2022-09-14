@@ -1,78 +1,78 @@
-const Runner = require('./src/runner')
-const config = require('./config.json')
-const { ethers } = require('ethers')
-const args = require('minimist')(process.argv.slice(2))
+const Runner = require("./src/runner")
+const config = require("./config.json")
+const { ethers } = require("ethers")
+const args = require("minimist")(process.argv.slice(2))
 
 
 async function init_config() {
 
-    if (args['http_endpoint']) {
-        config.http_endpoint = args['http_endpoint']
+    if (args["http_endpoint"]) {
+        config.http_endpoint = args["http_endpoint"]
     }
 
-    if (args['chain_id']) {
-        config.chain_id = args['chain_id']
+    if (args["chain_id"]) {
+        config.chain_id = args["chain_id"]
     }
 
-    if (args['continuous_benchmark']) {
-        config.continuous_benchmark = JSON.parse(args['continuous_benchmark']);
-    }
-
-
-    if (args['benchmark_time']) {
-        config.benchmark_time = JSON.parse(args['benchmark_time']);
+    if (args["continuous_benchmark"]) {
+        config.continuous_benchmark = JSON.parse(args["continuous_benchmark"]);
     }
 
 
-    if (args['batch_size']) {
-        config.batch_size = JSON.parse(args['batch_size']);
+    if (args["benchmark_time"]) {
+        config.benchmark_time = JSON.parse(args["benchmark_time"]);
     }
 
 
-    if (args['thread_num']) {
-        config.thread_num = JSON.parse(args['thread_num']);
+    if (args["batch_size"]) {
+        config.batch_size = JSON.parse(args["batch_size"]);
     }
 
 
-    if (args['id']) {
-        config.id = args['id']
+    if (args["thread_num"]) {
+        config.thread_num = JSON.parse(args["thread_num"]);
     }
 
 
-    if (args['token']) {
-        config.token = args['token']
+    if (args["id"]) {
+        config.id = args["id"]
     }
 
-    if (args['mnemonic']) {
-        config.mnemonic = args['mnemonic'];
+
+    if (args["token"]) {
+        config.token = args["token"]
     }
 
-    if (args['uniswapFactoryAddress']) {
-        config.uniswapFactoryAddress = args['uniswapFactoryAddress'];
+    if (args["mnemonic"]) {
+        config.mnemonic = args["mnemonic"];
     }
 
-    if (args['uniswapNonfungiblePositionManagerAddress']) {
-        config.uniswapNonfungiblePositionManagerAddress = args['uniswapNonfungiblePositionManagerAddress'];
+    if (args["uniswapFactoryAddress"]) {
+        config.uniswapFactoryAddress = args["uniswapFactoryAddress"];
     }
 
-    if (args['uniswapSwapRouterAddress']) {
-        config.uniswapSwapRouterAddress = args['uniswapSwapRouterAddress'];
+    if (args["uniswapNonfungiblePositionManagerAddress"]) {
+        config.uniswapNonfungiblePositionManagerAddress = args["uniswapNonfungiblePositionManagerAddress"];
     }
 
-    if (args['accounts_num']) {
-        config.accounts_num = JSON.parse(args['accounts_num']);
+    if (args["uniswapSwapRouterAddress"]) {
+        config.uniswapSwapRouterAddress = args["uniswapSwapRouterAddress"];
     }
 
-    if (args['mnemonic_index']) {
-        config.mnemonic_index = JSON.parse(args['mnemonic_index']);
+    if (args["accounts_num"]) {
+        config.accounts_num = JSON.parse(args["accounts_num"]);
     }
 
-    if (args['benchmark_cases']) {
-        config.benchmark_cases = JSON.parse(args['benchmark_cases'].replaceAll("\'", "\""));
+    if (args["mnemonic_index"]) {
+        config.mnemonic_index = JSON.parse(args["mnemonic_index"]);
     }
 
-    if (args['wait_for_tx_mined']) {
-        config.wait_for_tx_mined = JSON.parse(args['wait_for_tx_mined']);
+    if (args["benchmark_cases"]) {
+        config.benchmark_cases = JSON.parse(args["benchmark_cases"].replaceAll("\'", "\""));
+    }
+
+    if (args["wait_for_tx_mined"]) {
+        config.wait_for_tx_mined = JSON.parse(args["wait_for_tx_mined"]);
     }
 
     const hdNode = ethers.utils.HDNode.fromMnemonic(config.mnemonic);

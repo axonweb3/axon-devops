@@ -1,12 +1,12 @@
-const path = require('path');
-const Piscina = require('piscina');
-const { MessageEmbed, WebhookClient } = require('discord.js')
-const ethers = require('ethers');
+const path = require("path");
+const Piscina = require("piscina");
+const { MessageEmbed, WebhookClient } = require("discord.js")
+const ethers = require("ethers");
 const { NonceManager } = require("@ethersproject/experimental");
 const { abi: ERC20ABI } = require("./ERC20.json");
 
-const { createPool } = require('./uniswapV3_benchmark');
-const AccountFactory = require('./account_factory');
+const { createPool } = require("./uniswapV3_benchmark");
+const AccountFactory = require("./account_factory");
 
 async function approveERC20(contract, to, accounts) {
     return Promise.all(accounts.map((account) => (
@@ -166,7 +166,7 @@ class Runner {
 
     async exec() {
         const piscina = new Piscina({
-            filename: path.resolve(__dirname, 'worker.js')
+            filename: path.resolve(__dirname, "worker.js")
         })
 
         let tasks = []
@@ -219,17 +219,17 @@ class Runner {
 
         const embed = this.get_message_embed();
         await this.discord.send({
-            content: ' ',
-            username: 'axon-benchmark',
-            avatarURL: 'https://i.imgur.com/AfFp7pu.png',
+            content: " ",
+            username: "axon-benchmark",
+            avatarURL: "https://i.imgur.com/AfFp7pu.png",
             embeds: [embed],
         })
     }
 
     get_message_embed() {
         return new MessageEmbed()
-            .setTitle('axon benchmark')
-            .setColor('#0099ff')
+            .setTitle("axon benchmark")
+            .setColor("#0099ff")
             .addField("benchmark time:", `${this.benchmark_info.total_time}`)
             .addField("start height:", `${this.benchmark_info.start_block_number}`)
             .addField("end height:", `${this.benchmark_info.end_block_number}`)
@@ -239,20 +239,20 @@ class Runner {
     }
 
     log_benchmark_config_info() {
-        console.log('\n/////////////////////////////////////////////////////')
-        console.log('benchmark time:', this.config.benchmark_time, 'ms')
+        console.log("\n/////////////////////////////////////////////////////")
+        console.log("benchmark time:", this.config.benchmark_time, "ms")
         console.log(`endpoint: ${this.config.http_endpoint}`)
-        console.log('/////////////////////////////////////////////////////\n')
-        console.log('waiting...')
+        console.log("/////////////////////////////////////////////////////\n")
+        console.log("waiting...")
     }
 
     log_benchmark_res() {
-        console.log('\n/////////////////////////////////////////////////////')
-        console.log('benchmark time: ', this.benchmark_info.total_time, 'ms')
-        console.log('transaction count:', this.benchmark_info.transfer_count)
-        console.log('TPS:', this.get_average_time_elapsed(), 'ms')
-        console.log('transfer rate:', `${this.get_success_rate().toFixed(2)}`)
-        console.log('/////////////////////////////////////////////////////\n')
+        console.log("\n/////////////////////////////////////////////////////")
+        console.log("benchmark time: ", this.benchmark_info.total_time, "ms")
+        console.log("transaction count:", this.benchmark_info.transfer_count)
+        console.log("TPS:", this.get_average_time_elapsed(), "ms")
+        console.log("transfer rate:", `${this.get_success_rate().toFixed(2)}`)
+        console.log("/////////////////////////////////////////////////////\n")
     }
 }
 
