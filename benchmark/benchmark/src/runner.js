@@ -1,19 +1,36 @@
 const path = require('path');
 const Piscina = require('piscina');
 const { MessageEmbed, WebhookClient } = require('discord.js')
-const Web3 = require('web3')
-const AccountFactory = require('./account_factory')
-const logger = require('./logger')
 const ethers = require('ethers');
+const { NonceManager } = require("@ethersproject/experimental");
 const { abi: ERC20ABI } = require("./ERC20.json");
 
 const { createPool } = require('./uniswapV3_benchmark');
+const AccountFactory = require('./account_factory');
+
+async function approveERC20(contract, to, accounts) {
+    return Promise.all(accounts.map((account) => (
+        contract.connect(account).approve(
+            to,
+            ethers.constants.MaxUint256,
+        ).then((res) => res.wait())
+    )));
+}
+
+const MINT_TOKEN_AMOUNT = 1000000;
+
+function erc20MintToAccounts(contract, accounts) {
+    return Promise.all(accounts.map((account) => (
+        contract.connect(account).mint(
+            account.address,
+            MINT_TOKEN_AMOUNT,
+        ).then((res) => res.wait())
+    )));
+}
 
 class Runner {
-
     constructor(config) {
         this.config = config
-        this.web3 = new Web3(new Web3.providers.HttpProvider(config.http_endpoint))
         this.discord = new WebhookClient({ id: config.id, token: config.token })
 
         this.benchmark_info = {
@@ -28,125 +45,111 @@ class Runner {
             res: [],
         }
 
-        this.account = this.web3.eth.accounts.wallet.add(this.config.private_key);
         this.contracts = {};
 
-        this.provider = new ethers.providers.JsonRpcProvider(config.http_endpoint);
-        this.signer = new ethers.Wallet(config.private_key, this.provider);
+        this.provider = new ethers.providers.JsonRpcBatchProvider(config.http_endpoint);
+        this.signer = new NonceManager(
+            new ethers.Wallet(config.private_key, this.provider),
+        );
+
+        this.signer.address = this.signer.signer.address;
 
         this.chainId = 0;
+
+        this.accounts = [];
+        this.accountsPerThread = Object.entries(
+            this.config.benchmark_cases,
+        ).length * this.config.accounts_num;
     }
 
-    async getNonce() {
-        return this.web3.eth.getTransactionCount(this.account.address);
-    }
+    async deployContract(jsonPath, name, args) {
+        console.log("\ndeploying contract: ", name);
+        const contractJson = require(jsonPath);
 
-    async sendDeploymentContract(contract, contractJson, args, gNonce) {
-        const nonce = gNonce || await this.getNonce();
+        const factory = new ethers.ContractFactory(
+            contractJson.abi,
+            contractJson.bytecode,
+            this.signer,
+        )
+        const instance = await factory.deploy(...args);
+        await instance.deployTransaction.wait();
 
-        return contract
-            .deploy({
-                data: contractJson.bytecode,
-                arguments: args,
-            })
-            .send({
-                from: this.account.address,
-                nonce,
-                gas: 2000000,
-            });
-    }
+        const { address } = instance;
+        this.contracts[name] = address;
+        console.log(`\ncontract ${name} deployed to ${address}`);
 
-    async deployContract(jsonPath, name, args, gNonce) {
-        try {
-            console.log("\ndeploying contract: ", name);
-            const contractJson = require(jsonPath);
-
-            const contract = new this.web3.eth.Contract(contractJson.abi);
-            const instance = await this.sendDeploymentContract(
-                contract,
-                contractJson,
-                args,
-                gNonce,
-            );
-
-            const { address } = instance.options;
-            this.contracts[name] = address;
-            console.log(`\ncontract ${name} deployed to ${address}`);
-
-            return address;
-        } catch (e) {
-            logger.error("deploy contract err: ", e)
-            console.log(e);
-            await this.deployContract(jsonPath, name, args, gNonce)
-        }
-    }
-
-    async approveERC20({ address, signer, to, nonce }) {
-        const contract = new ethers.Contract(address, ERC20ABI, signer);
-        await (await contract.approve(
-            to,
-            ethers.constants.MaxUint256.toString(),
-            { nonce },
-        )).wait();
-
-        console.log(`\napproved ${address} from ${signer.address} to ${to}`);
+        return instance;
     }
 
     async prepare() {
-        console.log('preparing...');
+        console.log("\npreparing...");
 
-        const nonce = await this.getNonce();
         this.chainId = (await this.provider.getNetwork()).chainId;
+
+        const accountFactory = new AccountFactory(
+            this.signer,
+            this.provider,
+        );
+        this.accounts = await accountFactory.get_accounts(
+            10000000,
+            this.config.thread_num * this.accountsPerThread,
+        );
 
         const args = [
             "Name",
             "Symbol",
             this.signer.address,
-            ethers.constants.MaxUint256.toString(),
+            MINT_TOKEN_AMOUNT,
         ];
-        const [token0, token1] = await Promise.all([
-            this.deployContract("./ERC20.json", "Token0", args, nonce),
-            this.deployContract("./ERC20.json", "Token1", args, nonce + 1),
-            this.deployContract("./ERC20.json", "ERC20", args, nonce + 2),
+        const [token0, token1, erc20] = await Promise.all([
+            this.deployContract("./ERC20.json", "Token0", args),
+            this.deployContract("./ERC20.json", "Token1", args),
+            this.deployContract("./ERC20.json", "ERC20", args),
         ]);
 
+        console.log("\nMinting tokens...");
         await Promise.all([
-            this.approveERC20({
-                address: token0,
-                to: this.config.uniswapNonfungiblePositionManagerAddress,
-                signer: this.signer,
-                nonce: nonce + 3,
-            }),
-            this.approveERC20({
-                address: token1,
-                to: this.config.uniswapNonfungiblePositionManagerAddress,
-                signer: this.signer,
-                nonce: nonce + 4,
-            }),
-            this.approveERC20({
-                address: token0,
-                to: this.config.uniswapSwapRouterAddress,
-                signer: this.signer,
-                nonce: nonce + 5,
-            }),
-            this.approveERC20({
-                address: token1,
-                to: this.config.uniswapSwapRouterAddress,
-                signer: this.signer,
-                nonce: nonce + 6,
-            }),
+            erc20MintToAccounts(token0, this.accounts),
+            erc20MintToAccounts(token1, this.accounts),
+            erc20MintToAccounts(erc20, this.accounts),
         ]);
+        console.log("\nTokens minted");
+
+        console.log("\nApproving tokens...");
+        await Promise.all([
+            approveERC20(
+                token0,
+                this.config.uniswapNonfungiblePositionManagerAddress,
+                this.accounts.concat([this.signer]),
+            ),
+            approveERC20(
+                token0,
+                this.config.uniswapSwapRouterAddress,
+                this.accounts.concat([this.signer]),
+            ),
+            approveERC20(
+                token1,
+                this.config.uniswapNonfungiblePositionManagerAddress,
+                this.accounts.concat([this.signer]),
+            ),
+            approveERC20(
+                token1,
+                this.config.uniswapSwapRouterAddress,
+                this.accounts.concat([this.signer]),
+            ),
+        ]);
+        console.log("\nTokens approved...");
 
         const pool = await createPool({
-            token0,
-            token1,
+            token0: token0.address,
+            token1: token1.address,
             chainId: this.chainId,
             uniswapNonfungiblePositionManagerAddress: this.config.uniswapNonfungiblePositionManagerAddress,
             signer: this.signer,
         });
         this.contracts["UniswapV3Pool"] = pool;
 
-        console.log('\nprepared');
+        console.log("\nprepared");
     }
 
     async run() {
@@ -171,7 +174,13 @@ class Runner {
             tasks.push(
                 piscina.run({
                     contracts: this.contracts,
-                    config: {...this.config}
+                    config: {
+                        ...this.config,
+                    },
+                    accounts: this.accounts.slice(
+                        i * this.accountsPerThread,
+                        (i + 1) * this.accountsPerThread,
+                    ).map((acc) => acc.signer._signingKey().privateKey),
                 })
             )
         }
@@ -180,14 +189,14 @@ class Runner {
     }
 
     async start() {
-        this.benchmark_info.start_block_number = await this.web3.eth.getBlockNumber()
+        this.benchmark_info.start_block_number = await this.provider.getBlockNumber();
         this.benchmark_info.start_time = performance.now()
 
     }
 
     async end() {
         this.benchmark_info.end_time = performance.now()
-        this.benchmark_info.end_block_number = await this.web3.eth.getBlockNumber()
+        this.benchmark_info.end_block_number = await this.provider.getBlockNumber()
         this.benchmark_info.transfer_count = this.benchmark_info.res.reduce((total, res) => total + res.transfer_count, 0)
         this.benchmark_info.success_transfer_count = this.benchmark_info.res.reduce((total, res) => total + res.success_tx, 0)
         this.benchmark_info.fail_transfer_count = this.benchmark_info.res.reduce((total, res) => total + res.fail_tx, 0)
@@ -204,7 +213,7 @@ class Runner {
 
     async send_discord() {
 
-        if(!this.config.token || !this.config.id) {
+        if (!this.config.token || !this.config.id) {
             return;
         }
 

@@ -17,5 +17,6 @@
         "./benchmark": 1,
         "./contract_benchmark": 1,
         "./uniswapV3_benchmark": 1
-    }
+    },
+    "wait_for_tx_mined": false
 }

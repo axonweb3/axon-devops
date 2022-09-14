@@ -1,60 +1,49 @@
-const Web3 = require('web3')
-const { WaitableBatchRequest, sleep } = require('./utils');
-const logger = require('./logger')
+const logger = require('./logger');
 const ethers = require('ethers');
+const { NonceManager } = require("@ethersproject/experimental");
 
 class AccountFactory {
-    async get_accounts(config, value, account_num) {
+    constructor(signer, provider) {
+        this.signer = signer;
+        this.provider = provider;
+    }
 
-        let web3 = new Web3(new Web3.providers.HttpProvider(config.http_endpoint));
-        let account = web3.eth.accounts.privateKeyToAccount(config.private_key);
-        web3.eth.defaultAccount = account.address;
+    async get_accounts(value, accountNum) {
+        const accounts = [];
+        while (accounts.length < accountNum) {
+            const txs = await Promise.all(Array.from(
+                Array(accountNum - accounts.length),
+                () => {
+                    const account = new NonceManager(
+                        ethers.Wallet
+                            .createRandom()
+                            .connect(this.provider),
+                    );
+                    account.address = account.signer.address;
 
-        let accounts = []
-        while (accounts.length < account_num) {
-            let nonce = await web3.eth.getTransactionCount(account.address);
-            let batch_request = new WaitableBatchRequest(web3);
-            let tempAccounts = [];
+                    return this.signer.sendTransaction({
+                        to: account.address,
+                        value: ethers.utils.parseEther(String(value)),
+                    }).then((res) => [res, account]);
+                },
+            ));
 
-            for (let i = 0; i < account_num - accounts.length; i++) {
-                let benchmark_account = web3.eth.accounts.create()
-                let tx = {
-                    "to": benchmark_account.address,
-                    "type": 2,
-                    "value": ethers.utils.parseEther(value.toString()).toString(),
-                    "maxPriorityFeePerGas": ethers.utils.parseUnits('1', 'gwei').toString(),
-                    "maxFeePerGas": ethers.utils.parseUnits('2', 'gwei').toString(),
-                    "gasLimit": 2100000,
-                    "nonce": nonce,
-                    "chainId": config.chain_id
-                }
-                let signed_tx = await account.signTransaction(tx)
-                batch_request.add(web3.eth.sendSignedTransaction.request(signed_tx.rawTransaction, (err, res) => {
-                    if (err) logger.error("create account tx err: ", err)
-                    else tempAccounts.push(benchmark_account)
-                }), signed_tx.transactionHash);
-
-                nonce += 1;
-            }
-
-            await batch_request.execute();
-            await batch_request.waitFinished();
-            if (!await batch_request.waitConfirmed()) {
-                continue;
-            }
-
-            for (const tempAccount of tempAccounts) {
-                const balance = await web3.eth.getBalance(tempAccount.address);
-                if(balance != 0) {
-                    accounts.push(tempAccount);
-                }
-
-            }
-
+            await Promise.all(
+                txs.map(
+                    async ([res, acc]) => {
+                        try {
+                            await res.wait();
+                            accounts.push(acc);
+                        } catch (err) {
+                            logger.error("create account tx err: ", err);
+                        }
+                    },
+                ),
+            );
         }
 
-        return accounts
+        return accounts;
     }
 }
 
-module.exports = AccountFactory
+module.exports = AccountFactory;
