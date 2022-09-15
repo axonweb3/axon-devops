@@ -1,5 +1,5 @@
 deploy_path: "/home/ckb/axon-build"
-axon_repo: "https://github.com/nervosnetwork/axon.git"
+axon_repo: "https://github.com/axonweb3/axon.git"
 axon_branch: "main"
 bootstraps: "xxx.xxx.xxx.xxx"
 mercury_uri: "http://127.0.0.1"

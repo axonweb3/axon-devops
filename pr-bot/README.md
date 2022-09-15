@@ -22,7 +22,7 @@ Editor config.json
 {
   "repos": [
     {
-      "onwer": "nervosnetwork",
+      "onwer": "axonweb3",
       "repo":"axon"
     }
   ],
@@ -35,9 +35,9 @@ Editor config.json
 #### repo
 A case of a repo address
 ```http
-https://github.com/nervosnetwork/axon-devops
+https://github.com/axonweb3/axon-devops
 ```
-nervosnetwork = "onwer": "nervosnetwork"
+axonweb3 = "onwer": "axonweb3"
 
 axon-devops = "repo":"axon"
 
