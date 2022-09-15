@@ -151,17 +151,17 @@ axon node 采集端程序, 内部配置在 .env.example
 JACGER_COLLECTOR_IP=jaeger-collector:14250
 
 # 该配置用于和 axon 交互
-# 配置文件地址: https://github.com/nervosnetwork/axon/blob/main/devtools/chain/config.toml
+# 配置文件地址: https://github.com/axonweb3/axon/blob/main/devtools/chain/config.toml
 # 关联 [apm] tracing_address 参数
 JACGER_AGENT_PORT=6831
 
 # 该配置用于给 filebeat 采集日志用
-# 配置文件地址: https://github.com/nervosnetwork/axon/blob/main/devtools/chain/config.toml
+# 配置文件地址: https://github.com/axonweb3/axon/blob/main/devtools/chain/config.toml
 # 关联 [logger] log_path 参数
 AXON_LOG_PATH=axon/logs
 
 # 该配置用于将AXON_LOG_PATH mount 到filebeat
-# 配置文件地址: https://github.com/nervosnetwork/axon-devops/blob/21f6ea2bb2c9336ba6d640b302600753efe012af/apm/agent/docker-compose.yml#L50
+# 配置文件地址: https://github.com/axonweb3/axon-devops/blob/21f6ea2bb2c9336ba6d640b302600753efe012af/apm/agent/docker-compose.yml#L50
 # volumes: - ${AXON_LOG_PATH}:/usr/share/filebeat/logs
 ```
 
@@ -506,7 +506,7 @@ monitor_dir: /home/ckb/axon-monitor
 ### monitor 
 copy axon-devops 目录到指定机器上
 ```shell
-$ git clone https://github.com/nervosnetwork/axon-devops
+$ git clone https://github.com//axon-devops
 $ cd axon-devops/apm/monitor
 ```
 
@@ -541,7 +541,7 @@ http://jarger_ip:16686
 
 copy axon-devops 目录到 指定机器上 
 ```shell
-$ git clone https://github.com/nervosnetwork/axon-devops
+$ git clone https://github.com/axonweb3/axon-devops
 $ cd axon-devops/apm/agent
 ```
 
