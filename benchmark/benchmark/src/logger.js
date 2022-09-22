@@ -17,7 +17,7 @@ log4js.configure({
 		}
 	},
 	categories: {
-		default: { appenders: ["app"], level: "DEBUG" },
+		default: { appenders: ["app", "console"], level: "DEBUG" },
 	},
 });
 

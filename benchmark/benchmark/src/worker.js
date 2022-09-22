@@ -19,7 +19,7 @@ module.exports = (async (info) => {
 
     const benchmarkCases = await Promise.all(Object.entries(info.config.benchmark_cases)
         .map(async ([name, share], i) => {
-            console.log(name, share);
+            logger.info(`[Thread ${info.index}] ${name} ${share}`);
             const BenchmarkCase = require(name);
             return {
                 instance: new BenchmarkCase({
@@ -42,6 +42,8 @@ module.exports = (async (info) => {
         info.config.continuous_benchmark
         || info.config.benchmark_time > totalTime
     ) {
+        const failedCount = 0;
+
         const txs = (await Promise.all(Array.from(
             Array(info.config.batch_size),
             async (_, i) => {
@@ -56,8 +58,7 @@ module.exports = (async (info) => {
                 try {
                     return await benchmarkCases[j - 1].instance.gen_tx();
                 } catch (err) {
-                    benchmarkInfo.fail_tx += 1;
-                    console.log(err);
+                    failedCount += 1;
                     logger.error(err);
                     return undefined;
                 }
@@ -68,7 +69,7 @@ module.exports = (async (info) => {
             txs.map((tx) => provider
                 .sendTransaction(tx)
                 .catch((err) => {
-                    benchmarkInfo.fail_tx += 1;
+                    failedCount += 1;
                     logger.error(err);
                     return undefined;
                 },
@@ -80,20 +81,24 @@ module.exports = (async (info) => {
                 responses.map(async (res) => {
                     try {
                         await res.wait();
-                        benchmarkInfo.success_tx += 1;
                     } catch (err) {
-                        benchmarkInfo.fail_tx += 1;
+                        failedCount += 1;
                         logger.error(err);
                     }
                 }),
             );
-        } else {
-            benchmarkInfo.success_tx += responses.length;
         }
+
+        const successedCount = info.config.batch_size - failedCount;
+
+        benchmarkInfo.fail_tx += failedCount;
+        benchmarkInfo.success_tx += successedCount;
+        benchmarkInfo.transfer_count = benchmarkInfo.success_tx + benchmarkInfo.fail_tx;
+
+        logger.info(`[Thread ${info.index}] Transactions sent ${benchmarkInfo.success_tx}(+${successedCount})/${benchmarkInfo.transfer_count}(+${info.config.batch_size}).`);
 
         totalTime = performance.now() - startTime;
     }
 
-    benchmarkInfo.transfer_count = benchmarkInfo.success_tx + benchmarkInfo.fail_tx;
     return benchmarkInfo;
 });

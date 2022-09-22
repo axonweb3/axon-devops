@@ -3,7 +3,7 @@ const Piscina = require("piscina");
 const { MessageEmbed, WebhookClient } = require("discord.js")
 const ethers = require("ethers");
 const { NonceManager } = require("@ethersproject/experimental");
-const { abi: ERC20ABI } = require("./ERC20.json");
+const logger = require("./logger");
 
 const { createPool } = require("./uniswapV3_benchmark");
 const AccountFactory = require("./account_factory");
@@ -76,7 +76,7 @@ class Runner {
 
         const { address } = instance;
         this.contracts[name] = address;
-        console.log(`\ncontract ${name} deployed to ${address}`);
+        logger.info(`contract ${name} deployed to ${address}`);
 
         return instance;
     }
@@ -181,6 +181,7 @@ class Runner {
                         i * this.accountsPerThread,
                         (i + 1) * this.accountsPerThread,
                     ).map((acc) => acc.signer._signingKey().privateKey),
+                    index: i,
                 })
             )
         }
