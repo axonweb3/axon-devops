@@ -81,12 +81,15 @@ module.exports = (async (info) => {
                 responses.map(async (res) => {
                     try {
                         await res.wait();
+                        logger.debug(`Transaction ${res.hash} Sent`);
                     } catch (err) {
                         failedCount += 1;
                         logger.error(err);
                     }
                 }),
             );
+        } else {
+            responses.forEach((res) => logger.debug(`Transaction ${res.hash} Sent`));
         }
 
         const successedCount = info.config.batch_size - failedCount;
@@ -95,7 +98,7 @@ module.exports = (async (info) => {
         benchmarkInfo.success_tx += successedCount;
         benchmarkInfo.transfer_count = benchmarkInfo.success_tx + benchmarkInfo.fail_tx;
 
-        logger.info(`[Thread ${info.index}] Transactions sent ${benchmarkInfo.success_tx}(+${successedCount})/${benchmarkInfo.transfer_count}(+${info.config.batch_size}).`);
+        logger.debug(`[Thread ${info.index}] Transactions sent ${benchmarkInfo.success_tx}(+${successedCount})/${benchmarkInfo.transfer_count}(+${info.config.batch_size}).`);
 
         totalTime = performance.now() - startTime;
     }
