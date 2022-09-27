@@ -1,6 +1,6 @@
 const logger = require("./logger");
 const ethers = require("ethers");
-const { NonceManager } = require("@ethersproject/experimental");
+const NonceManager = require("./nonceManager");
 
 class AccountFactory {
     constructor(signer, provider) {
@@ -19,11 +19,11 @@ class AccountFactory {
                             .createRandom()
                             .connect(this.provider),
                     );
-                    account.address = account.signer.address;
 
-                    return this.signer.sendTransaction({
+                    return this.signer.signer.sendTransaction({
                         to: account.address,
                         value: ethers.utils.parseEther(String(value)),
+                        nonce: this.signer.getNonce(),
                     }).then((res) => [res, account]);
                 },
             ));
@@ -41,6 +41,8 @@ class AccountFactory {
                 ),
             );
         }
+
+        await Promise.all(accounts.map((acc) => acc.initNonce()));
 
         return accounts;
     }

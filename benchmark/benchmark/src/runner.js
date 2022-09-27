@@ -2,7 +2,7 @@ const path = require("path");
 const Piscina = require("piscina");
 const { MessageEmbed, WebhookClient } = require("discord.js")
 const ethers = require("ethers");
-const { NonceManager } = require("@ethersproject/experimental");
+const NonceManager = require("./nonceManager");
 const logger = require("./logger");
 
 const { createPool } = require("./uniswapV3_benchmark");
@@ -10,9 +10,10 @@ const AccountFactory = require("./account_factory");
 
 async function approveERC20(contract, to, accounts) {
     return Promise.all(accounts.map((account) => (
-        contract.connect(account).approve(
+        contract.connect(account.signer).approve(
             to,
             ethers.constants.MaxUint256,
+            { nonce: account.getNonce() },
         ).then((res) => res.wait())
     )));
 }
@@ -21,9 +22,10 @@ const MINT_TOKEN_AMOUNT = 1000000;
 
 function erc20MintToAccounts(contract, accounts) {
     return Promise.all(accounts.map((account) => (
-        contract.connect(account).mint(
+        contract.connect(account.signer).mint(
             account.address,
             MINT_TOKEN_AMOUNT,
+            { nonce: account.getNonce() },
         ).then((res) => res.wait())
     )));
 }
@@ -52,8 +54,6 @@ class Runner {
             new ethers.Wallet(config.private_key, this.provider),
         );
 
-        this.signer.address = this.signer.signer.address;
-
         this.chainId = 0;
 
         this.accounts = [];
@@ -69,9 +69,9 @@ class Runner {
         const factory = new ethers.ContractFactory(
             contractJson.abi,
             contractJson.bytecode,
-            this.signer,
+            this.signer.signer,
         )
-        const instance = await factory.deploy(...args);
+        const instance = await factory.deploy(...args, { nonce: this.signer.getNonce() });
         await instance.deployTransaction.wait();
 
         const { address } = instance;
@@ -83,6 +83,7 @@ class Runner {
 
     async prepare() {
         console.log("\npreparing...");
+        await this.signer.initNonce();
 
         this.chainId = (await this.provider.getNetwork()).chainId;
 
@@ -145,7 +146,7 @@ class Runner {
             token1: token1.address,
             chainId: this.chainId,
             uniswapNonfungiblePositionManagerAddress: this.config.uniswapNonfungiblePositionManagerAddress,
-            signer: this.signer,
+            nonceSigner: this.signer,
         });
         this.contracts["UniswapV3Pool"] = pool;
 

@@ -12,6 +12,8 @@ const { abi: IUniswapV3PoolInitializerABI } = require("@uniswap/v3-periphery/art
 const { abi: IUniswapV3PoolABI } = require("@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json");
 const { abi: SwapRouterABI } = require("@uniswap/swap-router-contracts/artifacts/contracts/interfaces/IV3SwapRouter.sol/IV3SwapRouter.json");
 
+const logger = require("./logger");
+
 async function getPoolImmutables(contract) {
     const [factory, token0, token1, fee, tickSpacing, maxLiquidityPerTick] = await Promise.all([
         contract.factory(),
@@ -80,7 +82,7 @@ class Benchmark {
         const immutables = await getPoolImmutables(this.contract);
 
         const callTx = await this.swapRouterContract
-            .connect(account)
+            .connect(account.signer)
             .populateTransaction
             .exactInputSingle({
                 tokenIn: immutables.token0,
@@ -90,21 +92,23 @@ class Benchmark {
                 amountIn: 1,
                 amountOutMinimum: 0,
                 sqrtPriceLimitX96: 0,
-            });
+            }, { nonce: account.getNonce() });
 
-        const tx = await account.populateTransaction(callTx);
-        account.incrementTransactionCount();
+        const tx = await account.signer.populateTransaction(callTx);
+        logger.debug(tx);
 
-        return account.signTransaction(tx);
+        return account.signer.signTransaction(tx);
     }
 
     static async createPool({
         token0,
         token1,
         uniswapNonfungiblePositionManagerAddress,
-        signer,
+        nonceSigner,
         chainId,
     }) {
+        const { signer } = nonceSigner;
+
         const initializer = new ethers.Contract(
             uniswapNonfungiblePositionManagerAddress,
             IUniswapV3PoolInitializerABI,
@@ -116,7 +120,7 @@ class Benchmark {
             token0 < token1 ? token1 : token0,
             500,
             encodeSqrtRatioX96(1, 1).toString(),
-            { gasLimit: "0x1000000" },
+            { gasLimit: "0x1000000", nonce: nonceSigner.getNonce() },
         )).wait();
 
         let eventInterface = new ethers.utils.Interface(
@@ -165,6 +169,7 @@ class Benchmark {
             data: calldata,
             to: uniswapNonfungiblePositionManagerAddress,
             value: value,
+            nonce: nonceSigner.getNonce(),
         };
 
         await (await signer.sendTransaction(

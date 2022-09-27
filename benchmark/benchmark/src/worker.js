@@ -1,6 +1,6 @@
 const logger = require("./logger");
 const ethers = require("ethers");
-const { NonceManager } = require("@ethersproject/experimental");
+const NonceManager = require("./nonceManager");
 
 module.exports = (async (info) => {
     const benchmarkInfo = {
@@ -9,13 +9,8 @@ module.exports = (async (info) => {
         fail_tx: 0,
     };
     const provider = new ethers.providers.JsonRpcBatchProvider(info.config.http_endpoint);
-    const accounts = info.accounts.map(
-        (p) => {
-            const signer = new NonceManager(new ethers.Wallet(p, provider));
-            signer.address = signer.signer.address;
-            return signer;
-        },
-    );
+    const accounts = info.accounts.map((p) => new NonceManager(new ethers.Wallet(p, provider)));
+    await Promise.all(accounts.map((acc) => acc.initNonce()));
 
     const benchmarkCases = await Promise.all(Object.entries(info.config.benchmark_cases)
         .map(async ([name, share], i) => {
@@ -42,11 +37,11 @@ module.exports = (async (info) => {
         info.config.continuous_benchmark
         || info.config.benchmark_time > totalTime
     ) {
-        const failedCount = 0;
+        let failedCount = 0;
 
         const txs = (await Promise.all(Array.from(
             Array(info.config.batch_size),
-            async (_, i) => {
+            (_, i) => {
                 let j = 0;
                 let targetShare = totalShare * i / info.config.batch_size;
                 for (; j < benchmarkCases.length; j += 1) {
@@ -55,13 +50,13 @@ module.exports = (async (info) => {
                     }
                     targetShare -= benchmarkCases[j].share;
                 }
-                try {
-                    return await benchmarkCases[j - 1].instance.gen_tx();
-                } catch (err) {
-                    failedCount += 1;
-                    logger.error(err);
-                    return undefined;
-                }
+                return benchmarkCases[j - 1].instance
+                    .gen_tx()
+                    .catch((err)=> {
+                        failedCount += 1;
+                        logger.error(err);
+                        return undefined;
+                    });
             },
         ))).filter((tx) => tx !== undefined);
 
