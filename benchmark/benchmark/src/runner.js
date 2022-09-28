@@ -57,9 +57,6 @@ class Runner {
         this.chainId = 0;
 
         this.accounts = [];
-        this.accountsPerThread = Object.entries(
-            this.config.benchmark_cases,
-        ).length * this.config.accounts_num;
     }
 
     async deployContract(jsonPath, name, args) {
@@ -85,7 +82,14 @@ class Runner {
         console.log("\npreparing...");
         await this.signer.initNonce();
 
-        this.chainId = (await this.provider.getNetwork()).chainId;
+        const [network, feeData] = await Promise.all([
+            this.provider.getNetwork(),
+            this.provider.getFeeData(),
+        ]);
+        this.provider.getNetwork = async () => network;
+        this.provider.getFeeData = async () => feeData;
+
+        this.chainId = network.chainId;
 
         const accountFactory = new AccountFactory(
             this.signer,
@@ -93,7 +97,8 @@ class Runner {
         );
         this.accounts = await accountFactory.get_accounts(
             10000000,
-            this.config.thread_num * this.accountsPerThread,
+            this.config.thread_num * this.config.accounts_num,
+            this.config,
         );
 
         const args = [
@@ -179,8 +184,8 @@ class Runner {
                         ...this.config,
                     },
                     accounts: this.accounts.slice(
-                        i * this.accountsPerThread,
-                        (i + 1) * this.accountsPerThread,
+                        i * this.config.accounts_num,
+                        (i + 1) * this.config.accounts_num,
                     ).map((acc) => acc.signer._signingKey().privateKey),
                     index: i,
                 })
