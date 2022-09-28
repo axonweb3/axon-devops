@@ -71,10 +71,6 @@ async function init_config() {
         config.benchmark_cases = JSON.parse(args["benchmark_cases"].replaceAll("\'", "\""));
     }
 
-    if (args["wait_for_tx_mined"]) {
-        config.wait_for_tx_mined = JSON.parse(args["wait_for_tx_mined"]);
-    }
-
     const hdNode = ethers.utils.HDNode.fromMnemonic(config.mnemonic);
     const keys = [];
     for (let i = 0; i < 10; i++) {

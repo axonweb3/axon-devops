@@ -73,12 +73,7 @@ class Benchmark {
         this.index = 0;
     }
 
-    async gen_tx() {
-        const index = this.index;
-        this.index += 1;
-
-        const account = this.accounts[index % this.accounts.length];
-
+    async gen_tx(account) {
         const immutables = await getPoolImmutables(this.contract);
 
         const callTx = await this.swapRouterContract
@@ -95,7 +90,6 @@ class Benchmark {
             }, { nonce: account.getNonce() });
 
         const tx = await account.signer.populateTransaction(callTx);
-        logger.debug(tx);
 
         return account.signer.signTransaction(tx);
     }
