@@ -8,26 +8,80 @@ const logger = require("./logger");
 const { createPool } = require("./uniswapV3_benchmark");
 const AccountFactory = require("./account_factory");
 
-async function approveERC20(contract, to, accounts) {
-    return Promise.all(accounts.map((account) => (
-        contract.connect(account.signer).approve(
-            to,
-            ethers.constants.MaxUint256,
-            { nonce: account.getNonce() },
-        ).then((res) => res.wait())
-    )));
-}
-
 const MINT_TOKEN_AMOUNT = 1000000;
 
-function erc20MintToAccounts(contract, accounts) {
-    return Promise.all(accounts.map((account) => (
-        contract.connect(account.signer).mint(
-            account.address,
-            MINT_TOKEN_AMOUNT,
-            { nonce: account.getNonce() },
-        ).then((res) => res.wait())
-    )));
+function genApproveERC20Txs(contract, to, accountsWithTxs) {
+    return Promise.all(accountsWithTxs.map(async ({ account, txs }) => {
+        txs.push(await contract.connect(account.signer)
+            .populateTransaction
+            .approve(
+                to,
+                ethers.constants.MaxUint256,
+            ),
+        );
+    }));
+}
+
+function genMintERC20Txs(contract, accountsWithTxs) {
+    return Promise.all(accountsWithTxs.map(async ({ account, txs }) => {
+        txs.push(await contract.connect(account.signer)
+            .populateTransaction
+            .mint(
+                account.address,
+                MINT_TOKEN_AMOUNT,
+            ),
+        );
+    }));
+}
+
+async function ensureTxsSent(provider, accountsWithTxs, batchSize) {
+    const total = accountsWithTxs.reduce((tot, { txs }) => tot + txs.length, 0);
+    let totalSent = 0;
+
+    logger.info(`[Preparing] Sending ${total} txs...`);
+    while (totalSent !== total) {
+        let sentThisRound = 0;
+        const errorThisRound = [];
+
+        const sendingTxs = accountsWithTxs.map(({ account, txs }, i) => {
+            if (sentThisRound >= batchSize) {
+                return;
+            }
+            accountsWithTxs[i].txs = [];
+            const sendingTxs = txs.map((tx) => {
+                if (sentThisRound >= batchSize) {
+                    accountsWithTxs[i].txs.push(tx);
+                    return;
+                }
+                sentThisRound += 1;
+                return account.signer
+                    .sendTransaction({
+                        ...tx,
+                        nonce: account.getNonce(),
+                    })
+                    .then(({ hash }) => provider.waitForTransaction(hash, 1, 10000).then(() => hash))
+                    .then((hash) => {
+                        logger.debug(`[Preparing] Transaction ${hash} Sent`);
+                        totalSent += 1;
+                    })
+                    .catch((err) => {
+                        logger.error(err);
+                        accountsWithTxs[i].txs.push(tx);
+                        errorThisRound.push(i);
+                    });
+            });
+            return Promise.all(sendingTxs);
+        });
+        await Promise.all(sendingTxs);
+
+        if (errorThisRound.length !== 0) {
+            const updatingNonces = errorThisRound
+                .filter((e, i) => errorThisRound.indexOf(e) === i)  // Only distinct
+                .map((e) => accountsWithTxs[e].account.updateNonce().catch((err) => logger.error(err)));
+            await Promise.all(updatingNonces);
+        }
+        logger.info(`[Preparing] Transactions sent ${totalSent}/${total}`);
+    }
 }
 
 class Runner {
@@ -60,7 +114,7 @@ class Runner {
     }
 
     async deployContract(jsonPath, name, args) {
-        console.log("\ndeploying contract: ", name);
+        logger.info(`[Preparing] Deploying contract ${name}...`);
         const contractJson = require(jsonPath);
 
         const factory = new ethers.ContractFactory(
@@ -73,21 +127,23 @@ class Runner {
 
         const { address } = instance;
         this.contracts[name] = address;
-        logger.info(`contract ${name} deployed to ${address}`);
+        logger.info(`[Preparing] Contract ${name} deployed to ${address}`);
 
         return instance;
     }
 
     async prepare() {
-        console.log("\npreparing...");
-        await this.signer.initNonce();
+        await this.signer.updateNonce();
 
+        // Reduce network usage
         const [network, feeData] = await Promise.all([
             this.provider.getNetwork(),
             this.provider.getFeeData(),
         ]);
         this.provider.getNetwork = async () => network;
         this.provider.getFeeData = async () => feeData;
+        this.provider.estimateGas = async () => ethers.BigNumber.from(1000000);
+        this.provider.getGasPrice = async () => feeData.gasPrice;
 
         this.chainId = network.chainId;
 
@@ -113,38 +169,40 @@ class Runner {
             this.deployContract("./ERC20.json", "ERC20", args),
         ]);
 
-        console.log("\nMinting tokens...");
-        await Promise.all([
-            erc20MintToAccounts(token0, this.accounts),
-            erc20MintToAccounts(token1, this.accounts),
-            erc20MintToAccounts(erc20, this.accounts),
-        ]);
-        console.log("\nTokens minted");
+        const accountsWithTxs = this.accounts.map((account) => ({ account, txs: [] }));
 
-        console.log("\nApproving tokens...");
         await Promise.all([
-            approveERC20(
+            genMintERC20Txs(token0, accountsWithTxs),
+            genMintERC20Txs(token1, accountsWithTxs),
+            genMintERC20Txs(erc20, accountsWithTxs),
+        ]);
+
+        accountsWithTxs.push({ account: this.signer, txs: [] });
+
+        await Promise.all([
+            genApproveERC20Txs(
                 token0,
                 this.config.uniswapNonfungiblePositionManagerAddress,
-                this.accounts.concat([this.signer]),
+                accountsWithTxs,
             ),
-            approveERC20(
+            genApproveERC20Txs(
                 token0,
                 this.config.uniswapSwapRouterAddress,
-                this.accounts.concat([this.signer]),
+                accountsWithTxs,
             ),
-            approveERC20(
+            genApproveERC20Txs(
                 token1,
                 this.config.uniswapNonfungiblePositionManagerAddress,
-                this.accounts.concat([this.signer]),
+                accountsWithTxs,
             ),
-            approveERC20(
+            genApproveERC20Txs(
                 token1,
                 this.config.uniswapSwapRouterAddress,
-                this.accounts.concat([this.signer]),
+                accountsWithTxs,
             ),
         ]);
-        console.log("\nTokens approved...");
+
+        await ensureTxsSent(this.provider, accountsWithTxs, this.config.batch_size);
 
         const pool = await createPool({
             token0: token0.address,
@@ -155,7 +213,7 @@ class Runner {
         });
         this.contracts["UniswapV3Pool"] = pool;
 
-        console.log("\nprepared");
+        logger.info("[Preparing] Prepared");
     }
 
     async run() {

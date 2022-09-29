@@ -1,5 +1,4 @@
 const ethers = require("ethers");
-const logger = require("./logger");
 
 class Benchmark {
     constructor(info) {

@@ -56,7 +56,7 @@ class Benchmark {
     constructor(info) {
         this.config = info.config;
 
-        this.provider = new ethers.providers.JsonRpcProvider(info.config.http_endpoint);
+        this.provider = info.provider;
 
         this.contract = new ethers.Contract(
             info.contracts["UniswapV3Pool"],
@@ -73,16 +73,18 @@ class Benchmark {
         this.index = 0;
     }
 
-    async gen_tx(account) {
-        const immutables = await getPoolImmutables(this.contract);
+    async prepare() {
+        this.immutables = await getPoolImmutables(this.contract);
+    }
 
+    async gen_tx(account) {
         const callTx = await this.swapRouterContract
             .connect(account.signer)
             .populateTransaction
             .exactInputSingle({
-                tokenIn: immutables.token0,
-                tokenOut: immutables.token1,
-                fee: immutables.fee,
+                tokenIn: this.immutables.token0,
+                tokenOut: this.immutables.token1,
+                fee: this.immutables.fee,
                 recipient: account.address,
                 amountIn: 1,
                 amountOutMinimum: 0,
@@ -122,7 +124,7 @@ class Benchmark {
         );
         const poolAddress = eventInterface.parseLog(creation.logs[0]).args.pool;
 
-        console.log(`\npool ${poolAddress} deployed for ${token0} and ${token1}`);
+        logger.info(`[Uniswap V3] Pool ${poolAddress} deployed for ${token0} and ${token1}`);
 
         const poolContract = new ethers.Contract(poolAddress, IUniswapV3PoolABI, signer);
 
@@ -170,7 +172,7 @@ class Benchmark {
             tx,
         )).wait();
 
-        console.log(`\nposition minted for ${poolAddress}`);
+        logger.info(`[Uniswap V3] Position minted for ${poolAddress}`);
 
         return poolAddress;
     }
