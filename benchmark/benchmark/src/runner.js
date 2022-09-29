@@ -269,11 +269,11 @@ class Runner {
     }
 
     get_success_rate() {
-        return (this.benchmark_info.success_transfer_count / (this.benchmark_info.success_transfer_count + this.benchmark_info.fail_transfer_count)) * 100
+        return (this.benchmark_info.success_transfer_count * 100) / this.benchmark_info.transfer_count;
     }
 
     get_average_time_elapsed() {
-        return Math.max(this.benchmark_info.transfer_count, 1) / (this.benchmark_info.total_time / 1000)
+        return Math.max(this.benchmark_info.success_transfer_count, 1) / (this.benchmark_info.total_time / 1000)
     }
 
     async send_discord() {
@@ -298,9 +298,9 @@ class Runner {
             .addField("benchmark time:", `${this.benchmark_info.total_time}`)
             .addField("start height:", `${this.benchmark_info.start_block_number}`)
             .addField("end height:", `${this.benchmark_info.end_block_number}`)
-            .addField("transaction count:", `${this.benchmark_info.transfer_count}`)
+            .addField("successed transaction count:", `${this.benchmark_info.success_transfer_count}`)
             .addField("TPS:", `${this.get_average_time_elapsed()}`)
-            .addField("transfer rate:", `${this.get_success_rate().toFixed(2)}`);
+            .addField("success rate:", `${this.get_success_rate().toFixed(2)}`);
     }
 
     log_benchmark_config_info() {
@@ -314,9 +314,9 @@ class Runner {
     log_benchmark_res() {
         console.log("\n/////////////////////////////////////////////////////")
         console.log("benchmark time: ", this.benchmark_info.total_time, "ms")
-        console.log("transaction count:", this.benchmark_info.transfer_count)
+        console.log("successed transaction count:", this.benchmark_info.success_transfer_count)
         console.log("TPS:", this.get_average_time_elapsed(), "ms")
-        console.log("transfer rate:", `${this.get_success_rate().toFixed(2)}`)
+        console.log("success rate:", `${this.get_success_rate().toFixed(2)}`)
         console.log("/////////////////////////////////////////////////////\n")
     }
 }
