@@ -1,6 +1,5 @@
 const ERC20JSON = require("./ERC20.json");
 const ethers = require("ethers");
-const logger = require("./logger");
 
 class Benchmark {
     constructor(info) {

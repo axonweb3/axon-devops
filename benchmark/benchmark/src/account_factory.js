@@ -9,6 +9,8 @@ class AccountFactory {
     }
 
     async get_accounts(value, accountNum) {
+        logger.info(`[Account Factory] Creating ${accountNum} accounts...`);
+
         const accounts = [];
         while (accounts.length < accountNum) {
             const leftCount = accountNum - accounts.length;
@@ -28,7 +30,7 @@ class AccountFactory {
                     })
                         .then((res) => [res, account])
                         .catch((err) => {
-                            logger.error("send create account tx err: ", err);
+                            logger.error("[Account Factory] ", err);
                             return undefined;
                         });
                 },
@@ -39,25 +41,25 @@ class AccountFactory {
                     async ([res, acc]) => {
                         try {
                             await this.provider.waitForTransaction(res.hash, 1, 10000);
-                            logger.debug(`Transaction ${res.hash} Sent`);
+                            logger.debug(`[Account Factory] Transaction ${res.hash} Sent`);
                             accounts.push(acc);
                         } catch (err) {
                             if (err.code === "TIMEOUT") {
-                                logger.error(`Transaction ${res.hash} timeout`);
+                                logger.error(`[Account Factory] Create account tx ${res.hash} timeout`);
                                 return;
                             }
-                            logger.error("create account tx err: ", err);
+                            logger.error("[Account Factory] Create account tx err: ", err);
                         }
                     },
                 ),
             );
 
-            logger.info(`${accounts.length}/${accountNum} accounts created`);
+            logger.info(`[Account Factory] ${accounts.length}/${accountNum} accounts created`);
 
-            await this.signer.initNonce();
+            await this.signer.updateNonce();
         }
 
-        await Promise.all(accounts.map((acc) => acc.initNonce()));
+        await Promise.all(accounts.map((acc) => acc.updateNonce()));
 
         return accounts;
     }
