@@ -2,6 +2,21 @@ const logger = require("./logger");
 const ethers = require("ethers");
 const NonceManager = require("./nonceManager");
 
+const TX_PER_ACCOUNT = 65;
+
+function saturatingSlice(arr, l, r) {
+    if (r - l >= arr.length) {
+        return arr;
+    }
+    // Normalized
+    const nl = l % arr.length;
+    const nr = r - l + nl;
+    if (nr <= arr.length) {
+        return arr.slice(nl, nr);
+    }
+    return arr.slice(nl, arr.length).concat(arr.slice(0, nr - arr.length));
+}
+
 module.exports = (async (info) => {
     const benchmarkInfo = {
         transfer_count: 0,
@@ -20,7 +35,6 @@ module.exports = (async (info) => {
     provider.getGasPrice = async () => feeData.gasPrice;
 
     const accounts = info.accounts.map((p) => new NonceManager(new ethers.Wallet(p, provider)));
-    let accountIndex = 0;
 
     const benchmarkCases = await Promise.all(Object.entries(info.config.benchmark_cases)
         .map(async ([name, share]) => {
@@ -51,27 +65,25 @@ module.exports = (async (info) => {
         info.config.continuous_benchmark
         || info.config.benchmark_time > totalTime
     ) {
-        // Init nonces
-        const endIndex = accountIndex + info.config.batch_size;
-        let accountsToUse;
-        if (info.config.batch_size >= accounts.length) {
-            accountsToUse = accounts;
-        } else {
-            accountsToUse = accounts.slice(accountIndex, endIndex);
-            if (endIndex > accounts.length) {
-                accountsToUse = accountsToUse.concat(
-                    accounts.slice(0, endIndex - accounts.length),
-                );
-            }
-        }
+        // Accounts [lastEndIndex, endIndex) should be updated
+        const lastEndIndex = Math.floor(
+            (benchmarkInfo.transfer_count - 1) / TX_PER_ACCOUNT,
+        ) + 1;
+        const endIndex = Math.floor(
+            (benchmarkInfo.transfer_count + info.config.batch_size - 1) / TX_PER_ACCOUNT,
+        ) + 1;
 
         // Calculate sent tx number by nonce difference
-        const newTxCounts = await Promise.all(accountsToUse.map((acc) => acc.updateNonce()
-            .catch((err) => {
-                logger.error(`[Thread ${info.index}] `, err);
-                return 0;
-            }),
-        ));
+        const newTxCounts = await Promise.all(
+            saturatingSlice(accounts, lastEndIndex, endIndex)
+                .map((acc) => acc
+                    .updateNonce()
+                    .catch((err) => {
+                        logger.error(`[Thread ${info.index}] `, err);
+                        return 0;
+                    }),
+                ),
+        );
         benchmarkInfo.success_tx += newTxCounts.reduce((tot, i) => tot + i, 0);
 
         // Generate txs to be sent
@@ -86,8 +98,11 @@ module.exports = (async (info) => {
                         break;
                     }
                 }
+                const transferCount = benchmarkInfo.transfer_count + i;
                 return benchmarkCases[j].instance
-                    .gen_tx(accounts[(accountIndex + i) % accounts.length])
+                    .gen_tx(accounts[
+                        Math.floor(transferCount / TX_PER_ACCOUNT) % accounts.length
+                    ])
                     .catch((err) => {
                         benchmarkInfo.fail_tx += 1;
                         logger.error(`[Thread ${info.index}] `, err);
@@ -102,7 +117,11 @@ module.exports = (async (info) => {
                 .perform("sendTransaction", { signedTransaction: tx })
                 .catch((err) => {
                     benchmarkInfo.fail_tx += 1;
-                    logger.error(`[Thread ${info.index}] `, err);
+                    if (err.message.includes("CommittedTx")) {
+                        logger.error(`[Thread ${info.index}] `, err.message);
+                    } else {
+                        logger.error(`[Thread ${info.index}] `, err);
+                    }
                     return undefined;
                 }),
             ),
@@ -111,8 +130,6 @@ module.exports = (async (info) => {
             .forEach((hash) => logger.debug(`[Thread ${info.index}] Transaction ${hash} Sent`));
 
         // Preapre for next round
-        accountIndex = endIndex % accounts.length;
-
         benchmarkInfo.transfer_count += info.config.batch_size;
         logger.info(`[Thread ${info.index}] Transactions sent ${benchmarkInfo.success_tx}/${benchmarkInfo.transfer_count}`);
 
