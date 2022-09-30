@@ -304,20 +304,20 @@ class Runner {
     }
 
     log_benchmark_config_info() {
-        console.log("\n/////////////////////////////////////////////////////")
-        console.log("benchmark time:", this.config.benchmark_time, "ms")
-        console.log(`endpoint: ${this.config.http_endpoint}`)
-        console.log("/////////////////////////////////////////////////////\n")
-        console.log("waiting...")
+        logger.info("/////////////////////////////////////////////////////")
+        const time = this.config.continuous_benchmark ? "infinity" : `${this.config.benchmark_time}ms`;
+        logger.info(`benchmark time: ${time}`)
+        logger.info(`endpoint: ${this.config.http_endpoint}`)
+        logger.info("/////////////////////////////////////////////////////")
     }
 
     log_benchmark_res() {
-        console.log("\n/////////////////////////////////////////////////////")
-        console.log("benchmark time: ", this.benchmark_info.total_time, "ms")
-        console.log("successed transaction count:", this.benchmark_info.success_transfer_count)
-        console.log("TPS:", this.get_average_time_elapsed(), "ms")
-        console.log("success rate:", `${this.get_success_rate().toFixed(2)}`)
-        console.log("/////////////////////////////////////////////////////\n")
+        logger.info("/////////////////////////////////////////////////////")
+        logger.info("benchmark time: ", this.benchmark_info.total_time, "ms")
+        logger.info("successed transaction count:", this.benchmark_info.success_transfer_count)
+        logger.info("TPS:", this.get_average_time_elapsed(), "ms")
+        logger.info("success rate:", `${this.get_success_rate().toFixed(2)}`)
+        logger.info("/////////////////////////////////////////////////////")
     }
 }
 
