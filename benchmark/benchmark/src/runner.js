@@ -202,7 +202,7 @@ class Runner {
             ),
         ]);
 
-        await ensureTxsSent(this.provider, accountsWithTxs, this.config.batch_size);
+        await ensureTxsSent(this.provider, accountsWithTxs, 5000);
 
         const pool = await createPool({
             token0: token0.address,
