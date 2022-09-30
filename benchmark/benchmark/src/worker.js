@@ -4,6 +4,10 @@ const NonceManager = require("./nonceManager");
 
 const TX_PER_ACCOUNT = 65;
 
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function saturatingSlice(arr, l, r) {
     if (r - l >= arr.length) {
         return arr;
@@ -133,6 +137,17 @@ module.exports = (async (info) => {
 
         // Preapre for next round
         benchmarkInfo.transfer_count += info.config.batch_size;
+
+        // Limit tps
+        if (info.config.max_tps > 0) {
+            const difference = (
+                benchmarkInfo.transfer_count / info.config.max_tps * 1000
+            ) - (performance.now() - startTime);
+            if (difference > 0) {
+                await sleep(difference);
+            }
+        }
+
         totalTime = performance.now() - startTime;
 
         const timeInSecond = totalTime / 1000;

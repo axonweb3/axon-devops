@@ -17,5 +17,6 @@
         "./contract_benchmark": 1,
         "./uniswapV3_benchmark": 1
     },
-    "log_level": "info"
+    "log_level": "info",
+    "max_tps": 0
 }
