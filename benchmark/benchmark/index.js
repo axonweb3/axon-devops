@@ -71,6 +71,10 @@ async function init_config() {
         config.benchmark_cases = JSON.parse(args["benchmark_cases"].replaceAll("\'", "\""));
     }
 
+    if (args["max_tps"]) {
+        config.max_tps = JSON.parse(args["max_tps"]);
+    }
+
     const hdNode = ethers.utils.HDNode.fromMnemonic(config.mnemonic);
     const keys = [];
     for (let i = 0; i < 10; i++) {
