@@ -119,6 +119,8 @@ module.exports = (async (info) => {
                     benchmarkInfo.fail_tx += 1;
                     if (err.message.includes("CommittedTx")) {
                         logger.error(`[Thread ${info.index}] `, err.message);
+                    } else if (err.message.includes("ReachLimit")) {
+                        logger.error(`[Thread ${info.index}] `, err.message);
                     } else {
                         logger.error(`[Thread ${info.index}] `, err);
                     }
@@ -131,9 +133,13 @@ module.exports = (async (info) => {
 
         // Preapre for next round
         benchmarkInfo.transfer_count += info.config.batch_size;
-        logger.info(`[Thread ${info.index}] Transactions sent ${benchmarkInfo.success_tx}/${benchmarkInfo.transfer_count}`);
-
         totalTime = performance.now() - startTime;
+
+        const timeInSecond = totalTime / 1000;
+        const sentTxCount = benchmarkInfo.transfer_count - benchmarkInfo.fail_tx;
+        const tps = (sentTxCount / timeInSecond).toFixed(2);
+        const idealTps = (benchmarkInfo.transfer_count / timeInSecond).toFixed(2);
+        logger.info(`[Thread ${info.index}] Transactions sent ${benchmarkInfo.success_tx}/${sentTxCount} ${tps}/s:${idealTps}/s`);
     }
 
     return benchmarkInfo;
