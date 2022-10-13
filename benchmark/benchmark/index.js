@@ -68,11 +68,16 @@ async function init_config() {
     }
 
     if (args["benchmark_cases"]) {
+        console.log(args["benchmark_cases"].replaceAll("\'", "\""));
         config.benchmark_cases = JSON.parse(args["benchmark_cases"].replaceAll("\'", "\""));
     }
 
     if (args["max_tps"]) {
         config.max_tps = JSON.parse(args["max_tps"]);
+    }
+
+    if (args["state_file"]) {
+        config.state_file = args["state_file"];
     }
 
     const hdNode = ethers.utils.HDNode.fromMnemonic(config.mnemonic);
