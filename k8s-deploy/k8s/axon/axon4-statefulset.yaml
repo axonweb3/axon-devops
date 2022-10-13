@@ -57,7 +57,7 @@ spec:
             - ./axon
             - -c=/app/devtools/chain/k8s/node_4.toml
             - -g=/app/devtools/chain/genesis.json
-          image: zhengjianhui/axon-k8s:latest
+          image: ghcr.io/tvl-labs/axon:v0.0.4
           volumeMounts:
           - name: config-node4
             mountPath: /app/devtools/chain/k8s/node_4.toml
