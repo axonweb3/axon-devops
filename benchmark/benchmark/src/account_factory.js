@@ -40,7 +40,7 @@ class AccountFactory {
                 txs.map(
                     async ([res, acc]) => {
                         try {
-                            await this.provider.waitForTransaction(res.hash, 1, 10000);
+                            await this.provider.waitForTransaction(res.hash, 1, 20000);
                             logger.debug(`[Account Factory] Transaction ${res.hash} Sent`);
                             accounts.push(acc);
                         } catch (err) {

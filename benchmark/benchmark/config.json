@@ -18,5 +18,6 @@
         "./uniswapV3_benchmark": 1
     },
     "log_level": "info",
-    "max_tps": 0
+    "max_tps": 0,
+    "state_file": "./state.json"
 }

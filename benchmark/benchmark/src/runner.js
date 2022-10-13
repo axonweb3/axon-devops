@@ -2,6 +2,7 @@ const path = require("path");
 const Piscina = require("piscina");
 const { MessageEmbed, WebhookClient } = require("discord.js")
 const ethers = require("ethers");
+const fs = require("fs");
 const NonceManager = require("./nonceManager");
 const logger = require("./logger");
 
@@ -59,7 +60,7 @@ async function ensureTxsSent(provider, accountsWithTxs, batchSize) {
                         ...tx,
                         nonce: account.getNonce(),
                     })
-                    .then(({ hash }) => provider.waitForTransaction(hash, 1, 10000).then(() => hash))
+                    .then(({ hash }) => provider.waitForTransaction(hash, 1, 20000).then(() => hash))
                     .then((hash) => {
                         logger.debug(`[Preparing] Transaction ${hash} Sent`);
                         totalSent += 1;
@@ -147,6 +148,17 @@ class Runner {
 
         this.chainId = network.chainId;
 
+        try {
+            const content = JSON.parse(fs.readFileSync(this.config.state_file));
+            this.contracts = content.contracts;
+            this.accounts = await Promise.all(content.accounts.map((pk) => {
+                const acc = new NonceManager(new ethers.Wallet(pk, this.provider));
+                return acc.updateNonce().then(() => acc);
+            }));
+
+            return;
+        } catch (err) {}
+
         const accountFactory = new AccountFactory(
             this.signer,
             this.provider,
@@ -213,7 +225,13 @@ class Runner {
         });
         this.contracts["UniswapV3Pool"] = pool;
 
+        const content = JSON.stringify({
+            contracts: this.contracts,
+            accounts: this.accounts.map((acc) => acc.signer._signingKey().privateKey),
+        });
+        fs.writeFileSync(this.config.state_file, content);
         logger.info("[Preparing] Prepared");
+        process.exit(0);
     }
 
     async run() {
