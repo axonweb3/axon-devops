@@ -57,7 +57,7 @@ spec:
             - ./axon
             - -c=/app/devtools/chain/k8s/node_3.toml
             - -g=/app/devtools/chain/genesis.json
-          image: ghcr.io/tvl-labs/axon:v0.0.4
+          image: zhengjianhui/axon-k8s:latest
           volumeMounts:
           - name: config-node3
             mountPath: /app/devtools/chain/k8s/node_3.toml
@@ -91,6 +91,8 @@ spec:
           resources: {}
           securityContext:
             privileged: true
+      imagePullSecrets:
+      - name: dockerconfigjson-github-com
       nodeSelector:
         disktype: node3
       volumes:

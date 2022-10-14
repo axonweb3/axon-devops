@@ -1,6 +1,7 @@
 SHELL = bash
 axon-deploy:
-	/home/ckb/axon-devops/k8s-deploy/k8s/axon/deploy.sh deploy
+	# /home/ckb/axon-devops/k8s-deploy/k8s/axon/deploy.sh deploy
+		/home/ckb/axon-devops/k8s-deploy/deploy.sh deploy
 
 axon-clean:
 	/home/ckb/axon-devops/k8s-deploy/k8s/axon/deploy.sh clean
