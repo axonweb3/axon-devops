@@ -203,8 +203,8 @@
         - clean
 
     - name: clean benchmark logs
-      shell: rm -rf  {{ benchmark_dir }}/logs
+      shell: rm -rf  {{ benchmark_dir }}/logs && rm -rf {{ benchmark_dir }}/state.json
       become: yes
       become_method: sudo
       tags: 
-        - clean
+        - clean 
