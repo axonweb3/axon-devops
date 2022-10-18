@@ -1,13 +1,23 @@
 {
     "http_endpoint": "http://#internal_ip:8000",
-    "chain_id": 2022,
     "mnemonic": "test test test test test test test test test test test junk",
+    "uniswapFactoryAddress": "0x21915b79E1d334499272521a3508061354D13FF0",
+    "uniswapNonfungiblePositionManagerAddress": "0xf4AE7E15B1012edceD8103510eeB560a9343AFd3",
+    "uniswapSwapRouterAddress": "0x18eb8AF587dcd7E4F575040F6D800a6B5Cef6CAf",
     "mnemonic_index": 0,
     "continuous_benchmark": false,
     "benchmark_time": 60000,
     "batch_size": #batch_size,
     "thread_num": #thread_num,
+    "accounts_num": #accounts_num,
     "id": "936501604767629344",
     "token": "#token",
-    "benchmark_cases": ["./benchmark", "./contract_benchmark"]
+    "benchmark_cases": {
+        "./benchmark": 1,
+        "./contract_benchmark": 1,
+        "./uniswapV3_benchmark": 1
+    },
+    "log_level": "info",
+    "max_tps": 0,
+    "state_file": "./state.json"
 }
