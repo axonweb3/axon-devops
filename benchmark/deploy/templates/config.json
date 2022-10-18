@@ -1,13 +1,23 @@
 {
     "http_endpoint": "http://#internal_ip:8000",
-    "chain_id": 2022,
     "mnemonic": "test test test test test test test test test test test junk",
+    "uniswapFactoryAddress": "0x3C0C19576Eda23840F435c07224A9c84C0a36355", //please deploy uniswap fisrt and replace related values
+    "uniswapNonfungiblePositionManagerAddress": "0x3A88Fadcb796E9256B2Ee46Cb6c2a45546Fcf159",
+    "uniswapSwapRouterAddress": "0x20b494339050A3994C9828597aC94Aaaa2a7c865",
     "mnemonic_index": #mnemonic_index,
     "continuous_benchmark": true,
     "benchmark_time": 60000,
     "batch_size": #batch_size,
     "thread_num": #thread_num,
+    "accounts_num": #accounts_num,
     "id": "936501604767629344",
     "token": "#token",
-    "benchmark_cases": ["./benchmark", "./contract_benchmark"]
+    "benchmark_cases": {
+        "./benchmark": 1,
+        "./contract_benchmark": 1,
+        "./uniswapV3_benchmark": 1
+    },
+    "log_level": "info",
+    "max_tps": 50,
+    "state_file": "./state/state.json"
 }
