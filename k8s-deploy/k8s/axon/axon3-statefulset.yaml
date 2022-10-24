@@ -91,8 +91,6 @@ spec:
           resources: {}
           securityContext:
             privileged: true
-      nodeSelector:
-        disktype: node3
       volumes:
         - name: config-node3
           configMap:
