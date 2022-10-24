@@ -1,10 +1,13 @@
-const log4js =  require('log4js');
-const path = require('path');
+const log4js =  require("log4js");
+const path = require("path");
+
+const config = require("../config.json")
+const args = require("minimist")(process.argv.slice(2))
 
 log4js.configure({
 	appenders: {
 		console: {
-			type: 'console'
+			type: "console"
 		},
 		app: {
 			type: "dateFile",
@@ -17,11 +20,11 @@ log4js.configure({
 		}
 	},
 	categories: {
-		default: { appenders: ['app'], level: 'DEBUG' },
+		default: { appenders: ["app", "console"], level: "DEBUG" },
 	},
 });
 
 const logger = log4js.getLogger();
-logger.level = 'info';
+logger.level = args["log_level"] ? args["log_level"] : config.log_level;
 
 module.exports = logger

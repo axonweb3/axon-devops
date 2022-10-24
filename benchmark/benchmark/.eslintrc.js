@@ -1,11 +1,13 @@
 module.exports = {
     root: true,
-    env: {
-        node: true
+    parserOptions: {
+        ecmaVersion: "latest",
     },
-    extends: ["plugin:vue/essential", "@vue/prettier", "@vue/typescript"],
+    env: {
+        node: true,
+        es6: true,
+    },
     rules: {
-        "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
         "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
         "no-dupe-keys": "error",
         "no-duplicate-case": "error",
@@ -13,9 +15,7 @@ module.exports = {
         "no-ex-assign": "error",
         "no-extra-boolean-cast": "error",
         "no-extra-semi": "error",
-        "curly": "error"
+        curly: "error",
+        quotes: ["error", "double"],
     },
-    parserOptions: {
-        parser: "@typescript-eslint/parser"
-    }
-}
+};
