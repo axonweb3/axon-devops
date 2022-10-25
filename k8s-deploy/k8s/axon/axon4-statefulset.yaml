@@ -95,7 +95,7 @@ spec:
       imagePullSecrets:
       - name: dockerconfigjson-github-com
       nodeSelector:
-        disktype: node3
+        disktype: node2
       volumes:
         - name: config-node4
           configMap:
