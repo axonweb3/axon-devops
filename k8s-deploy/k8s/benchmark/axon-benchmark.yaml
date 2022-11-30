@@ -38,12 +38,15 @@ spec:
     spec:
       containers:
       - name: axon-benchmark
-        image: zhengjianhui/axon-benchmark:latest
+        image: axonweb3/axon-benchmark:uniswap
         volumeMounts:
         - name: config-benchmark
           mountPath: /benchmark/config.json
           subPath: config.json
-        command: ["/bin/sh", "-c","node index.js"]
+        - name: state
+          mountPath: /benchmark/state
+          subPath: state
+        command: ["/bin/sh", "-c",'node index.js --benchmark_cases="{\"./benchmark\": 1}" ']
         ports:
         - containerPort: 8098
         securityContext:
@@ -52,5 +55,8 @@ spec:
         - name: config-benchmark
           configMap:
             name: config-benchmark
+        - name: state
+          emptyDir: {}
       restartPolicy: Always
 status: {}
+
