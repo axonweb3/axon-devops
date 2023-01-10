@@ -11,8 +11,8 @@ const AccountFactory = require("./account_factory");
 
 const MINT_TOKEN_AMOUNT = 1000000;
 
-function genApproveERC20Txs(contract, to, accountsWithTxs) {
-    return Promise.all(accountsWithTxs.map(async ({ account, txs }) => {
+async function genApproveERC20Txs(contract, to, accountsWithTxs) {
+    await Promise.all(accountsWithTxs.map(async ({ account, txs }) => {
         txs.push(await contract.connect(account.signer)
             .populateTransaction
             .approve(
@@ -21,10 +21,12 @@ function genApproveERC20Txs(contract, to, accountsWithTxs) {
             ),
         );
     }));
+
+    return contract;
 }
 
-function genMintERC20Txs(contract, accountsWithTxs) {
-    return Promise.all(accountsWithTxs.map(async ({ account, txs }) => {
+async function genMintERC20Txs(contract, accountsWithTxs) {
+    await Promise.all(accountsWithTxs.map(async ({ account, txs }) => {
         txs.push(await contract.connect(account.signer)
             .populateTransaction
             .mint(
@@ -33,6 +35,8 @@ function genMintERC20Txs(contract, accountsWithTxs) {
             ),
         );
     }));
+
+    return contract;
 }
 
 async function ensureTxsSent(provider, accountsWithTxs, batchSize) {
@@ -114,6 +118,11 @@ class Runner {
         this.accounts = [];
     }
 
+    hasCase(name) {
+        return Object.keys(this.config.benchmark_cases)
+            .some((k) => k.includes(name));
+    }
+
     async deployContract(jsonPath, name, args) {
         logger.info(`[Preparing] Deploying contract ${name}...`);
         const contractJson = require(jsonPath);
@@ -155,19 +164,25 @@ class Runner {
                 const acc = new NonceManager(new ethers.Wallet(pk, this.provider));
                 return acc.updateNonce().then(() => acc);
             }));
+        } catch (err) { }
 
-            return;
-        } catch (err) {}
+        let gotNew = false;
 
-        const accountFactory = new AccountFactory(
-            this.signer,
-            this.provider,
-        );
-        this.accounts = await accountFactory.get_accounts(
-            10000000,
-            this.config.thread_num * this.config.accounts_num,
-            this.config,
-        );
+        const totalAccountsNum = this.config.thread_num * this.config.accounts_num;
+        if (this.accounts.length < totalAccountsNum) {
+            gotNew = true;
+            const accountFactory = new AccountFactory(
+                this.signer,
+                this.provider,
+            );
+            this.accounts = this.accounts.concat(
+                await accountFactory.get_accounts(
+                    10000000,
+                    this.config.thread_num * this.config.accounts_num,
+                    this.config,
+                ),
+            );
+        }
 
         const args = [
             "Name",
@@ -175,63 +190,84 @@ class Runner {
             this.signer.address,
             MINT_TOKEN_AMOUNT,
         ];
-        const [token0, token1, erc20] = await Promise.all([
-            this.deployContract("./ERC20.json", "Token0", args),
-            this.deployContract("./ERC20.json", "Token1", args),
-            this.deployContract("./ERC20.json", "ERC20", args),
-        ]);
 
+        const deployingTokens = [];
         const accountsWithTxs = this.accounts.map((account) => ({ account, txs: [] }));
-
-        await Promise.all([
-            genMintERC20Txs(token0, accountsWithTxs),
-            genMintERC20Txs(token1, accountsWithTxs),
-            genMintERC20Txs(erc20, accountsWithTxs),
-        ]);
-
         accountsWithTxs.push({ account: this.signer, txs: [] });
 
-        await Promise.all([
-            genApproveERC20Txs(
-                token0,
-                this.config.uniswapNonfungiblePositionManagerAddress,
-                accountsWithTxs,
-            ),
-            genApproveERC20Txs(
-                token0,
-                this.config.uniswapSwapRouterAddress,
-                accountsWithTxs,
-            ),
-            genApproveERC20Txs(
-                token1,
-                this.config.uniswapNonfungiblePositionManagerAddress,
-                accountsWithTxs,
-            ),
-            genApproveERC20Txs(
-                token1,
-                this.config.uniswapSwapRouterAddress,
-                accountsWithTxs,
-            ),
-        ]);
+        if (
+            this.hasCase("/contract_benchmark")
+            && !this.contracts.ERC20
+        ) {
+            gotNew = true;
+            const deployingERC20 = this.deployContract(
+                "./ERC20.json",
+                "ERC20",
+                args,
+            )
+                .then((c) => genMintERC20Txs(c, accountsWithTxs));
+
+            deployingTokens.push(deployingERC20);
+        }
+
+        if (
+            this.hasCase("/uniswapV3_benchmark")
+            && !this.contracts.Token0
+            && !this.contracts.Token1
+        ) {
+            gotNew = true;
+            const deployUniswapToken = async (tokenName) => {
+                return this.deployContract(
+                    "./ERC20.json",
+                    tokenName,
+                    args,
+                )
+                    .then((c) => genMintERC20Txs(c, accountsWithTxs))
+                    .then((c) => genApproveERC20Txs(
+                        c,
+                        this.config.uniswapNonfungiblePositionManagerAddress,
+                        accountsWithTxs,
+                    ))
+                    .then((c) => genApproveERC20Txs(
+                        c,
+                        this.config.uniswapSwapRouterAddress,
+                        accountsWithTxs,
+                    ));
+            };
+            const deployingToken0 = deployUniswapToken("Token0");
+            const deployingToken1 = deployUniswapToken("Token1");
+            deployingTokens.push(deployingToken0);
+            deployingTokens.push(deployingToken1);
+        }
+
+        await Promise.all(deployingTokens);
 
         await ensureTxsSent(this.provider, accountsWithTxs, 5000);
 
-        const pool = await createPool({
-            token0: token0.address,
-            token1: token1.address,
-            chainId: this.chainId,
-            uniswapNonfungiblePositionManagerAddress: this.config.uniswapNonfungiblePositionManagerAddress,
-            nonceSigner: this.signer,
-        });
-        this.contracts["UniswapV3Pool"] = pool;
+        if (
+            this.hasCase("/uniswapV3_benchmark")
+            && !this.contracts.UniswapV3Pool
+        ) {
+            gotNew = true;
+            const pool = await createPool({
+                token0: this.contracts.Token0,
+                token1: this.contracts.Token1,
+                chainId: this.chainId,
+                uniswapNonfungiblePositionManagerAddress: this.config.uniswapNonfungiblePositionManagerAddress,
+                nonceSigner: this.signer,
+            });
+            this.contracts["UniswapV3Pool"] = pool;
+        }
 
-        const content = JSON.stringify({
-            contracts: this.contracts,
-            accounts: this.accounts.map((acc) => acc.signer._signingKey().privateKey),
-        });
-        fs.writeFileSync(this.config.state_file, content);
-        logger.info("[Preparing] Prepared");
-        process.exit(0);
+        if (gotNew) {
+            const content = JSON.stringify({
+                contracts: this.contracts,
+                accounts: this.accounts.map((acc) => acc.signer._signingKey().privateKey),
+            });
+            fs.writeFileSync(this.config.state_file, content);
+            logger.info("[Preparing] Prepared");
+            process.exit(0);
+        }
     }
 
     async run() {
