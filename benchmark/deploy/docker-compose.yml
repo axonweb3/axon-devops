@@ -3,10 +3,11 @@ version: '3'
 services:
   axon:
     container_name: axon-benchmark
-    image:  zhengjianhui/axon-benchmark:latest
+    image:  zhengjianhui/axon-benchmark:uniswap
     restart: always
     privileged: true
     volumes:
       - ./config.json:/benchmark/config.json
+      - ./state:/benchmark/state
       - ./logs:/benchmark/logs
-    command: node index.js --benchmark_cases="['./benchmark']"
+    command: 'node index.js --benchmark_cases="{\"./uniswapV3_benchmark\": 1}"'

@@ -15,7 +15,7 @@ mnemonic = "test test test test test test test test test test test junk"
 # initial_index = 0
 # path = "m/44'/60'/0'/0"
 count = 10
-balance = "56bc75e2d63100000"
+balance = "04ee2d6d415b85acef8100000000"
 
 [rpc]
 http_listening_address = "0.0.0.0:8000"
@@ -74,10 +74,10 @@ options_file = "default.db-options"
 
 [cross_client]
 axon_udt_hash = "0xf32ec1e3274c27ac4cc018c92efec443847e9b78ba8cbedca36f0fa8c35d1c9e"
-ckb_uri = "http://47.111.84.118:81/"
+ckb_uri = "https://mercury-testnet.ckbapp.dev/rpc"
 mercury_uri = "http://127.0.0.1:8116"
 indexer_uri = "http://127.0.0.1:8117"
-start_block_number = 5760719
+start_block_number = 5899094
 checkpoint_interval = 1000
 pk = "0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d"
 enable = false
