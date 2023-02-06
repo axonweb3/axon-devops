@@ -1,0 +1,14 @@
+[Unit]
+Description=Axon node
+After=network.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=no
+RestartSec=2
+User=root
+ExecStart={{ axon_deploy_path }}/axon -c={{ axon_deploy_path }}/config.toml -g={{ axon_deploy_path }}/genesis.json
+
+[Install]
+WantedBy=multi-user.target

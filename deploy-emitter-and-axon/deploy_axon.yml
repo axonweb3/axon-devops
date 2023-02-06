@@ -1,0 +1,78 @@
+---
+- name: axon service
+  hosts: axon
+  remote_user: ckb
+  become: yes
+  become_method: sudo
+  vars_files:
+    - config.yml
+  tasks:
+  ###############################################################################################################
+    - name: check axon dir
+      stat:
+        path: "{{ axon_deploy_path }}"
+      register: file_status
+      tags:
+        - deploy
+
+    - name: create axon dir
+      file:
+        path: "{{ axon_deploy_path }}"
+        state: directory
+      when:
+        file_status.stat.exists == False
+      tags:
+        - deploy
+
+###############################################################################################################
+    - name: Shutdown 
+      service: name={{ axon_node_service }} state=stopped
+      become: yes
+      tags: 
+        - shutdown
+###############################################################################################################
+    - name: Clean axon data
+      shell: rm -rf  {{ axon_deploy_path }}/devtools/chain/data
+      tags: 
+        - clean
+    - name: Clean axon logs
+      shell: rm -rf  {{ axon_deploy_path }}/logs
+      tags: 
+        - clean
+
+###############################################################################################################
+    - name: Copy the axon file
+      copy:
+        src: ./templates/
+        dest: "{{ axon_deploy_path }}"
+        mode: 0755
+      tags: 
+        - deploy
+        - config
+###############################################################################################################
+    - name: chmod axon
+      shell: "chmod 777 -R {{ axon_deploy_path }}"
+      become: yes
+      become_method: sudo
+      tags: 
+        - start
+
+    - name: copy ckb service file
+      template:
+        src: ./templates/axon-node.service
+        dest: /etc/systemd/system/axon-node.service
+      become: yes
+      tags: 
+        - start
+
+    - name: systemctl daemon-reload
+      shell: systemctl daemon-reload
+      become: yes
+      tags: 
+        - start
+
+    - name: Start axon
+      service: name={{ axon_node_service }} state=started
+      become: yes
+      tags: 
+        - start

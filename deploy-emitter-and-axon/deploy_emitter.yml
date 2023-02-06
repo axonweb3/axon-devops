@@ -1,0 +1,83 @@
+---
+- name: emitter service
+  hosts: emitter
+  remote_user: ckb
+  become: yes
+  become_method: sudo
+  vars_files:
+    - config.yml
+  tasks:
+  ###############################################################################################################
+    - name: check emitter dir
+      stat:
+        path: "{{ emitter_deploy_path }}"
+      register: file_status
+      tags:
+        - deploy
+
+    - name: create emitter dir
+      file:
+        path: "{{ emitter_deploy_path }}"
+        state: directory
+      when:
+        file_status.stat.exists == False
+      tags:
+        - deploy
+
+    - name: touch scan_state
+      shell: cd {{ emitter_deploy_path }} && touch scan_state
+      tags:
+        - deploy
+###############################################################################################################
+    - name: Shutdown 
+      service: name={{ emitter_node_service }} state=stopped
+      become: yes
+      ignore_errors: yes
+      tags: 
+        - shutdown
+###############################################################################################################
+    - name: Clean emitter data
+      shell: rm -rf  {{ emitter_deploy_path }}
+      tags: 
+        - clean
+
+###############################################################################################################
+    - name: Copy the emitter file
+      copy:
+        src: ./templates/
+        dest: "{{ emitter_deploy_path }}"
+        mode: 0755
+      tags: 
+        - deploy
+        - config
+
+###############################################################################################################
+    - name: chmod emitter
+      shell: "chmod 777 -R {{ emitter_deploy_path }}"
+      become: yes
+      become_method: sudo
+      tags: 
+        - start
+
+    - name: copy emitter service file
+      template:
+        src: ./templates/emitter-node.service
+        dest: /etc/systemd/system/emitter-node.service
+      become: yes
+      become_method: sudo
+      tags: 
+        - start
+
+    - name: systemctl daemon-reload
+      shell: systemctl daemon-reload
+      become: yes
+      become_method: sudo
+      tags: 
+        - start
+
+    - name: Start emitter
+      service: name={{ emitter_node_service }} state=started
+      become: yes
+      become_method: sudo
+      tags: 
+        - start

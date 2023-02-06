@@ -1,0 +1,46 @@
+---
+- name: build service
+  hosts: localhost
+  vars_files:
+    - config.yml
+
+  tasks:
+  ###############################################################################################################
+    - name: Pull axon code
+      git:
+        repo: "{{ axon_repo }}"
+        dest: "{{ axon_deploy_path }}"
+        version: "{{ axon_branch }}"
+        force: yes
+      tags: 
+        - build
+    - name: Build axon
+      shell: "cd {{ deploy_path }} && cargo build --release"
+      ignore_errors: yes
+      tags: 
+        - build
+    - name: Copy axon
+      shell: "cp {{ deploy_path }}/target/release/axon ./templates"
+      ignore_errors: yes
+      tags: 
+        - build
+
+  ###############################################################################################################
+    - name: Pull emitter code
+      git:
+        repo: "{{ emitter_repo }}"
+        dest: "{{ emitter_deploy_path }}"
+        version: "{{ emitter_branch }}"
+        force: yes
+      tags: 
+        - build-emitter
+    - name: Build emitter
+      shell: "cd {{ emitter_deploy_path }} && cargo build --release"
+      ignore_errors: yes
+      tags: 
+        - build-emitter
+    - name: Copy emitter
+      shell: "cp {{ emitter_deploy_path }}/target/release/emitter ./templates"
+      ignore_errors: yes
+      tags: 
+        - build-emitter

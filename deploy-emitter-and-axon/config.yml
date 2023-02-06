@@ -1,0 +1,8 @@
+axon_deploy_path: "/home/ckb/axon"
+axon_repo: "https://github.com/axonweb3/axon.git"
+axon_branch: "main"
+axon_node_service: "axon-node.service"
+emitter_deploy_path: "/home/ckb/emitter"
+emitter_repo: "https://github.com/felicityin/emitter.git"
+emitter_branch: "send-eth-tx"
+emitter_node_service: "emitter-node.service"
