@@ -15,12 +15,12 @@
       tags: 
         - build
     - name: Build axon
-      shell: "cd {{ deploy_path }} && cargo build --release"
+      shell: "cd {{ axon_deploy_path }} && cargo build --release"
       ignore_errors: yes
       tags: 
         - build
     - name: Copy axon
-      shell: "cp {{ deploy_path }}/target/release/axon ./templates"
+      shell: "cp {{ axon_deploy_path }}/target/release/axon ./templates"
       ignore_errors: yes
       tags: 
         - build

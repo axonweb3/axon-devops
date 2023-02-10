@@ -60,7 +60,7 @@
         - start
 
     - name: copy emitter service file
-      template:
+      copy:
         src: ./templates/emitter-node.service
         dest: /etc/systemd/system/emitter-node.service
       become: yes
