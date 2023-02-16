@@ -1,8 +1,8 @@
 axon-deploy: 
-        ansible-playbook build.yml --tags build && ansible-playbook  deploy_axon.yml --tags deploy,shutdown,start
+        ansible-playbook build.yml --tags build && ansible-playbook  deploy_axon.yml --tags deploy,start
 
 emitter-deploy: 
-        ansible-playbook build.yml --tags build-emitter && ansible-playbook  deploy_emitter.yml --tags deploy,shutdown,start
+        ansible-playbook build.yml --tags build-emitter && ansible-playbook  deploy_emitter.yml --tags deploy,start
 
 axon-clean: 
         ansible-playbook  deploy_axon.yml --tags shutdown,clean 
