@@ -58,7 +58,7 @@
         - start
 
     - name: copy ckb service file
-      copy:
+      template:
         src: ./templates/axon-node.service
         dest: /etc/systemd/system/axon-node.service
       become: yes
