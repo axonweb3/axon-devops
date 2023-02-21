@@ -33,7 +33,9 @@ metadata:
   name: axon2
   namespace: axon
 spec:
-  replicas: 1
+  replicas: 2
+  updateStrategy:
+    type: RollingUpdate
   serviceName: "axon2"
   selector:
     matchLabels:
@@ -57,7 +59,7 @@ spec:
             - ./axon
             - -c=/app/devtools/chain/k8s/node_2.toml
             - -g=/app/devtools/chain/genesis.json
-          image: zhengjianhui/axon-k8s:latest
+          image: axonweb3/axon:v0.1.0-alpha.5
           volumeMounts:
           - name: config-node2
             mountPath: /app/devtools/chain/k8s/node_2.toml
