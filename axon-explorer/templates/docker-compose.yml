@@ -1,0 +1,173 @@
+version: '3.8'
+
+volumes:
+  db:
+    driver: local
+
+services:
+  db:
+    image: postgres:14.4
+    restart: always
+    container_name: 'postgres'
+    environment:
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_USER: postgres_user
+      # POSTGRES_HOST_AUTH_METHOD: 'trust'
+    ports:
+      - posgres_port:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+  blockscan:
+    image: blockscan/blockscan:${DOCKER_TAG:-latest}
+    # depends_on:
+    #   - db
+    links:
+      - db:database
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile
+      args:
+        COIN: ""
+    restart: always
+    container_name: 'blockscan'
+    command: 'elixir --name blockscan@127.0.0.1 -S mix do ecto.create, ecto.migrate, phx.server'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    # env_file:
+    #   -  ./docker-compose/envs/common-blockscout.env
+
+    environment:
+      - MIX_ENV=prod
+      - DOCKER_TAG
+      - ETHEREUM_JSONRPC_VARIANT
+      - ETHEREUM_JSONRPC_HTTP_URL
+      - DATABASE_URL
+      - ETHEREUM_JSONRPC_TRACE_URL
+      - NETWORK
+      - SUBNETWORK
+      - LOGO
+      - LOGO_FOOTER
+      - ETHEREUM_JSONRPC_WS_URL
+      - ETHEREUM_JSONRPC_TRANSPORT
+      - IPC_PATH
+      - NETWORK_PATH
+      - API_PATH
+      - SOCKET_ROOT
+      - BLOCKSCOUT_HOST
+      - BLOCKSCOUT_PROTOCOL
+      - SECRET_KEY_BASE
+      - CHECK_ORIGIN
+      - PORT
+      - COIN
+      - COIN_NAME
+      - COINGECKO_COIN_ID
+      - METADATA_CONTRACT
+      - VALIDATORS_CONTRACT
+      - KEYS_MANAGER_CONTRACT
+      - REWARDS_CONTRACT
+      - TOKEN_BRIDGE_CONTRACT
+      - EMISSION_FORMAT
+      - CHAIN_SPEC_PATH
+      - SUPPLY_MODULE
+      - SOURCE_MODULE
+      - POOL_SIZE
+      - POOL_SIZE_API
+      - ECTO_USE_SSL
+      - DATADOG_HOST
+      - DATADOG_PORT
+      - SPANDEX_BATCH_SIZE
+      - SPANDEX_SYNC_THRESHOLD
+      - HEART_BEAT_TIMEOUT
+      - HEART_COMMAND
+      - BLOCKSCOUT_VERSION
+      - RELEASE_LINK
+      - BLOCK_TRANSFORMER
+      - GRAPHIQL_TRANSACTION
+      - FIRST_BLOCK
+      - LAST_BLOCK
+      - TRACE_FIRST_BLOCK
+      - TRACE_LAST_BLOCK
+      - LINK_TO_OTHER_EXPLORERS
+      - OTHER_EXPLORERS
+      - SUPPORTED_CHAINS
+      - CACHE_BLOCK_COUNT_PERIOD
+      - CACHE_TXS_COUNT_PERIOD
+      - CACHE_ADDRESS_COUNT_PERIOD
+      - CACHE_ADDRESS_SUM_PERIOD
+      - CACHE_TOTAL_GAS_USAGE_PERIOD
+      - CACHE_ADDRESS_TRANSACTIONS_GAS_USAGE_COUNTER_PERIOD
+      - CACHE_TOKEN_HOLDERS_COUNTER_PERIOD
+      - CACHE_TOKEN_TRANSFERS_COUNTER_PERIOD
+      - CACHE_ADDRESS_WITH_BALANCES_UPDATE_INTERVAL
+      - CACHE_AVERAGE_BLOCK_PERIOD
+      - CACHE_MARKET_HISTORY_PERIOD
+      - CACHE_ADDRESS_TRANSACTIONS_PERIOD
+      - CACHE_ADDRESS_TOKENS_USD_SUM_PERIOD
+      - CACHE_ADDRESS_TOKEN_TRANSFERS_COUNTER_PERIOD
+      - CACHE_BRIDGE_MARKET_CAP_UPDATE_INTERVAL
+      - CACHE_TOKEN_EXCHANGE_RATE_PERIOD
+      - TOKEN_METADATA_UPDATE_INTERVAL
+      - ALLOWED_EVM_VERSIONS
+      - UNCLES_IN_AVERAGE_BLOCK_TIME
+      - DISABLE_WEBAPP
+      - DISABLE_READ_API
+      - DISABLE_WRITE_API
+      - DISABLE_INDEXER
+      - INDEXER_DISABLE_PENDING_TRANSACTIONS_FETCHER
+      - INDEXER_DISABLE_INTERNAL_TRANSACTIONS_FETCHER
+      - WEBAPP_URL
+      - API_URL
+      - WOBSERVER_ENABLED
+      - SHOW_ADDRESS_MARKETCAP_PERCENTAGE
+      - CHECKSUM_ADDRESS_HASHES
+      - CHECKSUM_FUNCTION
+      - DISABLE_EXCHANGE_RATES
+      - DISABLE_KNOWN_TOKENS
+      - ENABLE_TXS_STATS
+      - SHOW_PRICE_CHART
+      - SHOW_TXS_CHART
+      - HISTORY_FETCH_INTERVAL
+      - TXS_HISTORIAN_INIT_LAG
+      - TXS_STATS_DAYS_TO_COMPILE_AT_INIT
+      - COIN_BALANCE_HISTORY_DAYS
+      - APPS_MENU
+      - EXTERNAL_APPS
+      - ETH_OMNI_BRIDGE_MEDIATOR
+      - BSC_OMNI_BRIDGE_MEDIATOR
+      - AMB_BRIDGE_MEDIATORS
+      - GAS_PRICE
+      - FOREIGN_JSON_RPC
+      - RESTRICTED_LIST
+      - RESTRICTED_LIST_KEY
+      - DISABLE_BRIDGE_MARKET_CAP_UPDATER
+      - POS_STAKING_CONTRACT
+      - INDEXER_DISABLE_BLOCK_REWARD_FETCHER
+      - ENABLE_POS_STAKING_IN_MENU
+      - SHOW_MAINTENANCE_ALERT
+      - MAINTENANCE_ALERT_MESSAGE
+      - SHOW_STAKING_WARNING
+      - STAKING_WARNING_MESSAGE
+      - CUSTOM_CONTRACT_ADDRESSES_TEST_TOKEN
+      - ENABLE_SOURCIFY_INTEGRATION
+      - SOURCIFY_SERVER_URL
+      - SOURCIFY_REPO_URL
+      - CHAIN_ID
+      - MAX_SIZE_UNLESS_HIDE_ARRAY
+      - HIDE_BLOCK_MINER
+      - DISPLAY_TOKEN_ICONS
+      - SHOW_TENDERLY_LINK
+      - TENDERLY_CHAIN_PATH
+      - MAX_STRING_LENGTH_WITHOUT_TRIMMING
+      - RE_CAPTCHA_SECRET_KEY
+      - RE_CAPTCHA_CLIENT_KEY
+      - JSON_RPC
+      - API_RATE_LIMIT
+      - API_RATE_LIMIT_BY_KEY
+      - API_RATE_LIMIT_BY_IP
+      - API_RATE_LIMIT_WHITELISTED_IPS
+      - API_RATE_LIMIT_STATIC_API_KEY
+    ports:
+      - 8190:4020
