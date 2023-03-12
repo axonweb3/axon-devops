@@ -42,11 +42,11 @@
       tags:
           - config
 
-    - name: Replace react_app_backend_ppoint
+    - name: Replace react_app_backend_point
       replace:
         path: "{{ deploy_path }}/.env"
-        regexp: "react_app_backend_ppoint"
-        replace: "{{ react_app_backend_ppoint }}"
+        regexp: "react_app_backend_point"
+        replace: "{{ react_app_backend_point }}"
       tags:
           - config
 
@@ -65,6 +65,14 @@
         replace: "{{ mongodb_password }}"
       tags:
           - config
+
+    - name: faucet build
+      shell: "cd {{ deploy_path }} &&  docker-compose --env-file ./.env -f ./docker-compose.yml build"
+      ignore_errors: yes
+      become: yes
+      become_method: sudo
+      tags:
+        - up
 
     - name: faucet start
       shell: "cd {{ deploy_path }} &&  docker-compose up -d"
