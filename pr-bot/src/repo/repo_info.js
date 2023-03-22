@@ -15,6 +15,10 @@ class RepoInfo {
 			if (prInfos[index].draft == true) {
 				continue
 			}
+			if (prInfos[index].user.login == 'dependabot[bot]') {
+				continue
+			}
+			
 			res.push(new PrIfnfo(prInfos[index]))
 		}
 
