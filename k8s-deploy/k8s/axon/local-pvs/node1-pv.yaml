@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: node1-pv-volume
+spec:
+    storageClassName: axon-node-storage
+    capacity:
+        storage: 10Gi
+    accessModes:
+        - ReadWriteOnce
+    local:
+        path: "/home/ec2-user/axon/node-1"
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+          - matchExpressions:
+             - key: kubernetes.io/hostname
+               operator: In
+               values:
+                 - axon-testnet-1

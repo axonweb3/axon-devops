@@ -33,7 +33,7 @@ metadata:
   name: axon4
   namespace: axon
 spec:
-  replicas: 2
+  replicas: 1
   updateStrategy:
     type: RollingUpdate
   serviceName: "axon4"
@@ -59,7 +59,7 @@ spec:
             - ./axon
             - -c=/app/devtools/chain/k8s/node_4.toml
             - -g=/app/devtools/chain/genesis.json
-          image: axonweb3/axon:v0.1.0-alpha.5
+          image: ghcr.io/tvl-labs/axon:0.0.5
           volumeMounts:
           - name: config-node4
             mountPath: /app/devtools/chain/k8s/node_4.toml
@@ -70,7 +70,7 @@ spec:
           - name: config-db-options
             mountPath: /app/devtools/chain/k8s/default.db-options
             subPath: default.db-options
-          - name: data4
+          - name: node4-pv-volum-axon4-0
             mountPath: /app/devtools/chain/data4
             subPath: data4
           ports:
@@ -93,8 +93,8 @@ spec:
           resources: {}
           securityContext:
             privileged: true
-      nodeSelector:
-        disktype: node4
+#      nodeSelector:
+#        disktype: node4
       volumes:
         - name: config-node4
           configMap:
@@ -108,10 +108,10 @@ spec:
       restartPolicy: Always
   volumeClaimTemplates:
   - metadata:
-      name: data4
+      name: node4-pv-volum-axon4-0
     spec:
       accessModes: ["ReadWriteOnce"]
-      storageClassName: gp2
+      storageClassName: axon-node-storage
       resources:
         requests:
-          storage: 100Gi
+          storage: 5Gi
