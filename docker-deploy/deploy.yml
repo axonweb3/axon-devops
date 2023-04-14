@@ -1,101 +1,108 @@
 ---
 - name: axon service
-  hosts: axon
-  remote_user: ckb
-  become: yes
-  become_method: sudo
+  hosts: localhost
   vars_files:
     - config.yml
   tasks:
-  ###############################################################################################################
-    - name: Pull code
-      git:
-        repo: "{{ axon_repo }}"
-        dest: "{{ deploy_path }}"
-        version: "{{ axon_branch }}"
-        force: yes
-      become: yes
-      become_method: sudo
-      tags: 
-        - deploy
-
 ###############################################################################################################
-    - name: Shutdown 
+    - name: Shutdown
       shell: cd {{ deploy_path }} && docker-compose down
       ignore_errors: yes
-      tags: 
+      tags:
         - shutdown
 ###############################################################################################################
     - name: Clean axon data
       shell: rm -rf  {{ deploy_path }}/devtools/chain/data
-      tags: 
+      tags:
         - clean
     - name: Clean axon logs
       shell: rm -rf  {{ deploy_path }}/logs
-      tags: 
+      tags:
         - clean
 
 ###############################################################################################################
-    - name: Copy docker configuration file
-      copy:
-        src: ./templates/docker-compose.yml
-        dest: "{{ deploy_path }}/docker-compose.yml"
-        mode: 0755
-      tags: 
+    - name: Register node1 privKey
+      shell: "cat {{ deploy_path }}/node_priv_key.yml | grep 'node_1' | awk '{print $2}' "
+      register: node1_privKey
+      tags:
         - deploy
         - config
 
-###############################################################################################################
-    - name: Copy config.toml
-      copy:
-        src: ./templates/config.toml
-        dest: "{{ deploy_path }}/devtools/chain/config.toml"
-        mode: 0755
-      tags: 
+    - name: Replace node1 privKey
+      shell:  sed -i "s/node_1_prikey/{{ node1_privKey.stdout }}/g" "{{ deploy_path }}/devtools/chain/node_1.toml"
+      tags:
         - deploy
         - config
 
-    - name: Copy genesis.json
-      copy:
-        src: ./templates/genesis.json
-        dest: "{{ deploy_path }}/devtools/chain/genesis.json"
-        mode: 0755
-      tags: 
+    - name: Register node2 privKey
+      shell: "cat {{ deploy_path }}/node_priv_key.yml | grep 'node_2' | awk '{print $2}' "
+      register: node2_privKey
+      tags:
         - deploy
         - config
 
-    - name: Copy node_prvi_key.yml
-      copy:
-        src: node_priv_key.yml
-        dest: "{{ deploy_path }}/node_priv_key.yml"
-        mode: 0755
-      tags: 
+    - name: Replace node1 privKey
+      shell:  sed -i "s/node_2_prikey/{{ node2_privKey.stdout }}/g" "{{ deploy_path }}/devtools/chain/node_2.toml"
+      tags:
         - deploy
         - config
 
-    - name: Register hostname
-      shell: hostname
-      register: hostname
-      tags: 
+    - name: Register node3 privKey
+      shell: "cat {{ deploy_path }}/node_priv_key.yml | grep 'node_3' | awk '{print $2}' "
+      register: node3_privKey
+      tags:
         - deploy
         - config
 
-    - name: Register privKey
-      shell: "cat {{ deploy_path }}/node_priv_key.yml | grep '{{ hostname.stdout }}' | awk '{print $2}' "
-      register: privKey
-      tags: 
+    - name: Replace node3 privKey
+      shell:  sed -i "s/node_3_prikey/{{ node3_privKey.stdout }}/g" "{{ deploy_path }}/devtools/chain/node_3.toml"
+      tags:
         - deploy
         - config
 
-    - name: Replace privKey
-      shell:  sed -i "s/#private_key/{{ privKey.stdout }}/g" "{{ deploy_path }}/devtools/chain/config.toml"
-      tags: 
+    - name: Register node4 privKey
+      shell: "cat {{ deploy_path }}/node_priv_key.yml | grep 'node_4' | awk '{print $2}' "
+      register: node4_privKey
+      tags:
+        - deploy
+        - config
+
+    - name: Replace node4 privKey
+      shell:  sed -i "s/node_4_prikey/{{ node4_privKey.stdout }}/g" "{{ deploy_path }}/devtools/chain/node_4.toml"
+      tags:
         - deploy
         - config
 
     - name: Replace mercury
       replace:
-        path: "{{ deploy_path }}/devtools/chain/config.toml"
+        path: "{{ deploy_path }}/devtools/chain/node_1.toml"
+        regexp: '#mercury_uri'
+        replace: "{{ mercury_uri }}"
+      tags:
+        - deploy
+        - config
+
+    - name: Replace mercury
+      replace:
+        path: "{{ deploy_path }}/devtools/chain/node_2.toml"
+        regexp: '#mercury_uri'
+        replace: "{{ mercury_uri }}"
+      tags:
+        - deploy
+        - config
+
+    - name: Replace mercury
+      replace:
+        path: "{{ deploy_path }}/devtools/chain/node_3.toml"
+        regexp: '#mercury_uri'
+        replace: "{{ mercury_uri }}"
+      tags:
+        - deploy
+        - config
+
+    - name: Replace mercury
+      replace:
+        path: "{{ deploy_path }}/devtools/chain/node_4.toml"
         regexp: '#mercury_uri'
         replace: "{{ mercury_uri }}"
       tags:
@@ -104,17 +111,47 @@
 
     - name: Replace enable_cross_client
       replace:
-        path: "{{ deploy_path }}/devtools/chain/config.toml"
+        path: "{{ deploy_path }}/devtools/chain/node_1.toml"
         regexp: '#enable_cross_client'
         replace: "{{ enable_cross_client }}"
       tags:
         - deploy
-        - config   
-    - name: Replace network config
+        - config
+
+
+    - name: Replace enable_cross_client
       replace:
-        path: "{{ deploy_path }}/devtools/chain/config.toml"
-        regexp: '#network'
-        replace: "{{ network }}"
+        path: "{{ deploy_path }}/devtools/chain/node_2.toml"
+        regexp: '#enable_cross_client'
+        replace: "{{ enable_cross_client }}"
+      tags:
+        - deploy
+        - config
+
+    - name: Replace enable_cross_client
+      replace:
+        path: "{{ deploy_path }}/devtools/chain/node_3.toml"
+        regexp: '#enable_cross_client'
+        replace: "{{ enable_cross_client }}"
+      tags:
+        - deploy
+        - config
+
+    - name: Replace enable_cross_client
+      replace:
+        path: "{{ deploy_path }}/devtools/chain/node_4.toml"
+        regexp: '#enable_cross_client'
+        replace: "{{ enable_cross_client }}"
+      tags:
+        - deploy
+        - config
+
+
+    - name: Replace axon image version
+      replace:
+        path: "{{ deploy_path }}/docker-compose.yml"
+        regexp: 'axon-image'
+        replace: "{{ axon_image }}"
       tags:
         - deploy
         - config
@@ -122,13 +159,13 @@
 ###############################################################################################################
     - name: Start axon
       shell: cd {{ deploy_path }} && docker-compose pull && docker-compose up -d
-      tags: 
+      tags:
         - start
     - name: Clear none images
       shell: docker rmi $(docker images | awk '/^<none>/ { print $3 }')
       ignore_errors: yes
-      tags: 
+      tags:
         - start
-        
-        
-        
+
+
+

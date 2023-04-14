@@ -1,0 +1,78 @@
+version: '3'
+services:
+  axon1:
+    container_name: axon1
+    image: axon-image
+    restart: always
+    privileged: true
+    ports:
+      - 8000:8000
+      - 8001:8001
+      - 8100:8100
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2048M
+    volumes:
+      - ./devtools:/app/devtools
+      - ./logs:/app/logs
+    networks:
+      - axon-net
+    command: ./axon -c=/app/devtools/chain/node_1.toml -g=/app/devtools/chain/genesis.json
+
+  axon2:
+    container_name: axon2
+    image: axon-image
+    restart: always
+    privileged: true
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2048M
+    volumes:
+      - ./devtools:/app/devtools
+      - ./logs:/app/logs
+    networks:
+      - axon-net
+    command: ./axon -c=/app/devtools/chain/node_2.toml -g=/app/devtools/chain/genesis.json
+
+  axon3:
+    container_name: axon3
+    image: axon-image
+    restart: always
+    privileged: true
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2048M
+    volumes:
+      - ./devtools:/app/devtools
+      - ./logs:/app/logs
+    networks:
+      - axon-net
+    command: ./axon -c=/app/devtools/chain/node_3.toml -g=/app/devtools/chain/genesis.json
+
+  axon4:
+    container_name: axon4
+    image: axon-image
+    restart: always
+    privileged: true
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2048M
+    volumes:
+      - ./devtools:/app/devtools
+      - ./logs:/app/logs
+    networks:
+      - axon-net
+    command: ./axon -c=/app/devtools/chain/node_4.toml -g=/app/devtools/chain/genesis.json
+
+
+networks:
+  axon-net:
+
