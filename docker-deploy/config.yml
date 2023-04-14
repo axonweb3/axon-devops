@@ -1,6 +1,4 @@
-deploy_path: "/home/ckb/axon-docker"
-axon_repo: "https://github.com/axonweb3/axon.git"
-axon_branch: "main"
+deploy_path: "/home/ckb/axon-devops/docker-deploy"
+axon_image: "axonweb3/axon:v0.1.0-alpha.7"
 enable_cross_client: "false"
 mercury_uri: "http://127.0.0.1:8116"
-network: 'multi_address = "/ip4/xxx.xxx.xxx.xxx/tcp/8001/p2p/QmNk6bBwkLPuqnsrtxpp819XLZY3ymgjs3p1nKtxBVgqxj"\n[[network.bootstraps]]\nmulti_address = "/ip4/xxx.xxx.xxx.xxx/tcp/8001/p2p/QmaHBJqULbLGDn7Td196goNebH6XMTMMu2sKNNP2DiX9S2"\n[[network.bootstraps]]\nmulti_address = "/ip4/xxx.xxx.xxx.xxx/tcp/8001/p2p/QmQLufVVmBuHKoYhdDCqUFYVtLYs1quryoaA1mkQYQdWkn"\n[[network.bootstraps]]\nmulti_address = "/ip4/xxx.xxx.xxx.xxx/tcp/8001/p2p/QmXoSkz4zkHHiFZqmDZQ4gFYtJ72uqtp4m6FX373X4VkRq"'
