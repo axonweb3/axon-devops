@@ -3,6 +3,5 @@ faucet_repo: "https://github.com/axonweb3/axon-faucet.git"
 faucet_branch: "master"
 axon_faucet_rpc_url: http://xxxx.xxx.xxx.xxx:8000
 axon_faucet_claim_value: 1000000000000000000
-react_app_backend_point: http://xxxx.xxx.xxx.xxx:8501
 mongodb_password: mongodbpassword
 mongodb_url: mongodb://root:mongodbpassword@faucet-mongo:27017
