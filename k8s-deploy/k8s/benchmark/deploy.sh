@@ -16,14 +16,14 @@ function clean() {
 }
 function create_configmap() {
     echo "DEBUG" "create configmap for axon benchmark, please wait..."
-    kubectl create configmap config-benchmark --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/benchmark/configmap/config.json -n axon-benchmark
-   
+    kubectl create configmap config-benchmark --from-file=./benchmark/configmap/config.json -n axon-benchmark
+
 }
 function deploy_axon_benchmark(){
     echo "DEBUG" "deploy axon benchmark, please wait..."
     # create svc & deployment
-    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/benchmark/axon-chain-to-axon-ns.yaml
-    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/benchmark/axon-benchmark.yaml
+    kubectl apply -f ./benchmark/axon-chain-to-axon-ns.yaml
+    kubectl apply -f ./benchmark/axon-benchmark.yaml
     echo "DEBUG" "waiting for axon benchmark running..."
     sleep 60
     axon_benchmark_num=`kubectl get pod -n axon-benchmark | grep -i "axon" |grep -ci "running"`
