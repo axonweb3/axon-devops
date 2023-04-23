@@ -17,23 +17,23 @@ function clean() {
 
 function create_configmap() {
     echo "DEBUG" "create configmap for axons, please wait..."
-    kubectl create configmap node1-toml --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/node_1.toml -n axon
-    kubectl create configmap node2-toml --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/node_2.toml -n axon
-    kubectl create configmap node3-toml --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/node_3.toml -n axon
-    kubectl create configmap node4-toml --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/node_4.toml -n axon
-    kubectl create configmap genesis --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/genesis.json -n axon
-    kubectl create configmap db-options --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-config/default.db-options -n axon
+    kubectl create configmap node1-toml --from-file=./axon/axon-config/node_1.toml -n axon
+    kubectl create configmap node2-toml --from-file=./axon/axon-config/node_2.toml -n axon
+    kubectl create configmap node3-toml --from-file=./axon/axon-config/node_3.toml -n axon
+    kubectl create configmap node4-toml --from-file=./axon/axon-config/node_4.toml -n axon
+    kubectl create configmap genesis --from-file=./axon/axon-config/genesis.json -n axon
+    kubectl create configmap db-options --from-file=./axon/axon-config/default.db-options -n axon
 }
 function deploy_axon(){
     echo "DEBUG" "deploy axons, please wait..."
-    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon1-statefulset.yaml
-    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon2-statefulset.yaml
-    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon3-statefulset.yaml
-    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon4-statefulset.yaml
-    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/axon/axon-chain.yaml
-    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/ingress/axon-ingress.yaml
-    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/pv/axon-logs-pv.yaml
-    kubectl apply -f /home/ckb/axon-devops/k8s-deploy/k8s/pv/axon-logs-pvc.yaml
+    kubectl apply -f ./axon/axon1-statefulset.yaml
+    kubectl apply -f ./axon/axon2-statefulset.yaml
+    kubectl apply -f ./axon/axon3-statefulset.yaml
+    kubectl apply -f ./axon/axon4-statefulset.yaml
+    kubectl apply -f ./axon/axon-chain.yaml
+    kubectl apply -f ./ingress/axon-ingress.yaml
+    kubectl apply -f ./pv/axon-logs-pv.yaml
+    kubectl apply -f ./pv/axon-logs-pvc.yaml
     echo "DEBUG" "waiting for axons running..."
     sleep 120
     axon_running_num=`kubectl get pod -n axon | grep -i "axon" |grep -ci "running"`
