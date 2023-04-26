@@ -4,11 +4,12 @@ privkey = "#private_key"
 # db config
 data_path = "./devtools/chain/data"
 
-epoch_len = 100_000_000
+crosschain_contract_address = "0xb9dc8bde1db42410d304b5e78c2ff843134e15e0"
+wckb_contract_address = "0xa13763691970d9373d4fab7cc323d7ba06fa9986"
 
-metadata_contract_address = "0xb00d616b820c39619ee29e5144d0226cf8b5c15a"
-crosschain_contract_address = "0xb484fd480e598621638f380f404697cd9f58b0f8"
-wckb_contract_address = "0x4af5ec5e3d29d9ddd7f4bf91a022131c41b72352"
+[[accounts]]
+address = "0xa0ee7a142d267c1f36714e4a8f75612f20a79720"
+balance = "56bc75e2d63100000"
 
 [rpc]
 http_listening_address = "0.0.0.0:8000"
@@ -16,10 +17,6 @@ ws_listening_address = "0.0.0.0:8010"
 maxconn = 25000
 max_payload_size = 10485760
 client_version = "0.1.0"
-# enable_dump_profile = false
-# [graphql.tls]
-# private_key_file_path = "key.pem"
-# certificate_chain_file_path = "cert.pem"
 
 
 [network]
@@ -57,7 +54,6 @@ metrics = true
 [rocksdb]
 max_open_files = 64
 cache_size = 134217728
-
 # Provide an options file to tune RocksDB for your workload and your system configuration.
 # More details can be found in [the official tuning guide](https://github.com/facebook/rocksdb/wiki/RocksDB-Tuning-Guide).
 options_file = "default.db-options"
@@ -70,20 +66,3 @@ tracing_batch_size = 50
 [prometheus]
 listening_address = "0.0.0.0:8100"
 
-[cross_client]
-axon_udt_hash = "0xf32ec1e3274c27ac4cc018c92efec443847e9b78ba8cbedca36f0fa8c35d1c9e"
-ckb_uri = "https://mercury-testnet.ckbapp.dev/rpc"
-mercury_uri = "#mercury_uri"
-start_block_number = 4096800
-checkpoint_interval = 1000
-pk = "0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d"
-enable = #enable_cross_client
-admin_address = "0x0000000000000000000000000000000000000000"
-node_address = "0x0000000000000000000000000000000000000000"
-selection_lock_hash = "0xf32ec1e3274c27ac4cc018c92efec443847e9b78ba8cbedca36f0fa8c35d1c9e"
-checkpoint_type_hash = "0xf32ec1e3274c27ac4cc018c92efec443847e9b78ba8cbedca36f0fa8c35d1c9e"
-
-[interoperability_extension]
-blockchain_extension_transaction_hashes = [
-    {name = "cardano", id = 2, tx_hash = "0xb1af175009413bf9670dffb7b120f0eca52896a9798bda123df9b25ff7d8f721"}
-]
