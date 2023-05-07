@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: axon
+  namespace: monitoring
+  labels:
+    metrics: "true"
+spec:
+  selector:
+    matchExpressions:
+      - {key: app, operator: In, values: [axon1, axon2, axon3, axon4]}
+  namespaceSelector:
+    matchNames:
+      - axon
+  endpoints:
+    - port: prometheus
+      path: /metrics
+      honorLabels: true
