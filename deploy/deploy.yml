@@ -27,19 +27,20 @@
         - deploy
 
 ###############################################################################################################
-    - name: Shutdown 
+    - name: Shutdown
       service: name={{ axon_node_service }} state=stopped
       become: yes
-      tags: 
+      ignore_errors: yes
+      tags:
         - shutdown
 ###############################################################################################################
     - name: Clean axon data
       shell: rm -rf  {{ deploy_path }}/devtools/chain/data
-      tags: 
+      tags:
         - clean
     - name: Clean axon logs
       shell: rm -rf  {{ deploy_path }}/logs
-      tags: 
+      tags:
         - clean
 
 ###############################################################################################################
@@ -48,7 +49,7 @@
         src: ./templates/
         dest: "{{ deploy_path }}"
         mode: 0755
-      tags: 
+      tags:
         - deploy
         - config
 
@@ -57,33 +58,33 @@
         src: node_priv_key.yml
         dest: "{{ deploy_path }}/node_priv_key.yml"
         mode: 0755
-      tags: 
+      tags:
         - deploy
         - config
 
     - name: Register hostname
       shell: hostname
       register: hostname
-      tags: 
+      tags:
         - deploy
         - config
 
     - name: Register privKey
       shell: "cat {{ deploy_path }}/node_priv_key.yml | grep '{{ hostname.stdout }}' | awk '{print $2}' "
       register: privKey
-      tags: 
+      tags:
         - deploy
         - config
 
     - name: Replace privKey
       shell:  sed -i "s/#private_key/{{ privKey.stdout }}/g" "{{ deploy_path }}/config.toml"
-      tags: 
+      tags:
         - deploy
         - config
 
     - name: Replace bootstraps
       shell:  sed -i "s/#bootstraps/{{ bootstraps }}/g" "{{ deploy_path }}/config.toml"
-      tags: 
+      tags:
         - deploy
         - config
 
@@ -103,14 +104,14 @@
         replace: "{{ enable_cross_client }}"
       tags:
         - deploy
-        - config    
+        - config
 
 ###############################################################################################################
     - name: chmod axon
       shell: "chmod 777 -R {{ deploy_path }}"
       become: yes
       become_method: sudo
-      tags: 
+      tags:
         - start
 
     - name: copy ckb service file
@@ -118,20 +119,20 @@
         src: ./templates/axon-node.service
         dest: /etc/systemd/system/axon-node.service
       become: yes
-      tags: 
+      tags:
         - start
 
     - name: systemctl daemon-reload
       shell: systemctl daemon-reload
       become: yes
-      tags: 
+      tags:
         - start
 
     - name: Start axon
       service: name={{ axon_node_service }} state=started
       become: yes
       when: enable_profile == 'false'
-      tags: 
+      tags:
         - start
 
     - name: Start axon
@@ -139,5 +140,5 @@
       when: enable_profile == 'true'
       become: yes
       become_method: sudo
-      tags: 
+      tags:
         - start
