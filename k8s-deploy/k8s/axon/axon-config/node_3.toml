@@ -1,5 +1,5 @@
 # crypto
-privkey = "0x51ce21643b911347c5d5c85c323d9d5421810dc89f46b688720b2715f5e8e936"
+privkey = "PRIVKEY_NODE3"
 
 # db config
 data_path = "./devtools/chain/data3"

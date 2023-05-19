@@ -26,6 +26,7 @@ function create_configmap() {
 }
 function deploy_axon(){
     echo "DEBUG" "deploy axons, please wait..."
+    kubectl apply -f ./axon/axon-config/node-key.yaml
     kubectl apply -f ./axon/axon1-statefulset.yaml
     kubectl apply -f ./axon/axon2-statefulset.yaml
     kubectl apply -f ./axon/axon3-statefulset.yaml
