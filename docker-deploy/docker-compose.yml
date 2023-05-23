@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   axon1:
     container_name: axon1
@@ -13,7 +13,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 2048M
+          memory: 3G
     volumes:
       - ./devtools:/app/devtools
       - ./logs:/app/logs
@@ -30,7 +30,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 2048M
+          memory: 3G
     volumes:
       - ./devtools:/app/devtools
       - ./logs:/app/logs
@@ -47,7 +47,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 2048M
+          memory: 3G
     volumes:
       - ./devtools:/app/devtools
       - ./logs:/app/logs
@@ -64,7 +64,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 2048M
+          memory: 3G
     volumes:
       - ./devtools:/app/devtools
       - ./logs:/app/logs
