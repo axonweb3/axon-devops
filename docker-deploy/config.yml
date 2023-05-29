@@ -1,4 +1,0 @@
-deploy_path: "/home/ckb/axon-devops/docker-deploy"
-axon_image: "axonweb3/axon:v0.1.0-alpha.7"
-enable_cross_client: "false"
-mercury_uri: "http://127.0.0.1:8116"

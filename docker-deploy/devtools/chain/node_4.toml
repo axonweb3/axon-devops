@@ -1,5 +1,5 @@
 # crypto
-privkey = "node_4_prikey"
+privkey = "0x69ff51f4c22f30615f68b88efa740f8f1b9169e88842b83d189748d06f1a948e"
 
 # db config
 data_path = "./devtools/chain/data4"
