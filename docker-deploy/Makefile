@@ -1,15 +1,27 @@
-deploy:
-	ansible-playbook deploy.yml --tags deploy,shutdown,start
+.DEFAULT_GOAL:=help
+height := `curl -s -H 'content-type: application/json' --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":2}' http://127.0.0.1:8000 | awk -F"[:\"]+" '{print $$6}' |xargs printf %d`
+axon_verson := `docker-compose exec axon1 ./axon --version`
 
-clean:
-	ansible-playbook deploy.yml --tags shutdown,clean
+help: ## Display this help
+		@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m\033[0m\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
-start:
-	ansible-playbook deploy.yml --tags start
+clean: ## Clean up axon data and logs
+	make stop
+	@rm -rf ./devtools/chain/data1 ./devtools/chain/data2 ./devtools/chain/data3 ./devtools/chain/data4
+	@rm -rf ./logs1 ./logs2 ./logs3 ./logs4
 
-stop:
-	ansible-playbook deploy.yml --tags shutdown
+start: ## Start axon nodes
+	docker-compose up -d
 
-config:
-	ansible-playbook deploy.yml --tags config
+stop: ## Stop axon nodes
+	docker-compose down
+
+status: ## Show axon containers
+	docker-compose ps
+
+height: ## Show axon chain block height
+	@echo "Current chain block height" $(height)
+
+version: ## Show axon version
+	@echo $(axon_verson)
 
