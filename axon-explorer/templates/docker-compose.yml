@@ -7,9 +7,13 @@ volumes:
 services:
   db:
     image: postgres:15.2
-    command: postgres -c 'max_connections=250'
+    command: postgres -c 'max_connections=150' -c 'shared_buffers=2048MB'
     restart: always
     container_name: 'postgres'
+    deploy:
+      resources:
+        limits:
+          memory: 8192M
     environment:
       POSTGRES_PASSWORD: postgres_password
       POSTGRES_USER: postgres_user
@@ -32,6 +36,14 @@ services:
       dockerfile: ./docker/Dockerfile
       args:
         COIN: ""
+        CACHE_EXCHANGE_RATES_PERIOD: ""
+        API_V1_READ_METHODS_DISABLED: "false"
+        DISABLE_WEBAPP: "false"
+        API_V1_WRITE_METHODS_DISABLED: "false"
+        CACHE_TOTAL_GAS_USAGE_COUNTER_ENABLED: ""
+        CACHE_ADDRESS_WITH_BALANCES_UPDATE_INTERVAL: ""
+        ADMIN_PANEL_ENABLED: ""
+        RELEASE_VERSION: 5.1.4
     restart: always
     container_name: 'blockscan'
     #command: 'elixir --name blockscan@127.0.0.1 -S mix do ecto.create, ecto.migrate, phx.server'
