@@ -2,6 +2,7 @@ deploy_path: "/home/ckb/axon-faucet"
 faucet_repo: "https://github.com/axonweb3/axon-faucet.git"
 faucet_branch: "master"
 axon_faucet_rpc_url: http://xxxx.xxx.xxx.xxx:8000
-axon_faucet_claim_value: 1000000000000000000
+axon_faucet_server_port: "8502"
+axon_faucet_claim_value: "1000000000000000000"
 mongodb_password: mongodbpassword
 mongodb_url: mongodb://root:mongodbpassword@faucet-mongo:27017

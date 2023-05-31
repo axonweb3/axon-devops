@@ -42,6 +42,13 @@
       tags:
           - config
 
+    - name: Replace axon_faucet_server_port
+      replace:
+        path: "{{ deploy_path }}/docker-compose.yml"
+        regexp: "8502"
+        replace: "{{ axon_faucet_server_port }}"
+      tags:
+          - config
 
     - name: Replace mongodb_url
       replace:
