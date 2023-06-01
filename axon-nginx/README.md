@@ -4,11 +4,11 @@ Requires docker、docker-compose
 ## Configuration of the deployment
 ### Step 1
 ```shell
-$ cd axon-devops/axon-nginx
+cd axon-devops/axon-nginx
 ```
 ### Step 2
 ```shell
-$ vim nginx/conf/nginx.conf 
+vim nginx/conf/nginx.conf 
 ```
 
 Editor nginx.conf
@@ -39,29 +39,26 @@ http {
     default_type  application/octet-stream;
 
 
-    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
-    '$status $body_bytes_sent "$http_referer" '
-    '"$http_user_agent" "$http_x_forwarded_for"'
-    '$upstream_addr $upstream_response_time $request_time ';
-
-    access_log  /var/log/nginx/access.log  main;
+    log_format json_log escape=json '{"realip":"$remote_addr","@timestamp":"$time_iso8601","host":"$http_host","request":"$request","req_body":"$request_body","status":"$status","size":$body_bytes_sent,"ua":"$http_user_agent","req_time":"$request_time","uri":"$uri","referer":"$http_referer","xff":"$http_x_forwarde
+d_for","ups_status":"$upstream_status","ups_addr":"$upstream_addr","ups_time":"$upstream_response_time"}';
+    access_log  /var/log/nginx/access.log  json_log;
     
     # upload file max size
     client_max_body_size 300m;
+    client_body_buffer_size 50m;
     sendfile        on;
     #tcp_nopush     on;
-    #keepalive_timeout  0;
     keepalive_timeout  65;
     keepalive_requests 7000;
     #gzip  on;
     include /etc/nginx/conf.d/*.conf;
     
-}                                              
+}                                             
 ```
 
 ### Step 3
 ```shell
-$ vim nginx/conf.d/axon.conf 
+vim nginx/conf.d/axon.conf 
 ```
 
 Editor axon.conf
@@ -98,31 +95,35 @@ server {
 
 ### Step 4
 ```shell
-$ vim config.yml 
+vim config.yml 
 ```
 Editor config.yml 
 
-- deploy_path: deploy files path
 - enable_access_log: true or false, 'true' will  generate access.log under niginx/logs.
+- nginx_port: nginx proxy axon rpc port
 
 ```yml
-deploy_path: "/home/ckb/axon-devops/axon-nginx"
-enable_access_log: "false"                                 
+enable_access_log: "true"
+nginx_port: "8500"                                 
 ```
 
 ## Deploy
-### deploy
+### start
 ```shell
-$ make deploy 
+make start 
 ```
-
 
 ### clean logs 
 ```shell
-$ make clean
+make clean
 ```
 
 ### config 
 ```shell
-$ make config
+make config
+```
+
+### stop 
+```shell
+make stop
 ```
