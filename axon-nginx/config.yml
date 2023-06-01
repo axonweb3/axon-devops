@@ -1,2 +1,2 @@
-deploy_path: "/home/ckb/axon-devops/axon-nginx"
 enable_access_log: "false"
+nginx_port: "8500"
