@@ -12,5 +12,5 @@ spec:
   capacity:
     storage: 4Gi
   hostPath:
-    path: "/home/ckb/k8s-deploy/k8s-deploy/logs"
-    
+    path: "./logs"
+
