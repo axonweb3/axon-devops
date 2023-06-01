@@ -1,6 +1,4 @@
 # Deploy Axon Explorer
-Requires Postgres. PostgreSQL with docker-compose [docker-compose-pg-only.yml](templates/postgres-docker-compose.yml).
-
 Please check your docker-compose version, should be latest.
 
 ```
@@ -12,30 +10,31 @@ docker-compose version 1.29.2, build 5becea4c
 
 ### Step 1
 ```shell
-$ cd axon-devops/axon-explorer
+cd axon-devops/axon-explorer
 ```
 
 ### Step 2
 ```shell
-$ vim config.yml
+vim config.yml
 ```
 
-
 ```
-
 Editor config.yml
 
-```yml
+
 deploy_path: "/home/ckb/axon_explorer"
-explorer_repo: "https://github.com/Magickbase/axon_explorer.git"
+explorer_repo: "https://github.com/Magickbase/blockscan.git"
 explorer_branch: "main"
-ETHEREUM_JSONRPC_HTTP_URL: "http://xxxx.xxx.xxx.xxx:8000"
-ETHEREUM_JSONRPC_TRACE_URL: "http://xxxx.xxx.xxx.xxx:8000"
-DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:5432/axon_explorer?ssl=false" 
-
-
-                                               
+jsonrpc_http_url: "http://xxxx.xxx.xxx.xxx:8000"
+jsonrpc_trace_url: "http://xxxx.xxx.xxx.xxx:8000"
+postgres_user: postgres
+postgres_password: postgres
+posgres_port: "5432"
+blockscan_port: "8190"                                           
 ```
+
+Please modify these fields
+
 `deploy_path`: explorer deploy path
 
 `explorer_repo`: git address of axon explorer 
@@ -50,19 +49,20 @@ DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:5432/axon_explorer?ssl=f
 
 `postgres_password`: Posgres db password
 
-`postgres_ip`: IP address of posgres db
-
 `posgres_port`: The port of posgres db
+
+`blockscan_port`: explorer http port
 
 
 
 ## Instructions for use
 ### start
 ```shell
-$ make start
+make start
 ```
 ### stop
 ```shell
-$ make stop
+make stop
 ```
-
+### Visit the explorer website 
+http://192.168.1.100:8190   # 192.168.1.100 is your server ip , 8190 is your blockscan_port
