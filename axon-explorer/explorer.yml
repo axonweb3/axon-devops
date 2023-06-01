@@ -75,13 +75,6 @@
       tags:
           - config
 
-    - name: Replace posgres_port in explorer.env
-      replace:
-        path: "{{ deploy_path }}/explorer.env"
-        regexp: "posgres_port"
-        replace: "{{ posgres_port }}"
-      tags:
-          - config 
     - name: Replace posgres_port in docker-compose.yml
       replace:
         path: "{{ deploy_path }}/docker-compose.yml"
@@ -90,6 +83,13 @@
       tags:
           - config 
 
+    - name: Replace blockscan_port in docker-compose.yml
+      replace:
+        path: "{{ deploy_path }}/docker-compose.yml"
+        regexp: "blockscan_port"
+        replace: "{{ blockscan_port }}"
+      tags:
+          - config
 
     - name: build 
       shell: "cd {{ deploy_path }} && docker-compose --env-file ./explorer.env -f ./docker-compose.yml build blockscan"
