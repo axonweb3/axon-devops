@@ -7,23 +7,10 @@
   tasks:
   ###############################################################################################################
 
-    - name: down
-      shell: "cd {{ deploy_path }} && docker-compose down"
-      ignore_errors: yes
-      become: yes
-      become_method: sudo
-      tags: 
-        - down
-
-    - name: start 
-      shell: "cd {{ deploy_path }} && docker-compose up -d"
-      become: yes
-      become_method: sudo
-      tags: 
-        - start
-
     - name: Clean axon logs
-      shell: rm -rf  {{ deploy_path }}/logs
+      file:
+        path: ./logs
+        state: absent
       become: yes
       become_method: sudo
       tags: 
@@ -32,7 +19,7 @@
     - name: disable access log.
       when: enable_access_log == 'false'
       replace:
-        path: "{{ deploy_path }}/nginx/conf/nginx.conf"
+        path: "./nginx/conf/nginx.conf"
         regexp: '(.*access_log.*)'
         replace: '#\1'
       tags: 
@@ -41,8 +28,31 @@
     - name: enable access log.
       when: enable_access_log == 'true'
       replace:
-        path: "{{ deploy_path }}/nginx/conf/nginx.conf"
+        path: "./nginx/conf/nginx.conf"
         regexp: '^#(.*access_log.*)'
         replace: '\1'
       tags: 
         - config
+
+    - name: Replace nginx port
+      replace:
+        path: "./docker-compose.yml"
+        regexp: "nginx_port"
+        replace: "{{ nginx_port }}"
+      tags:
+        - config
+
+    - name: down
+      shell: "docker-compose down"
+      ignore_errors: yes
+      become: yes
+      become_method: sudo
+      tags:
+        - down
+
+    - name: start
+      shell: "docker-compose up -d"
+      become: yes
+      become_method: sudo
+      tags:
+        - start
