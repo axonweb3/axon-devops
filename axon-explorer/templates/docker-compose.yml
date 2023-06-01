@@ -184,4 +184,4 @@ services:
       - API_RATE_LIMIT_WHITELISTED_IPS
       - API_RATE_LIMIT_STATIC_API_KEY
     ports:
-      - 8190:4020
+      - blockscan_port:4020

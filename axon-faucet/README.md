@@ -16,7 +16,7 @@ $ cd axon-devops/axon-faucet
 
 ### Step 2
 ```shell
-$ vim confit.yml
+$ vim config.yml
 ```
 
 
@@ -71,5 +71,5 @@ $ make stop
 ```
 ### Visit the faucet website
 
-http://Your server IP:axon_faucet_server_port
+http://192.168.1.100:8502  # 192.168.1.100 is your server ip , 8502 is your axon_faucet_server_port
 

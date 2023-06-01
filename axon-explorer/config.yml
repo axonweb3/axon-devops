@@ -3,6 +3,7 @@ explorer_repo: "https://github.com/Magickbase/blockscan.git"
 explorer_branch: "main"
 jsonrpc_http_url: "http://xxxx.xxx.xxx.xxx:8000"
 jsonrpc_trace_url: "http://xxxx.xxx.xxx.xxx:8000"
-postgres_user:
-postgres_password:
-posgres_port:
+postgres_user: postgres
+postgres_password: postgres
+posgres_port: "5432"
+blockscan_port: "8190"
