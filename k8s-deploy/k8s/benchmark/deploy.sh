@@ -13,9 +13,11 @@ function clean() {
     (kubectl get svc -n "axon-benchmark" -o json | jq --raw-output '.items[].metadata.name' | grep -E "^axon" || true) | while read -r name; do
         kubectl delete svc "$name" -n "axon-benchmark">/dev/null 2>&1
     done
+    kubectl delete namespace axon-benchmark
 }
 function create_configmap() {
     echo "DEBUG" "create configmap for axon benchmark, please wait..."
+    kubectl create namespace axon-benchmark
     kubectl create configmap config-benchmark --from-file=./benchmark/configmap/config.json -n axon-benchmark
 
 }
