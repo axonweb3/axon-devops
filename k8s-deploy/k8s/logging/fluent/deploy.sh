@@ -10,13 +10,15 @@ function clean() {
     (kubectl get cm -n "logging" -o json | jq --raw-output '.items[].metadata.name' | grep -v "^kube" || true) | while read -r name; do
         kubectl delete cm "$name" -n "logging">/dev/null 2>&1
     done
+    kubectl delete namespace logging
 }
 function create_configmap() {
-    kubectl create configmap fluentd-config --from-file=/home/ckb/axon-devops/k8s-deploy/k8s/eks/fluent/fluentd-configmap.yaml -n logging
-    
+    kubectl create namespace logging
+    kubectl create configmap fluentd-config --from-file=./logging/fluent/fluentd-configmap.yaml -n logging
+
 }
 function deploy_fluentd(){
-    kubectl apply -f =/home/ckb/axon-devops/k8s-deploy/k8s/eks/fluent/fluentd-daemonset.yaml
+    kubectl apply -f ./logging/fluent/fluentd-daemonset.yaml
     echo "DEBUG" "waiting for fluntd running..."
     sleep 120
     fluentd_running_num=`kubectl get pod -n logging | grep -i "fluentd" |grep -ci "running"`
@@ -25,7 +27,6 @@ function deploy_fluentd(){
     else
        echo "fluentd running"
     fi
-  
 }
 
 

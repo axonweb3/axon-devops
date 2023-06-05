@@ -13,10 +13,12 @@ function clean() {
     (kubectl get cm -n "axon" -o json | jq --raw-output '.items[].metadata.name' | grep -v "^kube" || true) | while read -r name; do
         kubectl delete cm "$name" -n "axon">/dev/null 2>&1
     done
+    kubectl delete namespace axon
 }
 
 function create_configmap() {
     echo "DEBUG" "create configmap for axons, please wait..."
+    kubectl create namespace axon
     kubectl create configmap node1-toml --from-file=./axon/axon-config/node_1.toml -n axon
     kubectl create configmap node2-toml --from-file=./axon/axon-config/node_2.toml -n axon
     kubectl create configmap node3-toml --from-file=./axon/axon-config/node_3.toml -n axon

@@ -62,14 +62,14 @@ k8s-deploy
 |        |____axon-benchmark.yaml
 |        |____axon-chain-to-axon-ns.yaml
 |        |____deploy.sh
-|    |___ eks
+|    |___ logging
 |        |fluent
 |           |deploy.sh
 |           |____fluentd-configmap.yaml
 |           |____fluentd-daemonset.yaml
 |    |___ ingress
 |        |____axon-ingress.yaml
-|___ Makefile
+|___ |___ Makefile
 
 ```
 
@@ -275,6 +275,13 @@ $ cd axon-devops/k8s-deploy/k8s
 - genesis.json
 - default.db-options
 
+给 k8s 节点添加标签,node-name 替换为节点名称
+```
+kubectl label nodes <node-name> disktype=node1
+kubectl label nodes <node-name> disktype=node2
+kubectl label nodes <node-name> disktype=node3
+kubectl label nodes <node-name> disktype=node4
+```
 
 之后使用 make 命令 启动/停止服务
 ```shell

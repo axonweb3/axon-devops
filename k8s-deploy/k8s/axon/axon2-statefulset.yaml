@@ -59,7 +59,7 @@ spec:
             - ./axon
             - -c=/app/devtools/chain/k8s/node_2.toml
             - -g=/app/devtools/chain/genesis.json
-          image: axonweb3/axon:v0.1.0-alpha.8
+          image: axonweb3/axon:v0.1.0-beta.1
           volumeMounts:
           - name: config-node2
             mountPath: /app/devtools/chain/k8s/node_2.toml
