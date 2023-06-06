@@ -4,6 +4,7 @@ After=network.service
 StartLimitIntervalSec=0
 
 [Service]
+WorkingDirectory= {{ deploy_path }}
 Type=simple
 Restart=no
 RestartSec=2
@@ -12,3 +13,4 @@ ExecStart={{ deploy_path }}/axon -c={{ deploy_path }}/config.toml -g={{ deploy_p
 
 [Install]
 WantedBy=multi-user.target
+

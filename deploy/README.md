@@ -7,9 +7,9 @@
       - [config.toml](#config.toml)
       - [genesis.json](#genesis.json)
       - [default.db-options](#default.db-options)
+      - [axon-node.service](#axon-node.service)
     - [ansible.cfg](#ansible.cfg)
-    - [hosts](#hosts)
-    - [node_priv_key.yml](#node_priv_key.yml)
+    - [axon_node.yml](#axon_node.yml)
     - [config.yml](#config.yml)
     - [build.yml](#build.yml)
     - [deploy.yml](#deploy.yml)
@@ -29,13 +29,13 @@ deploy
 |    |___ config.toml
 |    |___ genesis.json
 |    |___ default.db-options
+|    |___ axon-node.service
 |___ ansible.cfg
 |___ build.yml
 |___ config.yml
 |___ deploy.yml
-|___ hosts
+|___ axon_node.yml
 |___ Makefile
-|___ node_priv_key.yml
 
 ```
 
@@ -50,9 +50,9 @@ deploy
 [配置文件，基本与 axon 保持一致](https://github.com/axonweb3/axon/blob/main/devtools/chain/config.toml)
 
 `私钥替换` 
-[修改私钥为 #private_key 后续部署脚本会根据配置替换](https://github.com/axonweb3/axon-devops/blob/main/deploy/templates/config.toml#L2)
+[修改私钥为 node_privkey 后续部署脚本会根据配置替换](https://github.com/axonweb3/axon-devops/blob/main/deploy/templates/config.toml#L2)
 
-`p2p boot 节点替换` [替换 boot ip 为 #bootstraps, 后续部署脚本会根据配置哦替换](https://github.com/axonweb3/axon-devops/blob/main/deploy/templates/config.toml#L34)
+`p2p boot 节点替换` [替换 boot ip 为 bootstraps_ip, 后续部署脚本会根据配置替换](https://github.com/axonweb3/axon-devops/blob/main/deploy/templates/config.toml#L68)
 
 ****
 
@@ -86,30 +86,22 @@ host_key_checking：False
 ****
 
 <a id="markdown-hosts" name="hosts"></a>
-### hosts
-ansible 部署axon 节点的host list
+### hosts 是 axon 节点IP，node_privkey 来自 [devtools/chain/nodes](https://github.com//axon/tree/main/devtools/chain/nodes) 的 node_*.toml 中的 privkey
+ansible 部署 axon 节点的host list 和 node_privkey
 
-```hosts
-[axon]
-xxx.xxx.xxx.xxx 
-xxx.xxx.xxx.xxx 
-xxx.xxx.xxx.xxx
-xxx.xxx.xxx.xxx
+```axon_node.yml
+axon:
+  hosts:
+    xxx.xxx.xxx.xxx:
+      node_privkey: "0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d"
+    xxx.xxx.xxx.xxx:
+      node_privkey: "0x383fcff8683b8115e31613949be24254b4204ffbe43c227408a76334a2e3fb32"
+    xxx.xxx.xxx.xxx:
+      node_privkey: "0x51ce21643b911347c5d5c85c323d9d5421810dc89f46b688720b2715f5e8e936"
+    xxx.xxx.xxx.xxx:
+      node_privkey: "0x69ff51f4c22f30615f68b88efa740f8f1b9169e88842b83d189748d06f1a948e"
 ```
 ****
-
-<a id="markdown-node_priv_key.yml" name="node_priv_key.yml"></a>
-### node_priv_key.yml
-Register private key.
-
-key 是部署节点的 hostname，value 来自 [devtools/chain/nodes](https://github.com//axon/tree/main/devtools/chain/nodes) 的 node_*.toml 中的 privkey
-
-```node_priv_key.yml
-xxx.xxx.xxx.xxx: "0x21716c9844c7e0548b62c5a0720923c70ca74d92278a217ff2b23699d6888110"
-xxx.xxx.xxx.xxx: "0x249b518f72f8e40d994796c68529c7348bafa58ede900be9840c48c7e1e38434"
-xxx.xxx.xxx.xxx: "0xd77ca0ba1c280bbd62409af4aec68560c913a1a8794d33317e8344969eb43265"
-xxx.xxx.xxx.xxx: "0x3f37a142b0d5339da9dd4c16deda3d326b05d82c16f8ab68db41f6774ebda1d1"
-```
 
 ****
 
@@ -141,6 +133,9 @@ enable_profile_debug: "false"
 
 # jemalloc 用来分析内存，生成jemalloc 分析文件
 enable_jemalloc: "false"
+
+# 目标节点用户
+remote_server_user: "ckb"
 ```
 
 ****
@@ -167,8 +162,7 @@ $ cd axon-devops/deploy
 
 按照上述 deploy  详解文档描述修改以下文件
 - config.yml
-- hosts
-- node_priv_key.yml
+- axon_node.yml
 
 之后使用 make 命令 启动/停止服务
 ```shell
@@ -187,6 +181,7 @@ $ make check
 $ make start  # 启动 axon
 $ make stop   # 停止 axon
 $ make build  # 构建 axon
+$ make block  # 查看节点区块高度
 ```
 
 
