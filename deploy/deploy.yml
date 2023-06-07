@@ -1,7 +1,7 @@
 ---
 - name: axon service
   hosts: axon
-  remote_user: ckb
+  remote_user: "{{ remote_server_user }}"
   become: yes
   become_method: sudo
   vars_files:
@@ -53,37 +53,8 @@
         - deploy
         - config
 
-    - name: Copy node_prvi_key.yml
-      copy:
-        src: node_priv_key.yml
-        dest: "{{ deploy_path }}/node_priv_key.yml"
-        mode: 0755
-      tags:
-        - deploy
-        - config
-
-    - name: Register hostname
-      shell: hostname
-      register: hostname
-      tags:
-        - deploy
-        - config
-
-    - name: Register privKey
-      shell: "cat {{ deploy_path }}/node_priv_key.yml | grep '{{ hostname.stdout }}' | awk '{print $2}' "
-      register: privKey
-      tags:
-        - deploy
-        - config
-
-    - name: Replace privKey
-      shell:  sed -i "s/#private_key/{{ privKey.stdout }}/g" "{{ deploy_path }}/config.toml"
-      tags:
-        - deploy
-        - config
-
-    - name: Replace bootstraps
-      shell:  sed -i "s/#bootstraps/{{ bootstraps }}/g" "{{ deploy_path }}/config.toml"
+    - name: config config.toml
+      template: src=./templates/config.toml dest="{{ deploy_path }}/config.toml"
       tags:
         - deploy
         - config
@@ -107,14 +78,8 @@
         - config
 
 ###############################################################################################################
-    - name: chmod axon
-      shell: "chmod 777 -R {{ deploy_path }}"
-      become: yes
-      become_method: sudo
-      tags:
-        - start
 
-    - name: copy ckb service file
+    - name: copy axon service file
       template:
         src: ./templates/axon-node.service
         dest: /etc/systemd/system/axon-node.service
@@ -142,3 +107,14 @@
       become_method: sudo
       tags:
         - start
+
+    - name: rpc get_tip_block_number
+      shell: curl -s 'http://127.0.0.1:8000' -H 'content-type:application/json' --data-binary '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":2}'  |awk -F "[:\"]+" '{print $6}' | xargs printf %d
+      register: get_tip_block_number
+      tags:
+      - block_number
+
+    - name: show get_tip_block_numner
+      debug: msg={{ get_tip_block_number.stdout }}
+      tags:
+        - block_number

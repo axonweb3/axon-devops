@@ -1,0 +1,11 @@
+axon:
+  hosts:
+    xxx.xxx.xxx.xxx:
+      node_privkey: "0x37aa0f893d05914a4def0460c0a984d3611546cfb26924d7a7ca6e0db9950a2d"
+    xxx.xxx.xxx.xxx:
+      node_privkey: "0x383fcff8683b8115e31613949be24254b4204ffbe43c227408a76334a2e3fb32"
+    xxx.xxx.xxx.xxx:
+      node_privkey: "0x51ce21643b911347c5d5c85c323d9d5421810dc89f46b688720b2715f5e8e936"
+    xxx.xxx.xxx.xxx:
+      node_privkey: "0x69ff51f4c22f30615f68b88efa740f8f1b9169e88842b83d189748d06f1a948e"
+   

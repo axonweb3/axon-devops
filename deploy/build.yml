@@ -12,8 +12,6 @@
         dest: "{{ deploy_path }}"
         version: "{{ axon_branch }}"
         force: yes
-      become: yes
-      become_method: sudo
       tags: 
         - build
     - name: Build axon
