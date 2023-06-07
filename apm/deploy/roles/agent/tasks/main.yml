@@ -48,7 +48,7 @@
     - config
 
 - name: sed env
-  shell: sed -i 's/LOG_COLLECT_PATH/{{ log_path }}/' "{{ monitor_agent_dir }}/.env" && sed -i 's/jaeger-collector/{{monitor_address}}:8201/' "{{ monitor_agent_dir }}/.env"
+  shell: sed -i 's#LOG_COLLECT_PATH#{{ log_path }}#' "{{ monitor_agent_dir }}/.env" && sed -i 's/jaeger-collector/{{monitor_address}}:8201/' "{{ monitor_agent_dir }}/.env"
   tags: 
     - config
 

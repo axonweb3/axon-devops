@@ -45,6 +45,9 @@ services:
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=365d
+      - --storage.tsdb.retention.size=150GB
+      - --web.enable-admin-api
       - --web.console.libraries=/usr/share/prometheus/console_libraries
       - --web.console.templates=/usr/share/prometheus/consoles
       - --web.enable-lifecycle
@@ -64,7 +67,7 @@ services:
       - discovery.type=single-node
       - http.host=0.0.0.0
       - transport.host=127.0.0.1
-      - ES_JAVA_OPTS=-Xms8192m -Xmx8192m
+      - ES_JAVA_OPTS=-Xms2048m -Xmx8192m
       - xpack.security.enabled=false
     volumes:
       - ./data/es:/usr/share/elasticsearch/data

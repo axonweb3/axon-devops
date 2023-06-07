@@ -373,9 +373,9 @@ scrape_configs:
 | Makefile | 部署monitor/monitor agent make 命令 | |
 | deploy-monitor.yml | monitor 部署时ansible 主文件 | |
 | deploy_monitor_agent.yml | monitor agent 部署时ansible 主文件 |  |
-| hosts | mmonitor agent 部署时 指定的axon node 地址 |  |
+| hosts | monitor agent 部署时 指定的axon node 地址 |  |
 | init_config.sh | monitor 部署时替换文件的脚本 |  |
-| roles目录 | 主要存放monitor 部署与 mmonitor agent 部署时 的ansible 执行具体task 与所需vars |  |
+| roles目录 | 主要存放monitor 部署与 monitor agent 部署时 的ansible 执行具体task 与所需vars |  |
 
 
 <a id="markdown-deploy-目录" name="deploy-目录"></a>
@@ -528,12 +528,12 @@ $ docker-compose ps
 
 grafana
 ```http
-http://grafana_ip:3000
+http://grafana_ip:8600
 ```
 
 jaeger 地址
 ```http
-http://jarger_ip:16686
+http://jarger_ip:8202
 ```
 
 <a id="markdown-agent" name="agent"></a>
