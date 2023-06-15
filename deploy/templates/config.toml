@@ -47,7 +47,6 @@ balance = "04ee2d6d415b85acef8100000000"
 address = "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f"
 balance = "04ee2d6d415b85acef8100000000"
 
-
 [rpc]
 http_listening_address = "0.0.0.0:8000"
 ws_listening_address = "0.0.0.0:8010"
@@ -55,6 +54,9 @@ maxconn = 25000
 max_payload_size = 1048576
 client_version = "0.1.0"
 
+[web3]
+max_gas_cap = 50_000_000
+log_filter_max_block_range = 25000
 
 [network]
 listening_address = "/ip4/0.0.0.0/tcp/8001"
