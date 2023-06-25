@@ -1,0 +1,65 @@
+---
+- name: start proxy
+  hosts: localhost
+  become: yes
+  become_method: sudo
+  vars_files:
+    - config.yml
+  tasks:
+    ###############################################################################################################
+    - name: Pull code
+      git:
+        repo: "{{ proxy_repo }}"
+        dest: "{{ deploy_path }}"
+        version: "{{ proxy_branch }}"
+        force: yes
+      become: yes
+      become_method: sudo
+      tags:
+        - config
+
+    - name: Copy the template file
+      copy:
+        src: ./templates/
+        dest: "{{ deploy_path }}"
+        mode: 0755
+      tags:
+        - deploy
+        - config
+
+    - name: build
+      shell: "cd {{ deploy_path }} && cargo build --release"
+      ignore_errors: yes
+      become: yes
+      become_method: sudo
+      tags:
+        - build
+
+    - name: start redis
+      shell: "cd {{ deploy_path }} &&  docker-compose up -d"
+      ignore_errors: yes
+      become: yes
+      become_method: sudo
+      tags:
+        - up
+
+    - name: proxy start
+      shell: "cd {{ deploy_path }} &&  nohup axon-proxy -c config.toml &"
+      ignore_errors: yes
+      become: yes
+      become_method: sudo
+      tags:
+        - up
+
+    - name: Check if the process exists
+      shell: ps -ef | grep axon-proxy | grep -v grep | awk '{print $2}'
+      register: process_exists
+      tags:
+        - down
+
+    - name: down
+      shell: "kill {{ process_exists.stdout }}"
+      become: yes
+      tags:
+        - down
+    ###############################################################################################################
