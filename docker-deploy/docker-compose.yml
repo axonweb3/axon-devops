@@ -2,7 +2,7 @@ version: '3'
 services:
   axon1:
     container_name: axon1
-    image: axonweb3/axon:v0.1.0-beta.1
+    image: axonweb3/axon:amd64-v0.1.0-beta.3
     restart: always
     privileged: true
     ports:
@@ -23,7 +23,7 @@ services:
 
   axon2:
     container_name: axon2
-    image: axonweb3/axon:v0.1.0-beta.1
+    image: axonweb3/axon:amd64-v0.1.0-beta.3
     restart: always
     privileged: true
     deploy:
@@ -40,7 +40,7 @@ services:
 
   axon3:
     container_name: axon3
-    image: axonweb3/axon:v0.1.0-beta.1
+    image: axonweb3/axon:amd64-v0.1.0-beta.3
     restart: always
     privileged: true
     deploy:
@@ -57,7 +57,7 @@ services:
 
   axon4:
     container_name: axon4
-    image: axonweb3/axon:v0.1.0-beta.1
+    image: axonweb3/axon:amd64-v0.1.0-beta.3
     restart: always
     privileged: true
     deploy:
