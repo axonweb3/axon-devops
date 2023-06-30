@@ -1,0 +1,3 @@
+deploy_path: "/home/ckb/axon_proxy"
+proxy_repo: "https://github.com/axonweb3/axon-proxy.git"
+proxy_branch: "main"

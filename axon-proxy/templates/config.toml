@@ -1,0 +1,45 @@
+bind = 8011
+redis.url = "redis://127.0.0.1:8379/"
+# Upstream WebSocket connections are only used for subscription. Random LB is used for now.
+ws_nodes = ["ws://127.0.0.1:3001/ws", "ws://127.0.0.2:3001/ws"]
+# Default is p2c_least_requests
+# lb = "client_ip_hashing"
+
+[[nodes]]
+url = "http://xxx.xxx.xxx.xxx:8000/"
+
+[[nodes]]
+url = "http://xxx.xxx.xxx.xxx:8000/"
+# Weight is only effective if lb is client_ip_hashing.
+weight = 0.5
+
+[[nodes]]
+url = "http://xxx.xxx.xxx.xxx:8000/"
+
+[[nodes]]
+url = "http://xxx.xxx.xxx.xxx:8000/"
+# Weight is only effective if lb is client_ip_hashing.
+weight = 0.5
+
+# Health check is enabled by default.
+# [health_check]
+# enabled = true
+# timeout_secs = 3
+# interval_secs = 3
+# concurrency = 8
+
+# Default is no caching.
+[cache]
+eth_call = true
+eth_estimateGas = true
+
+# Default is no rate limit.
+# [rate_limit]
+# total = 3000
+# method."eth_call" = 600
+
+# Override rate limit settings for specific client ips.
+# Method rate limits are NOT inherited.
+# [rate_limit.ip."127.0.0.1"]
+# total = 10000
+# method."eth_call" = 2000
