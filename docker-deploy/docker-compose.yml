@@ -1,6 +1,6 @@
-version: '3'
+version: '3.8'
 services:
-  axon1:
+  axon:
     container_name: axon1
     image: axonweb3/axon:amd64-v0.1.0-beta.3
     restart: always
@@ -19,59 +19,79 @@ services:
       - ./logs1:/app/logs
     networks:
       - axon-net
-    command: ./axon -c=/app/devtools/chain/node_1.toml -g=/app/devtools/chain/genesis.json
+    command: ./axon -c=/app/devtools/chain/config.toml -g=/app/devtools/chain/genesis.json
 
-  axon2:
-    container_name: axon2
-    image: axonweb3/axon:amd64-v0.1.0-beta.3
-    restart: always
-    privileged: true
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 2048M
+
+  faucet-server:
+    image: ghcr.io/simon-tl/axon-faucet:latest
     volumes:
-      - ./devtools:/app/devtools
-      - ./logs2:/app/logs
+      - ./.env.faucet:/.env
+    ports:
+      - "8502:3000"
+    depends_on:
+      - faucet-mongo
+      - axon
     networks:
       - axon-net
-    command: ./axon -c=/app/devtools/chain/node_2.toml -g=/app/devtools/chain/genesis.json
 
-  axon3:
-    container_name: axon3
-    image: axonweb3/axon:amd64-v0.1.0-beta.3
+  faucet-mongo:
+    image: mongo:latest
+    container_name: faucet-mongo
     restart: always
-    privileged: true
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 2048M
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mongodbpassword
     volumes:
-      - ./devtools:/app/devtools
-      - ./logs3:/app/logs
+      - "./data/db:/data/db"
+      - "./data/log:/data/log"
+    ports:
+      - "27017:27017"
     networks:
       - axon-net
-    command: ./axon -c=/app/devtools/chain/node_3.toml -g=/app/devtools/chain/genesis.json
 
-  axon4:
-    container_name: axon4
-    image: axonweb3/axon:amd64-v0.1.0-beta.3
+  db:
+    image: postgres:15.2
+    command: postgres -c 'max_connections=250'
     restart: always
-    privileged: true
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 2048M
+    container_name: 'postgres'
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres123}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      # POSTGRES_HOST_AUTH_METHOD: 'trust'
+    ports:
+      - 27543:5432
+    env_file:
+      -  ./.env.explorer      
     volumes:
-      - ./devtools:/app/devtools
-      - ./logs4:/app/logs
+      - "db:/var/lib/postgresql/data"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     networks:
       - axon-net
-    command: ./axon -c=/app/devtools/chain/node_4.toml -g=/app/devtools/chain/genesis.json
 
+  blockscan:
+    image: ghcr.io/simon-tl/blockscan:${DOCKER_TAG:-latest}
+    # depends_on:
+    #   - db
+    links:
+      - db:database
+    restart: always
+    container_name: 'blockscan'
+    # command: 'elixir --name blockscan@127.0.0.1 -S mix do ecto.create, ecto.migrate, phx.server'
+    command: bash -c "bin/blockscout eval \"Elixir.Explorer.ReleaseTasks.create_and_migrate()\" && bin/blockscout start"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file:
+      -  ./.env.explorer
+    ports:
+      - 4020:4020
+    depends_on:
+      - axon
+    networks:
+      - axon-net
 
+volumes:
+  db:
+    driver: local
 networks:
   axon-net:
