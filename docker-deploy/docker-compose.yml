@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   axon:
-    container_name: axon1
+    container_name: axon
     image: axonweb3/axon:amd64-v0.1.0-beta.3
     restart: always
     privileged: true
@@ -16,7 +16,7 @@ services:
           memory: 2048M
     volumes:
       - ./devtools:/app/devtools
-      - ./logs1:/app/logs
+      - ./logs:/app/logs
     networks:
       - axon-net
     command: ./axon -c=/app/devtools/chain/config.toml -g=/app/devtools/chain/genesis.json
