@@ -35,7 +35,7 @@ services:
       - axon-net
 
   faucet-mongo:
-    image: mongo:latest
+    image: mongo:6.0.7
     container_name: faucet-mongo
     restart: always
     environment:
