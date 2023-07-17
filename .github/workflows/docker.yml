@@ -1,0 +1,29 @@
+name: Setup a new Axon chain in 5 minutes
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  one-node-mode:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Start the containers of Axon related services
+      working-directory: docker-deploy
+      run: docker compose up -d
+      # TODO: add health-check in docker-compose
+    - name: Check if the containers are all at a healthy state within five minutes
+      working-directory: docker-deploy
+      run: |
+        docker compose logs --tail 10
+        docker compose ps
+        timeout 300s bash -c 'docker compose logs -f'
+        docker compose ps
