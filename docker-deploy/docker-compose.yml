@@ -2,7 +2,7 @@ version: '3.8'
 services:
   axon:
     container_name: axon
-    image: axonweb3/axon:amd64-v0.1.0-beta.3
+    image: axonweb3/axon:amd64-v0.1.0-beta.5
     restart: always
     privileged: true
     ports:
